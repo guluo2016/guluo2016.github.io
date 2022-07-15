@@ -87,7 +87,7 @@
 <meta property="og:description" content="这里搭建hadoop集群，使用了三台电脑，分别是：   1234#主机名分别是：master,salve1,salve2192.168.0.11  192.168.0.12  192.168.0.13">
 <meta property="og:locale">
 <meta property="article:published_time" content="2022-07-08T13:53:43.000Z">
-<meta property="article:modified_time" content="2022-07-09T02:53:10.786Z">
+<meta property="article:modified_time" content="2022-07-15T06:17:41.615Z">
 <meta property="article:author" content="孤落">
 <meta property="article:tag" content="bigdata">
 <meta property="article:tag" content="hadoop">
@@ -382,20 +382,19 @@
 
 <span id="more"></span>
 
-<h3 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h3><p>修改hosts文件：  </p>
+<h2 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h2><p>修改hosts文件：  </p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1 localhost</span><br><span class="line">192.168.0.11    master</span><br><span class="line">192.168.0.12    slave1</span><br><span class="line">192.168.0.13    slave2</span><br></pre></td></tr></table></figure>
-
-<h3 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h3><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
+<h2 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h2><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#安装ssh服务端</span><br><span class="line">yum install openssh-server -y</span><br><span class="line">#安装ssh客户端</span><br><span class="line">yum install openssh-clients -y</span><br></pre></td></tr></table></figure>
 <p>使用命令:<code>ssh-keygen</code>生成本机密钥和公钥，这些文件在{USER_HOME}&#x2F;.ssh目录下，进入该目录，执行命令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#authorized_keys文件若没有，首先创建一个</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br></pre></td></tr></table></figure>
 <p>将authorize_keys文件分发到其他主机上，并追加到对应的authorized_keys文件中。即可实现在master主机上，免密登录其他主机。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh slave1   //免密登录</span><br></pre></td></tr></table></figure>
 
-<h3 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h3><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
+<h2 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h2><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tar zxvf jdk-XXX.tar.gz -C /opt</span><br><span class="line"></span><br><span class="line">#修改/etc/profile，添加如下语句</span><br><span class="line">export JAVA_HOME=/opt/jdk-XXX</span><br><span class="line">export PATH=&#123;JABA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
 
-<h3 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h3><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
+<h2 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h2><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar zxvf hadoop-2.7.1.XXX.tar.gz -C /opt</span><br></pre></td></tr></table></figure>
 
 <p>进入hadoop安装目录，修改etc&#x2F;hadoop目录下的各个配置文件：<br>修改core-site.xml文件：  </p>
@@ -426,7 +425,7 @@
 <p>当出现如下日志信息时，表示格式化hdfs成功：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">Storage directory /home/hadoop/dfs/name has been successfully formated.</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
 
-<h3 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h3><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
+<h2 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h2><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hdfs dfs -mkdir  /input</span><br><span class="line"></span><br><span class="line">hdfs dfs -put /home/word.txt /input</span><br></pre></td></tr></table></figure>
 
 <p>使用hadoop自带的wordcount类来统计word.txt中的字数：  </p>
@@ -630,7 +629,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEhosts%E5%90%84%E4%B8%AA%E4%B8%BB%E6%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">配置hosts各个主机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95"><span class="nav-number">2.</span> <span class="nav-text">免密登录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85jdk"><span class="nav-number">3.</span> <span class="nav-text">安装jdk</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85hadoop"><span class="nav-number">4.</span> <span class="nav-text">安装hadoop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95hadoop%E9%9B%86%E7%BE%A4"><span class="nav-number">5.</span> <span class="nav-text">测试hadoop集群</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEhosts%E5%90%84%E4%B8%AA%E4%B8%BB%E6%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">配置hosts各个主机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95"><span class="nav-number">2.</span> <span class="nav-text">免密登录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85jdk"><span class="nav-number">3.</span> <span class="nav-text">安装jdk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85hadoop"><span class="nav-number">4.</span> <span class="nav-text">安装hadoop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95hadoop%E9%9B%86%E7%BE%A4"><span class="nav-number">5.</span> <span class="nav-text">测试hadoop集群</span></a></li></ol></div>
             
 
           </div>
