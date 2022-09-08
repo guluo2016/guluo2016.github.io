@@ -12,30 +12,30 @@
 <span id="more"></span>
 
 <p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
 <p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
 <h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
 <h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
 <p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
 <p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
 <p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
 <h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
 <p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
 <p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
 <p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
 <p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
 <h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
 <p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
 <p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
 <h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
 ]]></content>
       <categories>
         <category>phoenix</category>
@@ -123,9 +123,9 @@
 <li>写入memstore</li>
 </ul>
 <p>如果不进行并发，那么在更新完WAL之后，在更新memstore时，可能第二个写线程先更新info:company,第一个写线程后更新info:company； 第一个线程先更新info:role，第二个线程后更新info:role，如下图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
 <p>那么我们最终读取到的数据就是下面这样，即数据出现不一致。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
 <h4 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了行锁机制，以rowkey为锁，当写线程需要更新数据时，需要先获取行锁，然后才能更新，对于没有获取到行锁的写线程，只能等待，直至获取到行锁。具体的流程如下。</p>
 <ul>
 <li>写操作开始</li>
@@ -136,9 +136,9 @@
 </ul>
 <h3 id="读写控制"><a href="#读写控制" class="headerlink" title="读写控制"></a>读写控制</h3><h4 id="无并发控制-1"><a href="#无并发控制-1" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>读写场景，同样先考虑不进行并发控制，可能会出现的情况。</p>
 <p>假如现在有两个写线程要更新同一行数据，同时一个读线程要对该行数据进行读取操作。读线程读取的时机是红线部分，此时第一个写线程已经完成，第二个写线程更新了一部分，如下图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
 <p>那么读线程读取的数据就是下面这样子，同样会出现数据不一致情况。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
 <h4 id="并发控制-1"><a href="#并发控制-1" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBas引入了MVCC机制，采用无锁机制，实现读写控制。为了实现该机制，HBase在进行写操作时，会进行如下操作：</p>
 <ul>
 <li>获取行锁</li>
@@ -150,9 +150,9 @@
 </ul>
 <p>与此同时，对于每一次的读操作，HBase都会为其分配一个已经完成、且值最大的写事务id。</p>
 <p>如图所示，两个写线程开启写事务时，HBase分别为其分配一个写id，当读事务开启时，由于写事务1已经完成，而写事务2还未完成，因此分配的已完成、其值最大的写事务id是1，称之为read point。因此对该读事务而言，所有小于等于read point的数据都是对其可见的，大于read point的数据是不可见的。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
 <p>因此，在这种情况下，读线程最终读取的结果是这个样子。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><a href="https://blogs.apache.org/hbase/entry/apache_hbase_internals_locking_and"><strong>Apache HBase Internals: Locking and Multiversion Concurrency Control</strong></a></li>
 <li><a href="http://hbasefly.com/2017/07/26/transaction-2/"><strong>数据库事务系列－HBase行级事务模型</strong></a></li>
@@ -233,7 +233,7 @@
 <li><p>tx_id ,事务id列，用于表明修改该行数据的事务id</p>
 </li>
 <li><p>回滚指针列，由于Innodb支持事务，且默认事务的隔离等级为可重复读，其内部对于一行数据，会存储多个版本，回滚指针用于指向在事务修改该行数据之前，该行数据的样子(即该行数据的上一个版本)，如下图所示，图片来自 <a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么</a></p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/bVbyzV9" alt="Undo Log回滚历史记录"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/bVbyzV9" alt="Undo Log回滚历史记录"></p>
 </li>
 </ul>
 <h4 id="mvcc实现可重复读"><a href="#mvcc实现可重复读" class="headerlink" title="mvcc实现可重复读"></a>mvcc实现可重复读</h4><p>mysql会按照事务的先后顺序，以严格递增方式为每一个事务分配一个唯一的事务id。</p>
@@ -284,17 +284,17 @@
 <span id="more"></span>
 
 <h2 id="hexo框架"><a href="#hexo框架" class="headerlink" title="hexo框架"></a>hexo框架</h2><h3 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h3><p>由于hexo是基于Node.js的框架，因此安装hexo之前，首先需要安装node.js。<br>node.js和hexo之间存在版本要求，具体如下所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220711173853678.png" alt="image-20220711173853678"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220711173853678.png" alt="image-20220711173853678"></p>
 <p>待node.js安装之后，可以通过npm命令去安装hexo。</p>
 <p>建议使用如下方式进行hexo安装</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
 <p>安装成功之后，可以通过如下方式验证hexo的效果。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714134809507.png" alt="image-20220714134809507"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714134809507.png" alt="image-20220714134809507"></p>
 <h3 id="hexo基本操作"><a href="#hexo基本操作" class="headerlink" title="hexo基本操作"></a>hexo基本操作</h3><h4 id="初始化一个hexo项目"><a href="#初始化一个hexo项目" class="headerlink" title="初始化一个hexo项目"></a>初始化一个hexo项目</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">初始化一个hexo 博客</span></span><br><span class="line">hexo init blog_test</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712134610287.png" alt="image-20220712134610287"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712134610287.png" alt="image-20220712134610287"></p>
 <p>在生成一个hexo_test文件夹后，hexo会自动创建如下内容：</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712134828979.png" alt="image-20220712134828979"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712134828979.png" alt="image-20220712134828979"></p>
 <p>其中比较重要的是：</p>
 <ul>
 <li><p>source，文件夹，我们的原始文件内容会存放在这里</p>
@@ -306,14 +306,14 @@
 </ul>
 <h4 id="生成静态资源"><a href="#生成静态资源" class="headerlink" title="生成静态资源"></a>生成静态资源</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">一键生成静态资源</span></span><br><span class="line">hexo g</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712135315014.png" alt="image-20220712135315014"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712135315014.png" alt="image-20220712135315014"></p>
 <p>上面的命令会自动生成静态资源文件，并将source下的markdown文件生成为html文件，存放在public文件中，如图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712135737455.png" alt="image-20220712135737455"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712135737455.png" alt="image-20220712135737455"></p>
 <h4 id="启动服务器，发布"><a href="#启动服务器，发布" class="headerlink" title="启动服务器，发布"></a>启动服务器，发布</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动hexo服务，用于在本地浏览器查看hexo生成的网页内容</span></span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712140942030.png" alt="image-20220712140942030"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712140942030.png" alt="image-20220712140942030"></p>
 <p>然后打开浏览器，输入<a href="http://localhost:4000/%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%AE%BF%E9%97%AE%E5%8D%9A%E5%AE%A2%E4%BA%86%E3%80%82">http://localhost:4000/就可以访问博客了。</a></p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712141114021.png" alt="image-20220712141114021"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712141114021.png" alt="image-20220712141114021"></p>
 <h2 id="next主题"><a href="#next主题" class="headerlink" title="next主题"></a>next主题</h2><p>hexo默认的主题，不是太好看，使用比较多的hexo主题是next。</p>
 <h3 id="安装next主题"><a href="#安装next主题" class="headerlink" title="安装next主题"></a>安装next主题</h3><p>切换到hexo项目目录，会有一个theme文件夹，用于存放各种主题，hexo默认是没有安装next主题的，我们需要通过git clone从github上将next主题clone到theme文件夹中。</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/iissnan/hexo-theme-next themes/next</span><br></pre></td></tr></table></figure>
@@ -325,24 +325,24 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">clean之后重新生成静态文件，然后发布</span></span><br><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br></pre></td></tr></table></figure>
 
 <p>此时从浏览器访问，可能会出现如下错误，原因是hexo在5.0之后把swig给删除了需要自己手动安装。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712141716057.png" alt="image-20220712141716057"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712141716057.png" alt="image-20220712141716057"></p>
 <p>此时在项目中安装swig可以解决问题：<code> npm i hexo-renderer-swig</code>，再次重新发布后，登录博客页面。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712143133581.png" alt="image-20220712143133581"></p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712143043445.png" alt="image-20220712143043445"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143133581.png" alt="image-20220712143133581"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143043445.png" alt="image-20220712143043445"></p>
 <p>从博客页面上来看，对站点配置文件的修改配置也生效了</p>
 <h3 id="配置next"><a href="#配置next" class="headerlink" title="配置next"></a>配置next</h3><p>next主题下同样有一个_config.yml文件，称之为主题配置文件。通过修改主题配置文件，可以进行一些自定义配置。</p>
 <ul>
 <li>更改next的scheme。</li>
 </ul>
 <p>next提供四种scheme，这里我选择的是：<code>scheme: Gemini</code>，修改完配置文件，保存并刷新浏览器，可以查看修改后的效果。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712143620514.png" alt="image-20220712143620514"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143620514.png" alt="image-20220712143620514"></p>
 <ul>
 <li>设置博客头像</li>
 </ul>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">配置用户头像</span></span><br><span class="line">avatar: https://github.com/guluo2016/picture/raw/dev/img/guluo.jpg</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用户头像下的名字</span></span><br><span class="line">author: 孤落</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用户头像名字下的说明</span></span><br><span class="line">description: 大漠孤烟直，长河落日圆</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">配置用户头像</span></span><br><span class="line">avatar: https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/guluo.jpg</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用户头像下的名字</span></span><br><span class="line">author: 孤落</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用户头像名字下的说明</span></span><br><span class="line">description: 大漠孤烟直，长河落日圆</span><br></pre></td></tr></table></figure>
 
 <p>修改并保存好主题配置文件后，刷新浏览器，可查看效果。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712143917357.png" alt="image-20220712143917357"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143917357.png" alt="image-20220712143917357"></p>
 <ul>
 <li>将博客头像设置为圆形</li>
 </ul>
@@ -351,17 +351,17 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">.site-author-image &#123;</span><br><span class="line">  margin: 0 auto;</span><br><span class="line">  padding: $site-author-image-padding;</span><br><span class="line">  max-width: $site-author-image-width;</span><br><span class="line">  height: $site-author-image-height;</span><br><span class="line">  border: $site-author-image-border-width solid $site-author-image-border-color;</span><br><span class="line"></span><br><span class="line">  border-radius: 50%;</span><br><span class="line">  -webkit-border-radius: 50%;</span><br><span class="line">  -moz-border-radius: 50%;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-author-image:hover &#123;</span><br><span class="line">    -webkit-transform: rotate(360deg);</span><br><span class="line">    -moz-transform: rotate(360deg);</span><br><span class="line">    -ms-transform: rotate(360deg);</span><br><span class="line">    -transform: rotate(360deg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-author-name &#123;</span><br><span class="line">  margin: $site-author-name-margin;</span><br><span class="line">  text-align: $site-author-name-align;</span><br><span class="line">  color: $site-author-name-color;</span><br><span class="line">  font-weight: $site-author-name-weight;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-description &#123;</span><br><span class="line">  margin-top: $site-description-margin-top;</span><br><span class="line">  text-align: $site-description-align;</span><br><span class="line">  font-size: $site-description-font-size;</span><br><span class="line">  color: $site-description-color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>保存，并刷新浏览器查看效果。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712144235301.png" alt="image-20220712144235301"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712144235301.png" alt="image-20220712144235301"></p>
 <h2 id="博客个性化配置"><a href="#博客个性化配置" class="headerlink" title="博客个性化配置"></a>博客个性化配置</h2><h3 id="为博客增加标签、分类页"><a href="#为博客增加标签、分类页" class="headerlink" title="为博客增加标签、分类页"></a>为博客增加标签、分类页</h3><p>在hexo项目的根目录下，执行如下命令，进行创建：</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建分类页</span></span><br><span class="line">hexo new page categories </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建标签页</span></span><br><span class="line">hexo new page tags</span><br></pre></td></tr></table></figure>
 
 <p>执行上面的命令后，hexo会在post下自动创建目录，如图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220712170844909.png" alt="image-20220712170844909"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712170844909.png" alt="image-20220712170844909"></p>
 <p>同时更新next主题配置文件,注意要去掉||前面的空格，否则点击页面会跳转失败。</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: /|| home</span><br><span class="line">  tags: /tags/|| tags</span><br><span class="line">  categories: /categories/|| th</span><br><span class="line">  archives: /archives/|| archive</span><br></pre></td></tr></table></figure>
 
 <p>保存配置，并刷新浏览器，查看效果。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714103032946.png" alt="image-20220714103032946"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103032946.png" alt="image-20220714103032946"></p>
 <h3 id="增加站内搜索功能"><a href="#增加站内搜索功能" class="headerlink" title="增加站内搜索功能"></a>增加站内搜索功能</h3><p>要实现博客的站内搜索功能，需要借助于插件<code>hexo-generator-searchdb</code>，因此在hexo项目下，安装该插件：  </p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br></pre></td></tr></table></figure>
 
@@ -372,14 +372,14 @@
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">local_search:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span>    <span class="comment">#将此设为true</span></span><br><span class="line">  <span class="comment"># if auto, trigger search by changing input</span></span><br><span class="line">  <span class="comment"># if manual, trigger search by pressing enter key or search button</span></span><br><span class="line">  <span class="attr">trigger:</span> <span class="string">auto</span></span><br><span class="line">  <span class="comment"># show top n results per article, show all results by setting to -1</span></span><br><span class="line">  <span class="attr">top_n_per_article:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
 
 <p>保存，并重启hexo，打开浏览器，查看效果。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714141357379.png" alt="image-20220714141357379"></p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714141451682.png" alt="image-20220714141451682"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714141357379.png" alt="image-20220714141357379"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714141451682.png" alt="image-20220714141451682"></p>
 <h3 id="设置博客文章展示部分"><a href="#设置博客文章展示部分" class="headerlink" title="设置博客文章展示部分"></a>设置博客文章展示部分</h3><p>在hexo的source目录下的博客源markdown文件中，合适的位置增加一样md语法，即可实现。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714103321987.png" alt="image-20220714103321987"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103321987.png" alt="image-20220714103321987"></p>
 <p>在浏览器中的显示效果如图所示。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714103449990.png" alt="image-20220714103449990"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103449990.png" alt="image-20220714103449990"></p>
 <h2 id="将hexo项目部署到github-page"><a href="#将hexo项目部署到github-page" class="headerlink" title="将hexo项目部署到github page"></a>将hexo项目部署到github page</h2><p>首先得在github上创建一个仓库，仓库名字是<code>&#123;github昵称&#125;.github.io</code>。然后查看该仓库的settings，并选择pages页面，可以查看到网址，我们通过该网址可以直接访问该仓库中的静态html资源。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714104338520.png" alt="image-20220714104338520"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714104338520.png" alt="image-20220714104338520"></p>
 <p>目前还访问不了，原因是这个仓库中没有任何文件，我们需要将前面hexo生成的静态资源上传至该仓库。</p>
 <p>为了能够将数据上传至该仓库，我们需要再hexo的站点配置文件中增加有关github的配置。</p>
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 这里有个前提，就是本机已经配置了有关github的认证信息</span></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">    <span class="attr">repository:</span> <span class="string">https://github.com/guluo2016/guluo2016.github.io.git</span></span><br><span class="line">    <span class="attr">branch:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
@@ -396,10 +396,10 @@
 <p>同时当我们打开这个博客文章时，gitalk会自动从issue中加载数据，将关于这个博客的评论展示在评论区。</p>
 <p>为了实现上述功能，需要进行如下操作。</p>
 <h3 id="申请OAuth-认证"><a href="#申请OAuth-认证" class="headerlink" title="申请OAuth 认证"></a>申请OAuth 认证</h3><p>登录github，在个人账户settings下，选择 <code>Developer settings</code> – <code>OAuth Apps</code>,进行OAuth认证。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714110420653.png" alt="image-20220714110420653"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714110420653.png" alt="image-20220714110420653"></p>
 <p>注意homepageurl和callback url都填写前面的github page网址。</p>
 <p>接着通过如下方式，获取到client id和ClientSecret，后面会用到。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714110622403.png" alt="image-20220714110622403"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714110622403.png" alt="image-20220714110622403"></p>
 <h3 id="在next主题配置文件中配置gitalk"><a href="#在next主题配置文件中配置gitalk" class="headerlink" title="在next主题配置文件中配置gitalk"></a>在next主题配置文件中配置gitalk</h3><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">gitalk:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">githubID:</span> <span class="string">guluo2016</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">guluo2016.github.io</span>  <span class="comment">#指定存放评论的仓库名，评论存放在仓库的issue上，因此仓库必须开启issue功能才行</span></span><br><span class="line">  <span class="attr">ClientID:</span> &#123;<span class="string">clientid</span>&#125;</span><br><span class="line">  <span class="attr">ClientSecret:</span> &#123;<span class="string">ClientSecret</span>&#125;</span><br><span class="line">  <span class="attr">adminUser:</span> <span class="string">guluo2016</span> <span class="comment">#指定可初始化评论账户</span></span><br><span class="line">  <span class="attr">distractionFreeMode:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
 
 <h3 id="增加gitalk相关内容"><a href="#增加gitalk相关内容" class="headerlink" title="增加gitalk相关内容"></a>增加gitalk相关内容</h3><p>在<code>netx\layout\_third-party\comments</code>目录下，新建gitalk.swig文件，并添加如下内容</p>
@@ -417,7 +417,7 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</span><br></pre></td></tr></table></figure>
 
 <p>然后登陆github pages网页查看效果。</p>
-<p><img src="https://github.com/guluo2016/picture/raw/dev/img/image-20220714113512240.png" alt="image-20220714113512240"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714113512240.png" alt="image-20220714113512240"></p>
 ]]></content>
       <categories>
         <category>工具</category>
