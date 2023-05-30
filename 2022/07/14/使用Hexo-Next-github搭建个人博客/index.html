@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Hexo 是一个快速、简洁且高效的博客框架。Hexo使用Markdown解析文章，在几秒内，即可利用靓丽的主题生成静态网页。这些静态资源文件可以托管在github或者其他服务器，形成我们自己的个人博客网站。 next是Hexo框架内的一套主题。 github作为生成的静态资源文件的托管平台。实际上我们通过Hexo也可以实现这些静态资源的托管，但是这样只能发布在本地，如果想通过互联网发布，则需要自己">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Hexo+Next+github搭建个人博客">
+<meta property="og:url" content="https://guluo2016.github.io/2022/07/14/%E4%BD%BF%E7%94%A8Hexo-Next-github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:site_name" content="孤落">
+<meta property="og:description" content="Hexo 是一个快速、简洁且高效的博客框架。Hexo使用Markdown解析文章，在几秒内，即可利用靓丽的主题生成静态网页。这些静态资源文件可以托管在github或者其他服务器，形成我们自己的个人博客网站。 next是Hexo框架内的一套主题。 github作为生成的静态资源文件的托管平台。实际上我们通过Hexo也可以实现这些静态资源的托管，但是这样只能发布在本地，如果想通过互联网发布，则需要自己">
+<meta property="og:locale">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220711173853678.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714134809507.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712134610287.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712134828979.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712135315014.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712135737455.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712140942030.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712141114021.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712141716057.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143133581.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143043445.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143620514.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143917357.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712144235301.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712170844909.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103032946.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714141357379.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714141451682.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103321987.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103449990.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714104338520.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714110420653.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714110622403.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714113512240.png">
+<meta property="article:published_time" content="2022-07-14T06:02:09.000Z">
+<meta property="article:modified_time" content="2023-05-30T14:14:38.726Z">
+<meta property="article:author" content="孤落">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220711173853678.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://guluo2016.github.io/2022/07/14/使用Hexo-Next-github搭建个人博客/"/>
+
+
+
+
+
+  <title>使用Hexo+Next+github搭建个人博客 | 孤落</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">孤落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://guluo2016.github.io/2022/07/14/%E4%BD%BF%E7%94%A8Hexo-Next-github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="孤落">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://github.com/guluo2016/picture/raw/dev/img/guluo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孤落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Hexo+Next+github搭建个人博客</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-07-14T14:02:09+08:00">
+                2022-07-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
+                    <span itemprop="name">工具</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Hexo 是一个快速、简洁且高效的博客框架。Hexo使用Markdown解析文章，在几秒内，即可利用靓丽的主题生成静态网页。这些静态资源文件可以托管在github或者其他服务器，形成我们自己的个人博客网站。</p>
+<p>next是Hexo框架内的一套主题。</p>
+<p>github作为生成的静态资源文件的托管平台。实际上我们通过Hexo也可以实现这些静态资源的托管，但是这样只能发布在本地，如果想通过互联网发布，则需要自己购买服务器，并自行申请域名之类的操作。而github中提供github pages功能，可以免费托管我们发布的内容，另外github pages还会自动为其创建一个域名。</p>
+<span id="more"></span>
+
+<h2 id="hexo框架"><a href="#hexo框架" class="headerlink" title="hexo框架"></a>hexo框架</h2><h3 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h3><p>由于hexo是基于Node.js的框架，因此安装hexo之前，首先需要安装node.js。<br>node.js和hexo之间存在版本要求，具体如下所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220711173853678.png" alt="image-20220711173853678"></p>
+<p>待node.js安装之后，可以通过npm命令去安装hexo。</p>
+<p>建议使用如下方式进行hexo安装</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+<p>安装成功之后，可以通过如下方式验证hexo的效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714134809507.png" alt="image-20220714134809507"></p>
+<h3 id="hexo基本操作"><a href="#hexo基本操作" class="headerlink" title="hexo基本操作"></a>hexo基本操作</h3><h4 id="初始化一个hexo项目"><a href="#初始化一个hexo项目" class="headerlink" title="初始化一个hexo项目"></a>初始化一个hexo项目</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">初始化一个hexo 博客</span></span><br><span class="line">hexo init blog_test</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712134610287.png" alt="image-20220712134610287"></p>
+<p>在生成一个hexo_test文件夹后，hexo会自动创建如下内容：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712134828979.png" alt="image-20220712134828979"></p>
+<p>其中比较重要的是：</p>
+<ul>
+<li><p>source，文件夹，我们的原始文件内容会存放在这里</p>
+</li>
+<li><p>_config.yml，文件，称之为站点配置文件，用于配置一些全局性的配置</p>
+</li>
+<li><p>public，文件夹，生成的静态资源文件，会放到public文件夹下，默认按照时间进行分类（初始化时，未创建，在执行完下面的hexo g之后，会自动生成）</p>
+</li>
+</ul>
+<h4 id="生成静态资源"><a href="#生成静态资源" class="headerlink" title="生成静态资源"></a>生成静态资源</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">一键生成静态资源</span></span><br><span class="line">hexo g</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712135315014.png" alt="image-20220712135315014"></p>
+<p>上面的命令会自动生成静态资源文件，并将source下的markdown文件生成为html文件，存放在public文件中，如图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712135737455.png" alt="image-20220712135737455"></p>
+<h4 id="启动服务器，发布"><a href="#启动服务器，发布" class="headerlink" title="启动服务器，发布"></a>启动服务器，发布</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动hexo服务，用于在本地浏览器查看hexo生成的网页内容</span></span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712140942030.png" alt="image-20220712140942030"></p>
+<p>然后打开浏览器，输入<a target="_blank" rel="noopener" href="http://localhost:4000/%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%AE%BF%E9%97%AE%E5%8D%9A%E5%AE%A2%E4%BA%86%E3%80%82">http://localhost:4000/就可以访问博客了。</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712141114021.png" alt="image-20220712141114021"></p>
+<h2 id="next主题"><a href="#next主题" class="headerlink" title="next主题"></a>next主题</h2><p>hexo默认的主题，不是太好看，使用比较多的hexo主题是next。</p>
+<h3 id="安装next主题"><a href="#安装next主题" class="headerlink" title="安装next主题"></a>安装next主题</h3><p>切换到hexo项目目录，会有一个theme文件夹，用于存放各种主题，hexo默认是没有安装next主题的，我们需要通过git clone从github上将next主题clone到theme文件夹中。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/iissnan/hexo-theme-next themes/next</span><br></pre></td></tr></table></figure>
+
+<p>同时，修改hexo项目的站点配置文件内容</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">将主题修改为next</span></span><br><span class="line">theme: next</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改语言，由于next中语言包中对应的中文简体为zh-Hans,因此进行如下修改</span></span><br><span class="line">language: zh-Hans</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">title用于标明网站的名字</span></span><br><span class="line">title: guluo</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">author</span></span><br><span class="line">author: 孤落</span><br></pre></td></tr></table></figure>
+
+<p>接下来执行如下命令进行重新发布。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">clean之后重新生成静态文件，然后发布</span></span><br><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br></pre></td></tr></table></figure>
+
+<p>此时从浏览器访问，可能会出现如下错误，原因是hexo在5.0之后把swig给删除了需要自己手动安装。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712141716057.png" alt="image-20220712141716057"></p>
+<p>此时在项目中安装swig可以解决问题：<code> npm i hexo-renderer-swig</code>，再次重新发布后，登录博客页面。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143133581.png" alt="image-20220712143133581"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143043445.png" alt="image-20220712143043445"></p>
+<p>从博客页面上来看，对站点配置文件的修改配置也生效了</p>
+<h3 id="配置next"><a href="#配置next" class="headerlink" title="配置next"></a>配置next</h3><p>next主题下同样有一个_config.yml文件，称之为主题配置文件。通过修改主题配置文件，可以进行一些自定义配置。</p>
+<ul>
+<li>更改next的scheme。</li>
+</ul>
+<p>next提供四种scheme，这里我选择的是：<code>scheme: Gemini</code>，修改完配置文件，保存并刷新浏览器，可以查看修改后的效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143620514.png" alt="image-20220712143620514"></p>
+<ul>
+<li>设置博客头像</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">配置用户头像</span></span><br><span class="line">avatar: https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/guluo.jpg</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用户头像下的名字</span></span><br><span class="line">author: 孤落</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用户头像名字下的说明</span></span><br><span class="line">description: 大漠孤烟直，长河落日圆</span><br></pre></td></tr></table></figure>
+
+<p>修改并保存好主题配置文件后，刷新浏览器，可查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143917357.png" alt="image-20220712143917357"></p>
+<ul>
+<li>将博客头像设置为圆形</li>
+</ul>
+<p>方形的用户头像不太好看，可以通过如下修改，将头像修改为圆形的。</p>
+<p>切换至<code>next\source\css_common\components\sidebar</code>目录下，将sidebar-author.styl中的内容替换为如下内容。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">.site-author-image &#123;</span><br><span class="line">  margin: 0 auto;</span><br><span class="line">  padding: $site-author-image-padding;</span><br><span class="line">  max-width: $site-author-image-width;</span><br><span class="line">  height: $site-author-image-height;</span><br><span class="line">  border: $site-author-image-border-width solid $site-author-image-border-color;</span><br><span class="line"></span><br><span class="line">  border-radius: 50%;</span><br><span class="line">  -webkit-border-radius: 50%;</span><br><span class="line">  -moz-border-radius: 50%;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-author-image:hover &#123;</span><br><span class="line">    -webkit-transform: rotate(360deg);</span><br><span class="line">    -moz-transform: rotate(360deg);</span><br><span class="line">    -ms-transform: rotate(360deg);</span><br><span class="line">    -transform: rotate(360deg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-author-name &#123;</span><br><span class="line">  margin: $site-author-name-margin;</span><br><span class="line">  text-align: $site-author-name-align;</span><br><span class="line">  color: $site-author-name-color;</span><br><span class="line">  font-weight: $site-author-name-weight;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-description &#123;</span><br><span class="line">  margin-top: $site-description-margin-top;</span><br><span class="line">  text-align: $site-description-align;</span><br><span class="line">  font-size: $site-description-font-size;</span><br><span class="line">  color: $site-description-color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>保存，并刷新浏览器查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712144235301.png" alt="image-20220712144235301"></p>
+<h2 id="博客个性化配置"><a href="#博客个性化配置" class="headerlink" title="博客个性化配置"></a>博客个性化配置</h2><h3 id="为博客增加标签、分类页"><a href="#为博客增加标签、分类页" class="headerlink" title="为博客增加标签、分类页"></a>为博客增加标签、分类页</h3><p>在hexo项目的根目录下，执行如下命令，进行创建：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建分类页</span></span><br><span class="line">hexo new page categories </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建标签页</span></span><br><span class="line">hexo new page tags</span><br></pre></td></tr></table></figure>
+
+<p>执行上面的命令后，hexo会在post下自动创建目录，如图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712170844909.png" alt="image-20220712170844909"></p>
+<p>同时更新next主题配置文件,注意要去掉||前面的空格，否则点击页面会跳转失败。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: /|| home</span><br><span class="line">  tags: /tags/|| tags</span><br><span class="line">  categories: /categories/|| th</span><br><span class="line">  archives: /archives/|| archive</span><br></pre></td></tr></table></figure>
+
+<p>保存配置，并刷新浏览器，查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103032946.png" alt="image-20220714103032946"></p>
+<h3 id="增加站内搜索功能"><a href="#增加站内搜索功能" class="headerlink" title="增加站内搜索功能"></a>增加站内搜索功能</h3><p>要实现博客的站内搜索功能，需要借助于插件<code>hexo-generator-searchdb</code>，因此在hexo项目下，安装该插件：  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br></pre></td></tr></table></figure>
+
+<p>修改站点配置文件，增加如下内容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br><span class="line">  <span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
+
+<p>然后再更新next主题配置文件：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">local_search:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span>    <span class="comment">#将此设为true</span></span><br><span class="line">  <span class="comment"># if auto, trigger search by changing input</span></span><br><span class="line">  <span class="comment"># if manual, trigger search by pressing enter key or search button</span></span><br><span class="line">  <span class="attr">trigger:</span> <span class="string">auto</span></span><br><span class="line">  <span class="comment"># show top n results per article, show all results by setting to -1</span></span><br><span class="line">  <span class="attr">top_n_per_article:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>保存，并重启hexo，打开浏览器，查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714141357379.png" alt="image-20220714141357379"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714141451682.png" alt="image-20220714141451682"></p>
+<h3 id="设置博客文章展示部分"><a href="#设置博客文章展示部分" class="headerlink" title="设置博客文章展示部分"></a>设置博客文章展示部分</h3><p>在hexo的source目录下的博客源markdown文件中，合适的位置增加一样md语法，即可实现。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103321987.png" alt="image-20220714103321987"></p>
+<p>在浏览器中的显示效果如图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103449990.png" alt="image-20220714103449990"></p>
+<h2 id="将hexo项目部署到github-page"><a href="#将hexo项目部署到github-page" class="headerlink" title="将hexo项目部署到github page"></a>将hexo项目部署到github page</h2><p>首先得在github上创建一个仓库，仓库名字是<code>&#123;github昵称&#125;.github.io</code>。然后查看该仓库的settings，并选择pages页面，可以查看到网址，我们通过该网址可以直接访问该仓库中的静态html资源。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714104338520.png" alt="image-20220714104338520"></p>
+<p>目前还访问不了，原因是这个仓库中没有任何文件，我们需要将前面hexo生成的静态资源上传至该仓库。</p>
+<p>为了能够将数据上传至该仓库，我们需要再hexo的站点配置文件中增加有关github的配置。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里有个前提，就是本机已经配置了有关github的认证信息</span></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">    <span class="attr">repository:</span> <span class="string">https://github.com/guluo2016/guluo2016.github.io.git</span></span><br><span class="line">    <span class="attr">branch:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
+
+<p>在hexo项目下执行如下命令，安装hexo的git工具。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p>接着执行如下命令，完成在github上的部署。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">清空缓存</span></span><br><span class="line">hexo clean </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成静态资源</span></span><br><span class="line">hexo g</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">部署至github</span></span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+
+<p>接着，就可以登录前面所述的github pages页面的网址，查看博客网站了。</p>
+<h2 id="设置评论功能模块"><a href="#设置评论功能模块" class="headerlink" title="设置评论功能模块"></a>设置评论功能模块</h2><p>这里采用gitalk插件，来实现自建博客的评论功能。</p>
+<p>他实际上就是借助于github仓库提供的issue功能来实现的评论功能，如果我们增加了gitalk插件，那么他会为博客中的所有文章在指定仓库的issue上创建一个以该博客文章名命名的问题，后面所有任何关于该博客文章的评论都会记录在这个issue下。</p>
+<p>同时当我们打开这个博客文章时，gitalk会自动从issue中加载数据，将关于这个博客的评论展示在评论区。</p>
+<p>为了实现上述功能，需要进行如下操作。</p>
+<h3 id="申请OAuth-认证"><a href="#申请OAuth-认证" class="headerlink" title="申请OAuth 认证"></a>申请OAuth 认证</h3><p>登录github，在个人账户settings下，选择 <code>Developer settings</code> – <code>OAuth Apps</code>,进行OAuth认证。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714110420653.png" alt="image-20220714110420653"></p>
+<p>注意homepageurl和callback url都填写前面的github page网址。</p>
+<p>接着通过如下方式，获取到client id和ClientSecret，后面会用到。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714110622403.png" alt="image-20220714110622403"></p>
+<h3 id="在next主题配置文件中配置gitalk"><a href="#在next主题配置文件中配置gitalk" class="headerlink" title="在next主题配置文件中配置gitalk"></a>在next主题配置文件中配置gitalk</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">gitalk:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">githubID:</span> <span class="string">guluo2016</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">guluo2016.github.io</span>  <span class="comment">#指定存放评论的仓库名，评论存放在仓库的issue上，因此仓库必须开启issue功能才行</span></span><br><span class="line">  <span class="attr">ClientID:</span> &#123;<span class="string">clientid</span>&#125;</span><br><span class="line">  <span class="attr">ClientSecret:</span> &#123;<span class="string">ClientSecret</span>&#125;</span><br><span class="line">  <span class="attr">adminUser:</span> <span class="string">guluo2016</span> <span class="comment">#指定可初始化评论账户</span></span><br><span class="line">  <span class="attr">distractionFreeMode:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="增加gitalk相关内容"><a href="#增加gitalk相关内容" class="headerlink" title="增加gitalk相关内容"></a>增加gitalk相关内容</h3><p>在<code>netx\layout\_third-party\comments</code>目录下，新建gitalk.swig文件，并添加如下内容</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;% if page.comments &amp;&amp; theme.gitalk.enable %&#125;</span><br><span class="line">  &lt;link rel=&quot;stylesheet&quot; href=&quot;https://unpkg.com/gitalk/dist/gitalk.css&quot;&gt;</span><br><span class="line">  &lt;script src=&quot;/js/src/md5.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">  &lt;script src=&quot;https://unpkg.com/gitalk/dist/gitalk.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">   &lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">        var gitalk = new Gitalk(&#123;</span><br><span class="line">          clientID: &#x27;&#123;&#123; theme.gitalk.ClientID &#125;&#125;&#x27;,</span><br><span class="line">          clientSecret: &#x27;&#123;&#123; theme.gitalk.ClientSecret &#125;&#125;&#x27;,</span><br><span class="line">          repo: &#x27;&#123;&#123; theme.gitalk.repo &#125;&#125;&#x27;,</span><br><span class="line">          owner: &#x27;&#123;&#123; theme.gitalk.githubID &#125;&#125;&#x27;,</span><br><span class="line">          admin: [&#x27;&#123;&#123; theme.gitalk.adminUser &#125;&#125;&#x27;],</span><br><span class="line">          id: md5(location.pathname),</span><br><span class="line">          distractionFreeMode: &#x27;&#123;&#123; theme.gitalk.distractionFreeMode &#125;&#125;&#x27;</span><br><span class="line">        &#125;)</span><br><span class="line">        gitalk.render(&#x27;gitalk-container&#x27;)</span><br><span class="line">       &lt;/script&gt;</span><br><span class="line">&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>这里需要说明一下，这里引入了md5.min.js文件，并对博客的pathname进行MD5处理，原因是由于github限制，不能创建超过50字符长度的issue？？？反正就是长度太长就是创建不了。</em></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/blueimp/JavaScript-MD5/tree/master/js">md5.min.js文件可以在github上下载</a>，下载后放到<code>next\source\js\src</code>目录下即可。</p>
+<p>在next主题的<code>\layout\_third-party\comments</code>目录中，更新index.swig文件，在文件末尾增加一行。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% include &#x27;gitalk.swig&#x27; %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在next主题的<code>\layout\_partials</code>目录中，更新comments.swig文件，如下增加gitalk部分即可。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;% elseif theme.<span class="property">valine</span>.<span class="property">appid</span> and theme.<span class="property">valine</span>.<span class="property">appkey</span> %&#125;</span><br><span class="line">  &lt;div <span class="keyword">class</span>=<span class="string">&quot;comments&quot;</span> id=<span class="string">&quot;comments&quot;</span>&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&#123;% elseif theme.<span class="property">gitalk</span>.<span class="property">enable</span> %&#125;</span><br><span class="line">  &lt;div id=<span class="string">&quot;gitalk-container&quot;</span>&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>待所有内容修改完毕之后，保存并执行如下命令，进行发布。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</span><br></pre></td></tr></table></figure>
+
+<p>然后登陆github pages网页查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714113512240.png" alt="image-20220714113512240"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/" rel="next" title="hadoop2.7.2集群搭建">
+                <i class="fa fa-chevron-left"></i> hadoop2.7.2集群搭建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/" rel="prev" title="Phoenix索引">
+                Phoenix索引 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://github.com/guluo2016/picture/raw/dev/img/guluo.jpg"
+                alt="孤落" />
+            
+              <p class="site-author-name" itemprop="name">孤落</p>
+              <p class="site-description motion-element" itemprop="description">大漠孤烟直，长河落日圆</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/guluo2016" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="1160605032@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo%E6%A1%86%E6%9E%B6"><span class="nav-number">1.</span> <span class="nav-text">hexo框架</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85hexo"><span class="nav-number">1.1.</span> <span class="nav-text">安装hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hexo%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.</span> <span class="nav-text">hexo基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%80%E4%B8%AAhexo%E9%A1%B9%E7%9B%AE"><span class="nav-number">1.2.1.</span> <span class="nav-text">初始化一个hexo项目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90"><span class="nav-number">1.2.2.</span> <span class="nav-text">生成静态资源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8C%E5%8F%91%E5%B8%83"><span class="nav-number">1.2.3.</span> <span class="nav-text">启动服务器，发布</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#next%E4%B8%BB%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">next主题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85next%E4%B8%BB%E9%A2%98"><span class="nav-number">2.1.</span> <span class="nav-text">安装next主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEnext"><span class="nav-number">2.2.</span> <span class="nav-text">配置next</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%9A%E5%AE%A2%E4%B8%AA%E6%80%A7%E5%8C%96%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">博客个性化配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E5%8D%9A%E5%AE%A2%E5%A2%9E%E5%8A%A0%E6%A0%87%E7%AD%BE%E3%80%81%E5%88%86%E7%B1%BB%E9%A1%B5"><span class="nav-number">3.1.</span> <span class="nav-text">为博客增加标签、分类页</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E7%AB%99%E5%86%85%E6%90%9C%E7%B4%A2%E5%8A%9F%E8%83%BD"><span class="nav-number">3.2.</span> <span class="nav-text">增加站内搜索功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0%E5%B1%95%E7%A4%BA%E9%83%A8%E5%88%86"><span class="nav-number">3.3.</span> <span class="nav-text">设置博客文章展示部分</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86hexo%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E5%88%B0github-page"><span class="nav-number">4.</span> <span class="nav-text">将hexo项目部署到github page</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E8%AF%84%E8%AE%BA%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97"><span class="nav-number">5.</span> <span class="nav-text">设置评论功能模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%B3%E8%AF%B7OAuth-%E8%AE%A4%E8%AF%81"><span class="nav-number">5.1.</span> <span class="nav-text">申请OAuth 认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8next%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E4%B8%AD%E9%85%8D%E7%BD%AEgitalk"><span class="nav-number">5.2.</span> <span class="nav-text">在next主题配置文件中配置gitalk</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0gitalk%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9"><span class="nav-number">5.3.</span> <span class="nav-text">增加gitalk相关内容</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">孤落</span>
+
+  
+</div>
+
+<!--
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+-->
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="/js/src/md5.min.js"></script>
+  <script src="/js/src/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '04ad5a3d7e218cc24cec',
+          clientSecret: '9a61ca1a681744d443642667dfb77e2d9d4f033c',
+          repo: 'guluo2016.github.io',
+          owner: 'guluo2016',
+          admin: ['guluo2016'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')
+       </script>
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

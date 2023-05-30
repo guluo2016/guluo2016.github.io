@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>2PC算法和共识算法</title>
+    <url>/2023/05/30/2PC%E7%AE%97%E6%B3%95%E5%92%8C%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>基础</category>
+      </categories>
+      <tags>
+        <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Elasticsearch的选举机制</title>
+    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>es</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Phoenix索引</title>
+    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
+<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
+<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
+<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
+<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
+<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
+<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
+<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
+<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
+<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
+<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
+<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
+<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
+<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
+<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
+<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
+<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
+<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
+<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
+]]></content>
+      <categories>
+        <category>phoenix</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hadoop2.7.2集群搭建</title>
+    <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">主机名分别是：master,salve1,salve2</span></span><br><span class="line">192.168.0.11  </span><br><span class="line">192.168.0.12  </span><br><span class="line">192.168.0.13</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h2 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h2><p>修改hosts文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">127.0.0.1 localhost</span><br><span class="line">192.168.0.11    master</span><br><span class="line">192.168.0.12    slave1</span><br><span class="line">192.168.0.13    slave2</span><br></pre></td></tr></table></figure>
+<h2 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h2><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装ssh服务端</span><br><span class="line">yum install openssh-server -y</span><br><span class="line">#安装ssh客户端</span><br><span class="line">yum install openssh-clients -y</span><br></pre></td></tr></table></figure>
+<p>使用命令:<code>ssh-keygen</code>生成本机密钥和公钥，这些文件在{USER_HOME}&#x2F;.ssh目录下，进入该目录，执行命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#authorized_keys文件若没有，首先创建一个</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br></pre></td></tr></table></figure>
+<p>将authorize_keys文件分发到其他主机上，并追加到对应的authorized_keys文件中。即可实现在master主机上，免密登录其他主机。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh slave1   //免密登录</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h2><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf jdk-XXX.tar.gz -C /opt</span><br><span class="line"></span><br><span class="line">#修改/etc/profile，添加如下语句</span><br><span class="line">export JAVA_HOME=/opt/jdk-XXX</span><br><span class="line">export PATH=&#123;JABA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h2><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf hadoop-2.7.1.XXX.tar.gz -C /opt</span><br></pre></td></tr></table></figure>
+
+<p>进入hadoop安装目录，修改etc&#x2F;hadoop目录下的各个配置文件：<br>修改core-site.xml文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9002&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.default.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;file:/home/hadoop/tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改hdfs-site.xml文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:9001&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">         &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">         &lt;value&gt;file:/home/hadoop/dfs/name&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">          &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">          &lt;value&gt;file:/home/hadoop/dfs/data&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">           &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">           &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改mapred-site.xml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master10020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19888&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改yarn-site.xml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8032&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8030&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8031&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.admin.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8033&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8088&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改slaves文件,用于指定slave节点：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">slave1 </span><br><span class="line">slave2</span><br></pre></td></tr></table></figure>
+
+<p>修改hadoop-env.sh文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将export JAVA_HOME行修改成如下：</span><br><span class="line">export JAVA_HOME=/opt/jdk.XXX</span><br></pre></td></tr></table></figure>
+
+<p>修改&#x2F;etc&#x2F;profile文件：   </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export HADOOP_HOME=/opt/hadoop-2.7.1</span><br><span class="line">export PATH=&#123;HADOOP_HOME&#125;/bin:$&#123;JAVA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#指令命令：</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<p>到此，hadoop已经配置成功了，通过scp命令将hadoop解压包分发到各个节点上：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br></pre></td></tr></table></figure>
+<p>到此，hadoop集群搭建完毕，开始进行hdfs文件系统的格式化操作：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop namenode -format</span><br></pre></td></tr></table></figure>
+<p>当出现如下日志信息时，表示格式化hdfs成功：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">Storage directory /home/hadoop/dfs/name has been successfully formated.</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h2><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hdfs dfs -mkdir  /input</span><br><span class="line"></span><br><span class="line">hdfs dfs -put /home/word.txt /input</span><br></pre></td></tr></table></figure>
+
+<p>使用hadoop自带的wordcount类来统计word.txt中的字数：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop jar /opt/hadoop-2.7.1/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.XX.jar worcount /input/* /out  </span><br><span class="line"></span><br><span class="line">使用如下指令查看统计结果：</span><br><span class="line">hdfs dfs -cat /out/*</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>hadoop</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hbase事务</title>
+    <url>/2022/08/16/hbase%E4%BA%8B%E5%8A%A1/</url>
+    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>HBase支持行级事务，也即用户对于HBase的一条数据的读写，HBase可以保证其原子性。对于多行事务，HBase并不能保证其原子性。</p>
+<p>为了保证行级事务，需要考虑写写控制和读写控制，对于读读操作，由于不涉及到数据的修改，因此无须进行并发控制。如果不考虑这两种控制，可能会出现数据不一致情况，也就不是事务了。</p>
+<p>下面对于写写控制和读写控制，分别考虑。</p>
+<span id="more"></span>
+
+<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><h4 id="无并发控制"><a href="#无并发控制" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>先考虑不进行并发控制的情况。</p>
+<p>假设有两个写线程，同一时间段内，对一行数据进行修改，由于HBase的写入需要经过好两个步骤：</p>
+<ul>
+<li>写WAL</li>
+<li>写入memstore</li>
+</ul>
+<p>如果不进行并发，那么在更新完WAL之后，在更新memstore时，可能第二个写线程先更新info:company,第一个写线程后更新info:company； 第一个线程先更新info:role，第二个线程后更新info:role，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
+<p>那么我们最终读取到的数据就是下面这样，即数据出现不一致。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<h4 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了行锁机制，以rowkey为锁，当写线程需要更新数据时，需要先获取行锁，然后才能更新，对于没有获取到行锁的写线程，只能等待，直至获取到行锁。具体的流程如下。</p>
+<ul>
+<li>写操作开始</li>
+<li>获取行锁</li>
+<li>更新WAL</li>
+<li>更新memstore</li>
+<li>释放锁</li>
+</ul>
+<h3 id="读写控制"><a href="#读写控制" class="headerlink" title="读写控制"></a>读写控制</h3><h4 id="无并发控制-1"><a href="#无并发控制-1" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>读写场景，同样先考虑不进行并发控制，可能会出现的情况。</p>
+<p>假如现在有两个写线程要更新同一行数据，同时一个读线程要对该行数据进行读取操作。读线程读取的时机是红线部分，此时第一个写线程已经完成，第二个写线程更新了一部分，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
+<p>那么读线程读取的数据就是下面这样子，同样会出现数据不一致情况。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<h4 id="并发控制-1"><a href="#并发控制-1" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBas引入了MVCC机制，采用无锁机制，实现读写控制。为了实现该机制，HBase在进行写操作时，会进行如下操作：</p>
+<ul>
+<li>获取行锁</li>
+<li>分配一个写事务id</li>
+<li>更新WAL</li>
+<li>更新memstore</li>
+<li>完成写事务id</li>
+<li>释放锁</li>
+</ul>
+<p>与此同时，对于每一次的读操作，HBase都会为其分配一个已经完成、且值最大的写事务id。</p>
+<p>如图所示，两个写线程开启写事务时，HBase分别为其分配一个写id，当读事务开启时，由于写事务1已经完成，而写事务2还未完成，因此分配的已完成、其值最大的写事务id是1，称之为read point。因此对该读事务而言，所有小于等于read point的数据都是对其可见的，大于read point的数据是不可见的。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
+<p>因此，在这种情况下，读线程最终读取的结果是这个样子。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://blogs.apache.org/hbase/entry/apache_hbase_internals_locking_and"><strong>Apache HBase Internals: Locking and Multiversion Concurrency Control</strong></a></li>
+<li><a href="http://hbasefly.com/2017/07/26/transaction-2/"><strong>数据库事务系列－HBase行级事务模型</strong></a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>hbase</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+        <tag>事务</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2022/07/07/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<span id="more"></span>
+
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>linux中很有用的命令</title>
+    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
+<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
+<ul>
+<li>Windows中的文件格式为dos  </li>
+<li>Linux中的文件格式为unix</li>
+</ul>
+<span id="more"></span>
+
+<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
+
+<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
+<ul>
+<li><p>1 替换文本内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2 删除匹配行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3 插入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql中的mvcc</title>
+    <url>/2022/08/16/mysql%E4%B8%AD%E7%9A%84mvcc/</url>
+    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>MVCC全称多版本并发控制。</p>
+<p>主要原理就是对于同一份数据，在数据库中存储多份，每一份都是一个版本。然后根据事务发生的先后顺序，来决定哪些版本的数据对该事务可见，从而实现并发控制。</p>
+<p><strong>MVCC主要解决的问题</strong></p>
+<p>MVCC主要解决的是读写并发问题，可以在无锁情况下实现读写并发，从而可以提交读写效率。</p>
+<p>关系型数据库中的读已提交、可重复读事务的隔离等级就是基于MVCC实现的。</p>
+<span id="more"></span>
+<h3 id="MVCC在mysql中的应用"><a href="#MVCC在mysql中的应用" class="headerlink" title="MVCC在mysql中的应用"></a>MVCC在mysql中的应用</h3><p>mysql中的Innodb存储引擎支持MVCC，对于Innodb表，mysql会默认为表创建几个隐藏列，其中比较重要的就是</p>
+<ul>
+<li><p>tx_id ,事务id列，用于表明修改该行数据的事务id</p>
+</li>
+<li><p>回滚指针列，由于Innodb支持事务，且默认事务的隔离等级为可重复读，其内部对于一行数据，会存储多个版本，回滚指针用于指向在事务修改该行数据之前，该行数据的样子(即该行数据的上一个版本)，如下图所示，图片来自 <a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/bVbyzV9" alt="Undo Log回滚历史记录"></p>
+</li>
+</ul>
+<h4 id="mvcc实现可重复读"><a href="#mvcc实现可重复读" class="headerlink" title="mvcc实现可重复读"></a>mvcc实现可重复读</h4><p>mysql会按照事务的先后顺序，以严格递增方式为每一个事务分配一个唯一的事务id。</p>
+<p>当mysql开启一个事务时，会立即形成一个快照，称之为<code>read view</code>,<code>read view</code>中记录了所有当前活跃的事务id(<strong>所谓活跃，是指事务已经开始，但是还没有结束</strong>)。在<code>read view</code>中的活跃事务集合中，存在一个最小id的事务，假设称之为<code>low_tx_id</code>, 存在一个最大事务id，<code>high_tx_id</code>。当前事务称之为<code>cur_tx_id</code>，假定<code>cur_tx_id</code>要读取的那行数据的隐藏事务列为<code>tx_id</code>，则可能存在如下几种情况。</p>
+<blockquote>
+<p><strong>这里需要说明一点，当前事务id不一定是<code>read view</code>中的最大值，因为在开启事务时，生成<code>read view</code>之前，可能会有新的事务进来，这个时候就会出现<code>read view</code>中的<code>rv_max_tx_id</code>比当前事务id大的情况</strong></p>
+</blockquote>
+<ul>
+<li><code>cur_tx_id = tx_id</code>，表示这行数据就是由当前事务修改的，必然对该事务可见</li>
+<li><code>tx_id &lt; low_tx_id</code>，表示在当前事务开启的时候，<code>tx_id</code>所代表的事务已经提交了，因此这行的该版本数据，对当前事务可见</li>
+<li><code>low_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务还未提交，因此这行数据的这个版本对当前事务不可见</li>
+<li>l<code>ow_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>不在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务已经提交，因此这行数据对当前事务可见</li>
+<li><code>tx_id &gt; high_tx_id</code>，表示<code>tx_id</code>事务是在当前事务开启之后提交的，因此数据对当前事务不可见</li>
+</ul>
+<p>mvcc通过如上原理，再加上回滚指针，按照如下流程就行读取。</p>
+<ul>
+<li><p>当读取的数据版本，对当前事务可见时，则可以直接读取，结束</p>
+</li>
+<li><p>当读取的数据版本，对当前事务不可见时，则按照改行的隐藏列回滚指针列，去读取这上数据的上一个版本（这个数据是存储在undo日志中的）</p>
+</li>
+<li><p>首先读取这个版本对应的事务id列，获取<code>tx_id</code>，并与上述规则进行匹配，成功，则该版本数据对当前事务可见，结束； 否则继续第二步</p>
+</li>
+</ul>
+<h4 id="MVCC实现读已提交"><a href="#MVCC实现读已提交" class="headerlink" title="MVCC实现读已提交"></a>MVCC实现读已提交</h4><p>在读提提交隔离级别，MVCC遵循的规则和上面一致，不同的点是，在事务执行过程中，每一次的读操作，都会创建一个<code>read view</code>。</p>
+<p>这样的话，<code>read view</code>不断更新，因此之前不可见的数据，随着对应事务的提交，也会对当前事务可见，从而就实现了读已提交。具体流程如下。</p>
+<ul>
+<li>读事务开启</li>
+<li>当要进行读取操作时，立即生成一个<code>read view</code>,并获取对应行数据，安装MVCC规则进行匹配，匹配成功，则该版本数据对当前事务可见，否则根据回滚指针读取上一个版本的数据，直至读取到对当前事务可见的版本</li>
+<li>其他操作</li>
+<li>当再次涉及到读操作时，继续进行第二步操作</li>
+</ul>
+<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><p>MVCC实现了读写之前的无锁并发控制，而对于写写操作，Innodb表采用锁机制来进行并发控制，不过它采用的是行锁来进行控制，与表锁相比，它的粒度更细，锁定的范围更小，因此效率更高。</p>
+<p><strong>参考：<a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么？</a>    <a href="https://segmentfault.com/a/1190000037557620">https://segmentfault.com/a/1190000037557620</a></strong></p>
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>事务</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql索引</title>
+    <url>/2023/05/30/mysql%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用Hexo+Next+github搭建个人博客</title>
+    <url>/2022/07/14/%E4%BD%BF%E7%94%A8Hexo-Next-github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</url>
+    <content><![CDATA[<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo使用Markdown解析文章，在几秒内，即可利用靓丽的主题生成静态网页。这些静态资源文件可以托管在github或者其他服务器，形成我们自己的个人博客网站。</p>
+<p>next是Hexo框架内的一套主题。</p>
+<p>github作为生成的静态资源文件的托管平台。实际上我们通过Hexo也可以实现这些静态资源的托管，但是这样只能发布在本地，如果想通过互联网发布，则需要自己购买服务器，并自行申请域名之类的操作。而github中提供github pages功能，可以免费托管我们发布的内容，另外github pages还会自动为其创建一个域名。</p>
+<span id="more"></span>
+
+<h2 id="hexo框架"><a href="#hexo框架" class="headerlink" title="hexo框架"></a>hexo框架</h2><h3 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h3><p>由于hexo是基于Node.js的框架，因此安装hexo之前，首先需要安装node.js。<br>node.js和hexo之间存在版本要求，具体如下所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220711173853678.png" alt="image-20220711173853678"></p>
+<p>待node.js安装之后，可以通过npm命令去安装hexo。</p>
+<p>建议使用如下方式进行hexo安装</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
+<p>安装成功之后，可以通过如下方式验证hexo的效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714134809507.png" alt="image-20220714134809507"></p>
+<h3 id="hexo基本操作"><a href="#hexo基本操作" class="headerlink" title="hexo基本操作"></a>hexo基本操作</h3><h4 id="初始化一个hexo项目"><a href="#初始化一个hexo项目" class="headerlink" title="初始化一个hexo项目"></a>初始化一个hexo项目</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">初始化一个hexo 博客</span></span><br><span class="line">hexo init blog_test</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712134610287.png" alt="image-20220712134610287"></p>
+<p>在生成一个hexo_test文件夹后，hexo会自动创建如下内容：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712134828979.png" alt="image-20220712134828979"></p>
+<p>其中比较重要的是：</p>
+<ul>
+<li><p>source，文件夹，我们的原始文件内容会存放在这里</p>
+</li>
+<li><p>_config.yml，文件，称之为站点配置文件，用于配置一些全局性的配置</p>
+</li>
+<li><p>public，文件夹，生成的静态资源文件，会放到public文件夹下，默认按照时间进行分类（初始化时，未创建，在执行完下面的hexo g之后，会自动生成）</p>
+</li>
+</ul>
+<h4 id="生成静态资源"><a href="#生成静态资源" class="headerlink" title="生成静态资源"></a>生成静态资源</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">一键生成静态资源</span></span><br><span class="line">hexo g</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712135315014.png" alt="image-20220712135315014"></p>
+<p>上面的命令会自动生成静态资源文件，并将source下的markdown文件生成为html文件，存放在public文件中，如图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712135737455.png" alt="image-20220712135737455"></p>
+<h4 id="启动服务器，发布"><a href="#启动服务器，发布" class="headerlink" title="启动服务器，发布"></a>启动服务器，发布</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">启动hexo服务，用于在本地浏览器查看hexo生成的网页内容</span></span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712140942030.png" alt="image-20220712140942030"></p>
+<p>然后打开浏览器，输入<a href="http://localhost:4000/%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%AE%BF%E9%97%AE%E5%8D%9A%E5%AE%A2%E4%BA%86%E3%80%82">http://localhost:4000/就可以访问博客了。</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712141114021.png" alt="image-20220712141114021"></p>
+<h2 id="next主题"><a href="#next主题" class="headerlink" title="next主题"></a>next主题</h2><p>hexo默认的主题，不是太好看，使用比较多的hexo主题是next。</p>
+<h3 id="安装next主题"><a href="#安装next主题" class="headerlink" title="安装next主题"></a>安装next主题</h3><p>切换到hexo项目目录，会有一个theme文件夹，用于存放各种主题，hexo默认是没有安装next主题的，我们需要通过git clone从github上将next主题clone到theme文件夹中。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/iissnan/hexo-theme-next themes/next</span><br></pre></td></tr></table></figure>
+
+<p>同时，修改hexo项目的站点配置文件内容</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">将主题修改为next</span></span><br><span class="line">theme: next</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改语言，由于next中语言包中对应的中文简体为zh-Hans,因此进行如下修改</span></span><br><span class="line">language: zh-Hans</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">title用于标明网站的名字</span></span><br><span class="line">title: guluo</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">author</span></span><br><span class="line">author: 孤落</span><br></pre></td></tr></table></figure>
+
+<p>接下来执行如下命令进行重新发布。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">clean之后重新生成静态文件，然后发布</span></span><br><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br></pre></td></tr></table></figure>
+
+<p>此时从浏览器访问，可能会出现如下错误，原因是hexo在5.0之后把swig给删除了需要自己手动安装。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712141716057.png" alt="image-20220712141716057"></p>
+<p>此时在项目中安装swig可以解决问题：<code> npm i hexo-renderer-swig</code>，再次重新发布后，登录博客页面。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143133581.png" alt="image-20220712143133581"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143043445.png" alt="image-20220712143043445"></p>
+<p>从博客页面上来看，对站点配置文件的修改配置也生效了</p>
+<h3 id="配置next"><a href="#配置next" class="headerlink" title="配置next"></a>配置next</h3><p>next主题下同样有一个_config.yml文件，称之为主题配置文件。通过修改主题配置文件，可以进行一些自定义配置。</p>
+<ul>
+<li>更改next的scheme。</li>
+</ul>
+<p>next提供四种scheme，这里我选择的是：<code>scheme: Gemini</code>，修改完配置文件，保存并刷新浏览器，可以查看修改后的效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143620514.png" alt="image-20220712143620514"></p>
+<ul>
+<li>设置博客头像</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">配置用户头像</span></span><br><span class="line">avatar: https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/guluo.jpg</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用户头像下的名字</span></span><br><span class="line">author: 孤落</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用户头像名字下的说明</span></span><br><span class="line">description: 大漠孤烟直，长河落日圆</span><br></pre></td></tr></table></figure>
+
+<p>修改并保存好主题配置文件后，刷新浏览器，可查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712143917357.png" alt="image-20220712143917357"></p>
+<ul>
+<li>将博客头像设置为圆形</li>
+</ul>
+<p>方形的用户头像不太好看，可以通过如下修改，将头像修改为圆形的。</p>
+<p>切换至<code>next\source\css_common\components\sidebar</code>目录下，将sidebar-author.styl中的内容替换为如下内容。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">.site-author-image &#123;</span><br><span class="line">  margin: 0 auto;</span><br><span class="line">  padding: $site-author-image-padding;</span><br><span class="line">  max-width: $site-author-image-width;</span><br><span class="line">  height: $site-author-image-height;</span><br><span class="line">  border: $site-author-image-border-width solid $site-author-image-border-color;</span><br><span class="line"></span><br><span class="line">  border-radius: 50%;</span><br><span class="line">  -webkit-border-radius: 50%;</span><br><span class="line">  -moz-border-radius: 50%;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-author-image:hover &#123;</span><br><span class="line">    -webkit-transform: rotate(360deg);</span><br><span class="line">    -moz-transform: rotate(360deg);</span><br><span class="line">    -ms-transform: rotate(360deg);</span><br><span class="line">    -transform: rotate(360deg);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-author-name &#123;</span><br><span class="line">  margin: $site-author-name-margin;</span><br><span class="line">  text-align: $site-author-name-align;</span><br><span class="line">  color: $site-author-name-color;</span><br><span class="line">  font-weight: $site-author-name-weight;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.site-description &#123;</span><br><span class="line">  margin-top: $site-description-margin-top;</span><br><span class="line">  text-align: $site-description-align;</span><br><span class="line">  font-size: $site-description-font-size;</span><br><span class="line">  color: $site-description-color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>保存，并刷新浏览器查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712144235301.png" alt="image-20220712144235301"></p>
+<h2 id="博客个性化配置"><a href="#博客个性化配置" class="headerlink" title="博客个性化配置"></a>博客个性化配置</h2><h3 id="为博客增加标签、分类页"><a href="#为博客增加标签、分类页" class="headerlink" title="为博客增加标签、分类页"></a>为博客增加标签、分类页</h3><p>在hexo项目的根目录下，执行如下命令，进行创建：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建分类页</span></span><br><span class="line">hexo new page categories </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建标签页</span></span><br><span class="line">hexo new page tags</span><br></pre></td></tr></table></figure>
+
+<p>执行上面的命令后，hexo会在post下自动创建目录，如图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220712170844909.png" alt="image-20220712170844909"></p>
+<p>同时更新next主题配置文件,注意要去掉||前面的空格，否则点击页面会跳转失败。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: /|| home</span><br><span class="line">  tags: /tags/|| tags</span><br><span class="line">  categories: /categories/|| th</span><br><span class="line">  archives: /archives/|| archive</span><br></pre></td></tr></table></figure>
+
+<p>保存配置，并刷新浏览器，查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103032946.png" alt="image-20220714103032946"></p>
+<h3 id="增加站内搜索功能"><a href="#增加站内搜索功能" class="headerlink" title="增加站内搜索功能"></a>增加站内搜索功能</h3><p>要实现博客的站内搜索功能，需要借助于插件<code>hexo-generator-searchdb</code>，因此在hexo项目下，安装该插件：  </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br></pre></td></tr></table></figure>
+
+<p>修改站点配置文件，增加如下内容：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br><span class="line">  <span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
+
+<p>然后再更新next主题配置文件：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">local_search:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span>    <span class="comment">#将此设为true</span></span><br><span class="line">  <span class="comment"># if auto, trigger search by changing input</span></span><br><span class="line">  <span class="comment"># if manual, trigger search by pressing enter key or search button</span></span><br><span class="line">  <span class="attr">trigger:</span> <span class="string">auto</span></span><br><span class="line">  <span class="comment"># show top n results per article, show all results by setting to -1</span></span><br><span class="line">  <span class="attr">top_n_per_article:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>保存，并重启hexo，打开浏览器，查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714141357379.png" alt="image-20220714141357379"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714141451682.png" alt="image-20220714141451682"></p>
+<h3 id="设置博客文章展示部分"><a href="#设置博客文章展示部分" class="headerlink" title="设置博客文章展示部分"></a>设置博客文章展示部分</h3><p>在hexo的source目录下的博客源markdown文件中，合适的位置增加一样md语法，即可实现。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103321987.png" alt="image-20220714103321987"></p>
+<p>在浏览器中的显示效果如图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103449990.png" alt="image-20220714103449990"></p>
+<h2 id="将hexo项目部署到github-page"><a href="#将hexo项目部署到github-page" class="headerlink" title="将hexo项目部署到github page"></a>将hexo项目部署到github page</h2><p>首先得在github上创建一个仓库，仓库名字是<code>&#123;github昵称&#125;.github.io</code>。然后查看该仓库的settings，并选择pages页面，可以查看到网址，我们通过该网址可以直接访问该仓库中的静态html资源。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714104338520.png" alt="image-20220714104338520"></p>
+<p>目前还访问不了，原因是这个仓库中没有任何文件，我们需要将前面hexo生成的静态资源上传至该仓库。</p>
+<p>为了能够将数据上传至该仓库，我们需要再hexo的站点配置文件中增加有关github的配置。</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 这里有个前提，就是本机已经配置了有关github的认证信息</span></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">    <span class="attr">repository:</span> <span class="string">https://github.com/guluo2016/guluo2016.github.io.git</span></span><br><span class="line">    <span class="attr">branch:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
+
+<p>在hexo项目下执行如下命令，安装hexo的git工具。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p>接着执行如下命令，完成在github上的部署。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">清空缓存</span></span><br><span class="line">hexo clean </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成静态资源</span></span><br><span class="line">hexo g</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">部署至github</span></span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+
+<p>接着，就可以登录前面所述的github pages页面的网址，查看博客网站了。</p>
+<h2 id="设置评论功能模块"><a href="#设置评论功能模块" class="headerlink" title="设置评论功能模块"></a>设置评论功能模块</h2><p>这里采用gitalk插件，来实现自建博客的评论功能。</p>
+<p>他实际上就是借助于github仓库提供的issue功能来实现的评论功能，如果我们增加了gitalk插件，那么他会为博客中的所有文章在指定仓库的issue上创建一个以该博客文章名命名的问题，后面所有任何关于该博客文章的评论都会记录在这个issue下。</p>
+<p>同时当我们打开这个博客文章时，gitalk会自动从issue中加载数据，将关于这个博客的评论展示在评论区。</p>
+<p>为了实现上述功能，需要进行如下操作。</p>
+<h3 id="申请OAuth-认证"><a href="#申请OAuth-认证" class="headerlink" title="申请OAuth 认证"></a>申请OAuth 认证</h3><p>登录github，在个人账户settings下，选择 <code>Developer settings</code> – <code>OAuth Apps</code>,进行OAuth认证。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714110420653.png" alt="image-20220714110420653"></p>
+<p>注意homepageurl和callback url都填写前面的github page网址。</p>
+<p>接着通过如下方式，获取到client id和ClientSecret，后面会用到。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714110622403.png" alt="image-20220714110622403"></p>
+<h3 id="在next主题配置文件中配置gitalk"><a href="#在next主题配置文件中配置gitalk" class="headerlink" title="在next主题配置文件中配置gitalk"></a>在next主题配置文件中配置gitalk</h3><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">gitalk:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">githubID:</span> <span class="string">guluo2016</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">guluo2016.github.io</span>  <span class="comment">#指定存放评论的仓库名，评论存放在仓库的issue上，因此仓库必须开启issue功能才行</span></span><br><span class="line">  <span class="attr">ClientID:</span> &#123;<span class="string">clientid</span>&#125;</span><br><span class="line">  <span class="attr">ClientSecret:</span> &#123;<span class="string">ClientSecret</span>&#125;</span><br><span class="line">  <span class="attr">adminUser:</span> <span class="string">guluo2016</span> <span class="comment">#指定可初始化评论账户</span></span><br><span class="line">  <span class="attr">distractionFreeMode:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="增加gitalk相关内容"><a href="#增加gitalk相关内容" class="headerlink" title="增加gitalk相关内容"></a>增加gitalk相关内容</h3><p>在<code>netx\layout\_third-party\comments</code>目录下，新建gitalk.swig文件，并添加如下内容</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&#123;% if page.comments &amp;&amp; theme.gitalk.enable %&#125;</span><br><span class="line">  &lt;link rel=&quot;stylesheet&quot; href=&quot;https://unpkg.com/gitalk/dist/gitalk.css&quot;&gt;</span><br><span class="line">  &lt;script src=&quot;/js/src/md5.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">  &lt;script src=&quot;https://unpkg.com/gitalk/dist/gitalk.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">   &lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">        var gitalk = new Gitalk(&#123;</span><br><span class="line">          clientID: &#x27;&#123;&#123; theme.gitalk.ClientID &#125;&#125;&#x27;,</span><br><span class="line">          clientSecret: &#x27;&#123;&#123; theme.gitalk.ClientSecret &#125;&#125;&#x27;,</span><br><span class="line">          repo: &#x27;&#123;&#123; theme.gitalk.repo &#125;&#125;&#x27;,</span><br><span class="line">          owner: &#x27;&#123;&#123; theme.gitalk.githubID &#125;&#125;&#x27;,</span><br><span class="line">          admin: [&#x27;&#123;&#123; theme.gitalk.adminUser &#125;&#125;&#x27;],</span><br><span class="line">          id: md5(location.pathname),</span><br><span class="line">          distractionFreeMode: &#x27;&#123;&#123; theme.gitalk.distractionFreeMode &#125;&#125;&#x27;</span><br><span class="line">        &#125;)</span><br><span class="line">        gitalk.render(&#x27;gitalk-container&#x27;)</span><br><span class="line">       &lt;/script&gt;</span><br><span class="line">&#123;% endif %&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>这里需要说明一下，这里引入了md5.min.js文件，并对博客的pathname进行MD5处理，原因是由于github限制，不能创建超过50字符长度的issue？？？反正就是长度太长就是创建不了。</em></p>
+<p><a href="https://github.com/blueimp/JavaScript-MD5/tree/master/js">md5.min.js文件可以在github上下载</a>，下载后放到<code>next\source\js\src</code>目录下即可。</p>
+<p>在next主题的<code>\layout\_third-party\comments</code>目录中，更新index.swig文件，在文件末尾增加一行。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&#123;% include &#x27;gitalk.swig&#x27; %&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在next主题的<code>\layout\_partials</code>目录中，更新comments.swig文件，如下增加gitalk部分即可。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&#123;% elseif theme.<span class="property">valine</span>.<span class="property">appid</span> and theme.<span class="property">valine</span>.<span class="property">appkey</span> %&#125;</span><br><span class="line">  &lt;div <span class="keyword">class</span>=<span class="string">&quot;comments&quot;</span> id=<span class="string">&quot;comments&quot;</span>&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&#123;% elseif theme.<span class="property">gitalk</span>.<span class="property">enable</span> %&#125;</span><br><span class="line">  &lt;div id=<span class="string">&quot;gitalk-container&quot;</span>&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+
+<p>待所有内容修改完毕之后，保存并执行如下命令，进行发布。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</span><br></pre></td></tr></table></figure>
+
+<p>然后登陆github pages网页查看效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714113512240.png" alt="image-20220714113512240"></p>
+]]></content>
+      <categories>
+        <category>工具</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>行式/列式/列族式数据库</title>
+    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>基础</category>
+      </categories>
+  </entry>
+</search>
