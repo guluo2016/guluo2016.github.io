@@ -1,66 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>2PC算法和共识算法</title>
-    <url>/2023/05/30/2PC%E7%AE%97%E6%B3%95%E5%92%8C%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>基础</category>
-      </categories>
-      <tags>
-        <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Elasticsearch的选举机制</title>
     <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[]]></content>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
       <categories>
         <category>es</category>
       </categories>
   </entry>
   <entry>
-    <title>Phoenix索引</title>
-    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
-<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
-<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
-<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
-<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
-<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
-<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
-<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
-<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
-<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
-<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
-<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
-<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
-<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
-<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
-<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
-<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
-<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
-<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
+    <title>2PC算法和共识算法</title>
+    <url>/2023/05/30/2PC%E7%AE%97%E6%B3%95%E5%92%8C%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<p>TODO</p>
 ]]></content>
       <categories>
-        <category>phoenix</category>
+        <category>基础</category>
       </categories>
       <tags>
-        <tag>索引</tag>
+        <tag>算法</tag>
       </tags>
   </entry>
   <entry>
@@ -125,6 +83,50 @@
       </categories>
       <tags>
         <tag>bigdata</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Phoenix索引</title>
+    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
+<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
+<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
+<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
+<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
+<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
+<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
+<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
+<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
+<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
+<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
+<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
+<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
+<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
+<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
+<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
+<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
+<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
+<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
+]]></content>
+      <categories>
+        <category>phoenix</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
@@ -206,39 +208,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>linux中很有用的命令</title>
-    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
-<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
-<ul>
-<li>Windows中的文件格式为dos  </li>
-<li>Linux中的文件格式为unix</li>
-</ul>
-<span id="more"></span>
-
-<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
-
-<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
-<ul>
-<li><p>1 替换文本内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>2 删除匹配行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>3 插入</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>linux</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>mysql中的mvcc</title>
     <url>/2022/08/16/mysql%E4%B8%AD%E7%9A%84mvcc/</url>
     <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>MVCC全称多版本并发控制。</p>
@@ -293,6 +262,48 @@
       <tags>
         <tag>事务</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>linux中很有用的命令</title>
+    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
+<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
+<ul>
+<li>Windows中的文件格式为dos  </li>
+<li>Linux中的文件格式为unix</li>
+</ul>
+<span id="more"></span>
+
+<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
+
+<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
+<ul>
+<li><p>1 替换文本内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2 删除匹配行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3 插入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>行式/列式/列族式数据库</title>
+    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>基础</category>
+      </categories>
   </entry>
   <entry>
     <title>mysql索引</title>
@@ -452,14 +463,6 @@
 ]]></content>
       <categories>
         <category>工具</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>行式/列式/列族式数据库</title>
-    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>基础</category>
       </categories>
   </entry>
 </search>
