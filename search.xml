@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Elasticsearch的选举机制</title>
-    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<p>TODO</p>
-]]></content>
-      <categories>
-        <category>es</category>
-      </categories>
-  </entry>
-  <entry>
     <title>2PC算法和共识算法</title>
     <url>/2023/05/30/2PC%E7%AE%97%E6%B3%95%E5%92%8C%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/</url>
     <content><![CDATA[<p>TODO</p>
@@ -19,6 +10,137 @@
       </categories>
       <tags>
         <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hadoop2.7.2集群搭建</title>
+    <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">主机名分别是：master,salve1,salve2</span></span><br><span class="line">192.168.0.11  </span><br><span class="line">192.168.0.12  </span><br><span class="line">192.168.0.13</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h2 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h2><p>修改hosts文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">127.0.0.1 localhost</span><br><span class="line">192.168.0.11    master</span><br><span class="line">192.168.0.12    slave1</span><br><span class="line">192.168.0.13    slave2</span><br></pre></td></tr></table></figure>
+<h2 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h2><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装ssh服务端</span><br><span class="line">yum install openssh-server -y</span><br><span class="line">#安装ssh客户端</span><br><span class="line">yum install openssh-clients -y</span><br></pre></td></tr></table></figure>
+<p>使用命令:<code>ssh-keygen</code>生成本机密钥和公钥，这些文件在{USER_HOME}&#x2F;.ssh目录下，进入该目录，执行命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#authorized_keys文件若没有，首先创建一个</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br></pre></td></tr></table></figure>
+<p>将authorize_keys文件分发到其他主机上，并追加到对应的authorized_keys文件中。即可实现在master主机上，免密登录其他主机。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh slave1   //免密登录</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h2><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf jdk-XXX.tar.gz -C /opt</span><br><span class="line"></span><br><span class="line">#修改/etc/profile，添加如下语句</span><br><span class="line">export JAVA_HOME=/opt/jdk-XXX</span><br><span class="line">export PATH=&#123;JABA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h2><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf hadoop-2.7.1.XXX.tar.gz -C /opt</span><br></pre></td></tr></table></figure>
+
+<p>进入hadoop安装目录，修改etc&#x2F;hadoop目录下的各个配置文件：<br>修改core-site.xml文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9002&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.default.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;file:/home/hadoop/tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改hdfs-site.xml文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:9001&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">         &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">         &lt;value&gt;file:/home/hadoop/dfs/name&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">          &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">          &lt;value&gt;file:/home/hadoop/dfs/data&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">           &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">           &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改mapred-site.xml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master10020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19888&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改yarn-site.xml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8032&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8030&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8031&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.admin.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8033&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8088&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改slaves文件,用于指定slave节点：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">slave1 </span><br><span class="line">slave2</span><br></pre></td></tr></table></figure>
+
+<p>修改hadoop-env.sh文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将export JAVA_HOME行修改成如下：</span><br><span class="line">export JAVA_HOME=/opt/jdk.XXX</span><br></pre></td></tr></table></figure>
+
+<p>修改&#x2F;etc&#x2F;profile文件：   </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export HADOOP_HOME=/opt/hadoop-2.7.1</span><br><span class="line">export PATH=&#123;HADOOP_HOME&#125;/bin:$&#123;JAVA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#指令命令：</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<p>到此，hadoop已经配置成功了，通过scp命令将hadoop解压包分发到各个节点上：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br></pre></td></tr></table></figure>
+<p>到此，hadoop集群搭建完毕，开始进行hdfs文件系统的格式化操作：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop namenode -format</span><br></pre></td></tr></table></figure>
+<p>当出现如下日志信息时，表示格式化hdfs成功：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">Storage directory /home/hadoop/dfs/name has been successfully formated.</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h2><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hdfs dfs -mkdir  /input</span><br><span class="line"></span><br><span class="line">hdfs dfs -put /home/word.txt /input</span><br></pre></td></tr></table></figure>
+
+<p>使用hadoop自带的wordcount类来统计word.txt中的字数：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop jar /opt/hadoop-2.7.1/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.XX.jar worcount /input/* /out  </span><br><span class="line"></span><br><span class="line">使用如下指令查看统计结果：</span><br><span class="line">hdfs dfs -cat /out/*</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>hadoop</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Elasticsearch的选举机制</title>
+    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>es</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>hbase事务</title>
+    <url>/2022/08/16/hbase%E4%BA%8B%E5%8A%A1/</url>
+    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>HBase支持行级事务，也即用户对于HBase的一条数据的读写，HBase可以保证其原子性。对于多行事务，HBase并不能保证其原子性。</p>
+<p>为了保证行级事务，需要考虑写写控制和读写控制，对于读读操作，由于不涉及到数据的修改，因此无须进行并发控制。如果不考虑这两种控制，可能会出现数据不一致情况，也就不是事务了。</p>
+<p>下面对于写写控制和读写控制，分别考虑。</p>
+<span id="more"></span>
+
+<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><h4 id="无并发控制"><a href="#无并发控制" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>先考虑不进行并发控制的情况。</p>
+<p>假设有两个写线程，同一时间段内，对一行数据进行修改，由于HBase的写入需要经过好两个步骤：</p>
+<ul>
+<li>写WAL</li>
+<li>写入memstore</li>
+</ul>
+<p>如果不进行并发，那么在更新完WAL之后，在更新memstore时，可能第二个写线程先更新info:company,第一个写线程后更新info:company； 第一个线程先更新info:role，第二个线程后更新info:role，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
+<p>那么我们最终读取到的数据就是下面这样，即数据出现不一致。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<h4 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了行锁机制，以rowkey为锁，当写线程需要更新数据时，需要先获取行锁，然后才能更新，对于没有获取到行锁的写线程，只能等待，直至获取到行锁。具体的流程如下。</p>
+<ul>
+<li>写操作开始</li>
+<li>获取行锁</li>
+<li>更新WAL</li>
+<li>更新memstore</li>
+<li>释放锁</li>
+</ul>
+<h3 id="读写控制"><a href="#读写控制" class="headerlink" title="读写控制"></a>读写控制</h3><h4 id="无并发控制-1"><a href="#无并发控制-1" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>读写场景，同样先考虑不进行并发控制，可能会出现的情况。</p>
+<p>假如现在有两个写线程要更新同一行数据，同时一个读线程要对该行数据进行读取操作。读线程读取的时机是红线部分，此时第一个写线程已经完成，第二个写线程更新了一部分，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
+<p>那么读线程读取的数据就是下面这样子，同样会出现数据不一致情况。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<h4 id="并发控制-1"><a href="#并发控制-1" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBas引入了MVCC机制，采用无锁机制，实现读写控制。为了实现该机制，HBase在进行写操作时，会进行如下操作：</p>
+<ul>
+<li>获取行锁</li>
+<li>分配一个写事务id</li>
+<li>更新WAL</li>
+<li>更新memstore</li>
+<li>完成写事务id</li>
+<li>释放锁</li>
+</ul>
+<p>与此同时，对于每一次的读操作，HBase都会为其分配一个已经完成、且值最大的写事务id。</p>
+<p>如图所示，两个写线程开启写事务时，HBase分别为其分配一个写id，当读事务开启时，由于写事务1已经完成，而写事务2还未完成，因此分配的已完成、其值最大的写事务id是1，称之为read point。因此对该读事务而言，所有小于等于read point的数据都是对其可见的，大于read point的数据是不可见的。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
+<p>因此，在这种情况下，读线程最终读取的结果是这个样子。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://blogs.apache.org/hbase/entry/apache_hbase_internals_locking_and"><strong>Apache HBase Internals: Locking and Multiversion Concurrency Control</strong></a></li>
+<li><a href="http://hbasefly.com/2017/07/26/transaction-2/"><strong>数据库事务系列－HBase行级事务模型</strong></a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>hbase</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+        <tag>事务</tag>
       </tags>
   </entry>
   <entry>
@@ -86,125 +208,36 @@
 ]]></content>
   </entry>
   <entry>
-    <title>hadoop2.7.2集群搭建</title>
-    <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">主机名分别是：master,salve1,salve2</span></span><br><span class="line">192.168.0.11  </span><br><span class="line">192.168.0.12  </span><br><span class="line">192.168.0.13</span><br></pre></td></tr></table></figure>
-
+    <title>linux中很有用的命令</title>
+    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
+<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
+<ul>
+<li>Windows中的文件格式为dos  </li>
+<li>Linux中的文件格式为unix</li>
+</ul>
 <span id="more"></span>
 
-<h2 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h2><p>修改hosts文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">127.0.0.1 localhost</span><br><span class="line">192.168.0.11    master</span><br><span class="line">192.168.0.12    slave1</span><br><span class="line">192.168.0.13    slave2</span><br></pre></td></tr></table></figure>
-<h2 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h2><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装ssh服务端</span><br><span class="line">yum install openssh-server -y</span><br><span class="line">#安装ssh客户端</span><br><span class="line">yum install openssh-clients -y</span><br></pre></td></tr></table></figure>
-<p>使用命令:<code>ssh-keygen</code>生成本机密钥和公钥，这些文件在{USER_HOME}&#x2F;.ssh目录下，进入该目录，执行命令：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#authorized_keys文件若没有，首先创建一个</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br></pre></td></tr></table></figure>
-<p>将authorize_keys文件分发到其他主机上，并追加到对应的authorized_keys文件中。即可实现在master主机上，免密登录其他主机。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh slave1   //免密登录</span><br></pre></td></tr></table></figure>
+<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
 
-<h2 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h2><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf jdk-XXX.tar.gz -C /opt</span><br><span class="line"></span><br><span class="line">#修改/etc/profile，添加如下语句</span><br><span class="line">export JAVA_HOME=/opt/jdk-XXX</span><br><span class="line">export PATH=&#123;JABA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
-
-<h2 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h2><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf hadoop-2.7.1.XXX.tar.gz -C /opt</span><br></pre></td></tr></table></figure>
-
-<p>进入hadoop安装目录，修改etc&#x2F;hadoop目录下的各个配置文件：<br>修改core-site.xml文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9002&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.default.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;file:/home/hadoop/tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改hdfs-site.xml文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:9001&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">         &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">         &lt;value&gt;file:/home/hadoop/dfs/name&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">          &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">          &lt;value&gt;file:/home/hadoop/dfs/data&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">           &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">           &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改mapred-site.xml文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master10020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19888&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改yarn-site.xml文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8032&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8030&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8031&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.admin.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8033&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8088&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改slaves文件,用于指定slave节点：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">slave1 </span><br><span class="line">slave2</span><br></pre></td></tr></table></figure>
-
-<p>修改hadoop-env.sh文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将export JAVA_HOME行修改成如下：</span><br><span class="line">export JAVA_HOME=/opt/jdk.XXX</span><br></pre></td></tr></table></figure>
-
-<p>修改&#x2F;etc&#x2F;profile文件：   </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export HADOOP_HOME=/opt/hadoop-2.7.1</span><br><span class="line">export PATH=&#123;HADOOP_HOME&#125;/bin:$&#123;JAVA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#指令命令：</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
-
-<p>到此，hadoop已经配置成功了，通过scp命令将hadoop解压包分发到各个节点上：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br></pre></td></tr></table></figure>
-<p>到此，hadoop集群搭建完毕，开始进行hdfs文件系统的格式化操作：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop namenode -format</span><br></pre></td></tr></table></figure>
-<p>当出现如下日志信息时，表示格式化hdfs成功：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">Storage directory /home/hadoop/dfs/name has been successfully formated.</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h2 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h2><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hdfs dfs -mkdir  /input</span><br><span class="line"></span><br><span class="line">hdfs dfs -put /home/word.txt /input</span><br></pre></td></tr></table></figure>
-
-<p>使用hadoop自带的wordcount类来统计word.txt中的字数：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop jar /opt/hadoop-2.7.1/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.XX.jar worcount /input/* /out  </span><br><span class="line"></span><br><span class="line">使用如下指令查看统计结果：</span><br><span class="line">hdfs dfs -cat /out/*</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>hadoop</category>
-      </categories>
-      <tags>
-        <tag>bigdata</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hbase事务</title>
-    <url>/2022/08/16/hbase%E4%BA%8B%E5%8A%A1/</url>
-    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>HBase支持行级事务，也即用户对于HBase的一条数据的读写，HBase可以保证其原子性。对于多行事务，HBase并不能保证其原子性。</p>
-<p>为了保证行级事务，需要考虑写写控制和读写控制，对于读读操作，由于不涉及到数据的修改，因此无须进行并发控制。如果不考虑这两种控制，可能会出现数据不一致情况，也就不是事务了。</p>
-<p>下面对于写写控制和读写控制，分别考虑。</p>
-<span id="more"></span>
-
-<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><h4 id="无并发控制"><a href="#无并发控制" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>先考虑不进行并发控制的情况。</p>
-<p>假设有两个写线程，同一时间段内，对一行数据进行修改，由于HBase的写入需要经过好两个步骤：</p>
+<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
 <ul>
-<li>写WAL</li>
-<li>写入memstore</li>
-</ul>
-<p>如果不进行并发，那么在更新完WAL之后，在更新memstore时，可能第二个写线程先更新info:company,第一个写线程后更新info:company； 第一个线程先更新info:role，第二个线程后更新info:role，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
-<p>那么我们最终读取到的数据就是下面这样，即数据出现不一致。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
-<h4 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了行锁机制，以rowkey为锁，当写线程需要更新数据时，需要先获取行锁，然后才能更新，对于没有获取到行锁的写线程，只能等待，直至获取到行锁。具体的流程如下。</p>
-<ul>
-<li>写操作开始</li>
-<li>获取行锁</li>
-<li>更新WAL</li>
-<li>更新memstore</li>
-<li>释放锁</li>
-</ul>
-<h3 id="读写控制"><a href="#读写控制" class="headerlink" title="读写控制"></a>读写控制</h3><h4 id="无并发控制-1"><a href="#无并发控制-1" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>读写场景，同样先考虑不进行并发控制，可能会出现的情况。</p>
-<p>假如现在有两个写线程要更新同一行数据，同时一个读线程要对该行数据进行读取操作。读线程读取的时机是红线部分，此时第一个写线程已经完成，第二个写线程更新了一部分，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
-<p>那么读线程读取的数据就是下面这样子，同样会出现数据不一致情况。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
-<h4 id="并发控制-1"><a href="#并发控制-1" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBas引入了MVCC机制，采用无锁机制，实现读写控制。为了实现该机制，HBase在进行写操作时，会进行如下操作：</p>
-<ul>
-<li>获取行锁</li>
-<li>分配一个写事务id</li>
-<li>更新WAL</li>
-<li>更新memstore</li>
-<li>完成写事务id</li>
-<li>释放锁</li>
-</ul>
-<p>与此同时，对于每一次的读操作，HBase都会为其分配一个已经完成、且值最大的写事务id。</p>
-<p>如图所示，两个写线程开启写事务时，HBase分别为其分配一个写id，当读事务开启时，由于写事务1已经完成，而写事务2还未完成，因此分配的已完成、其值最大的写事务id是1，称之为read point。因此对该读事务而言，所有小于等于read point的数据都是对其可见的，大于read point的数据是不可见的。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
-<p>因此，在这种情况下，读线程最终读取的结果是这个样子。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
-<li><a href="https://blogs.apache.org/hbase/entry/apache_hbase_internals_locking_and"><strong>Apache HBase Internals: Locking and Multiversion Concurrency Control</strong></a></li>
-<li><a href="http://hbasefly.com/2017/07/26/transaction-2/"><strong>数据库事务系列－HBase行级事务模型</strong></a></li>
+<li><p>1 替换文本内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2 删除匹配行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3 插入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
 </ul>
 ]]></content>
       <categories>
-        <category>hbase</category>
+        <category>linux</category>
       </categories>
       <tags>
-        <tag>bigdata</tag>
-        <tag>事务</tag>
+        <tag>shell</tag>
       </tags>
   </entry>
   <entry>
@@ -264,39 +297,6 @@
       </tags>
   </entry>
   <entry>
-    <title>linux中很有用的命令</title>
-    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
-<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
-<ul>
-<li>Windows中的文件格式为dos  </li>
-<li>Linux中的文件格式为unix</li>
-</ul>
-<span id="more"></span>
-
-<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
-
-<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
-<ul>
-<li><p>1 替换文本内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>2 删除匹配行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>3 插入</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>linux</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>mysql索引</title>
     <url>/2023/05/30/mysql%E7%B4%A2%E5%BC%95/</url>
     <content><![CDATA[<p>TODO</p>
@@ -307,15 +307,6 @@
       <tags>
         <tag>索引</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>行式/列式/列族式数据库</title>
-    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
-    <content><![CDATA[<p>TODO</p>
-]]></content>
-      <categories>
-        <category>基础</category>
-      </categories>
   </entry>
   <entry>
     <title>使用Hexo+Next+github搭建个人博客</title>
@@ -463,6 +454,15 @@
 ]]></content>
       <categories>
         <category>工具</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>行式/列式/列族式数据库</title>
+    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>基础</category>
       </categories>
   </entry>
 </search>
