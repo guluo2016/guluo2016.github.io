@@ -13,6 +13,59 @@
       </tags>
   </entry>
   <entry>
+    <title>Elasticsearch的选举机制</title>
+    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>es</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Phoenix索引</title>
+    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
+<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
+<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
+<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
+<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
+<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
+<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
+<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
+<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
+<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
+<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
+<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
+<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
+<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
+<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
+<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
+<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
+<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
+<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
+]]></content>
+      <categories>
+        <category>phoenix</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>hadoop2.7.2集群搭建</title>
     <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
     <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
@@ -77,15 +130,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Elasticsearch的选举机制</title>
-    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<p>TODO</p>
-]]></content>
-      <categories>
-        <category>es</category>
-      </categories>
-  </entry>
-  <entry>
     <title>hbase事务</title>
     <url>/2022/08/16/hbase%E4%BA%8B%E5%8A%A1/</url>
     <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>HBase支持行级事务，也即用户对于HBase的一条数据的读写，HBase可以保证其原子性。对于多行事务，HBase并不能保证其原子性。</p>
@@ -141,50 +185,6 @@
       <tags>
         <tag>bigdata</tag>
         <tag>事务</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Phoenix索引</title>
-    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
-<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
-<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
-<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
-<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
-<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
-<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
-<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
-<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
-<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
-<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
-<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
-<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
-<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
-<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
-<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
-<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
-<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
-<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
-]]></content>
-      <categories>
-        <category>phoenix</category>
-      </categories>
-      <tags>
-        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
@@ -298,8 +298,49 @@
   </entry>
   <entry>
     <title>mysql索引</title>
-    <url>/2023/05/30/mysql%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<p>TODO</p>
+    <url>/2023/06/03/mysql%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
+<span id="more"></span>
+
+<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
+<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
+<ul>
+<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
+<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
+</ul>
+<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
+<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
+<li>优势：在查询数据时，基于索引进行查询速度很快</li>
+<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
+</ul>
+<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
+<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
+<blockquote>
+<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
+</blockquote>
+<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
+<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
+<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
+<blockquote>
+<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
+</blockquote>
+<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
+<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
+<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
+<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
+<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
+<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
+<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
+<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
+<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
+<ul>
+<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
+</ul>
+<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
+<ul>
+<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
+</ul>
+<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
 ]]></content>
       <categories>
         <category>mysql</category>
