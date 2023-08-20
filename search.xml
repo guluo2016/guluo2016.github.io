@@ -350,6 +350,19 @@
       </tags>
   </entry>
   <entry>
+    <title>neovim配置方案</title>
+    <url>/2023/08/18/neovim%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88/</url>
+    <content><![CDATA[<p>&#x2F;&#x2F;todo</p>
+<h3 id="什么是neovim？"><a href="#什么是neovim？" class="headerlink" title="什么是neovim？"></a>什么是neovim？</h3><h4 id="neovim诞生的背景"><a href="#neovim诞生的背景" class="headerlink" title="neovim诞生的背景"></a>neovim诞生的背景</h4><p>一个巴西程序员申请向vim合入一些patch，但是这些patch遭到vim创始人的拒绝。<br>在此背景下，该程序员fork了vim项目，并在此基础上发起了neovim项目。<br>neovim是基于vim项目开发的新项目，它能够完全兼容vim，并且提供了一些vim不具备的优秀功能。</p>
+<h4 id="neovim的特特点"><a href="#neovim的特特点" class="headerlink" title="neovim的特特点"></a>neovim的特特点</h4><h3 id="neovim配置方案"><a href="#neovim配置方案" class="headerlink" title="neovim配置方案"></a>neovim配置方案</h3><h4 id="安装neovim"><a href="#安装neovim" class="headerlink" title="安装neovim"></a>安装neovim</h4><h4 id="配置neovim"><a href="#配置neovim" class="headerlink" title="配置neovim"></a>配置neovim</h4>]]></content>
+      <categories>
+        <category>差生文具多</category>
+      </categories>
+      <tags>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用Hexo+Next+github搭建个人博客</title>
     <url>/2022/07/14/%E4%BD%BF%E7%94%A8Hexo-Next-github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</url>
     <content><![CDATA[<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo使用Markdown解析文章，在几秒内，即可利用靓丽的主题生成静态网页。这些静态资源文件可以托管在github或者其他服务器，形成我们自己的个人博客网站。</p>
@@ -494,8 +507,11 @@
 <p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714113512240.png" alt="image-20220714113512240"></p>
 ]]></content>
       <categories>
-        <category>工具</category>
+        <category>差生文具多</category>
       </categories>
+      <tags>
+        <tag>工具</tag>
+      </tags>
   </entry>
   <entry>
     <title>行式/列式/列族式数据库</title>
