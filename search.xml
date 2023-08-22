@@ -124,6 +124,39 @@
       </tags>
   </entry>
   <entry>
+    <title>linux中很有用的命令</title>
+    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
+<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
+<ul>
+<li>Windows中的文件格式为dos  </li>
+<li>Linux中的文件格式为unix</li>
+</ul>
+<span id="more"></span>
+
+<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
+
+<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
+<ul>
+<li><p>1 替换文本内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2 删除匹配行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3 插入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>hadoop2.7.2集群搭建</title>
     <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
     <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
@@ -188,37 +221,24 @@
       </tags>
   </entry>
   <entry>
-    <title>linux中很有用的命令</title>
-    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
-<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
-<ul>
-<li>Windows中的文件格式为dos  </li>
-<li>Linux中的文件格式为unix</li>
-</ul>
+    <title>Hello World</title>
+    <url>/2022/07/07/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
 <span id="more"></span>
 
-<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
-<ul>
-<li><p>1 替换文本内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>2 删除匹配行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>3 插入</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
-</ul>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
-      <categories>
-        <category>linux</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
-      </tags>
   </entry>
   <entry>
     <title>mysql中的mvcc</title>
@@ -277,28 +297,70 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2022/07/07/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+    <title>mysql索引</title>
+    <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
 <span id="more"></span>
 
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
+<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
+<ul>
+<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
+<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
+</ul>
+<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
+<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
+<li>优势：在查询数据时，基于索引进行查询速度很快</li>
+<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
+</ul>
+<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
+<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
+<blockquote>
+<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
+</blockquote>
+<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
+<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
+<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
+<blockquote>
+<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
+</blockquote>
+<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
+<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
+<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
+<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
+<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
+<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
+<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
+<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
+<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
+<ul>
+<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
+</ul>
+<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
+<ul>
+<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
+</ul>
+<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
 ]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>行式/列式/列族式数据库</title>
+    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>基础</category>
+      </categories>
   </entry>
   <entry>
     <title>neovim配置方案</title>
-    <url>/2023/08/18/neovim%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88/</url>
+    <url>/2023/08/23/neovim%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88/</url>
     <content><![CDATA[<h3 id="什么是neovim"><a href="#什么是neovim" class="headerlink" title="什么是neovim"></a>什么是neovim</h3><h4 id="neovim诞生的背景"><a href="#neovim诞生的背景" class="headerlink" title="neovim诞生的背景"></a>neovim诞生的背景</h4><p>一个巴西程序员申请向vim合入一些patch，但是这些patch遭到vim创始人的拒绝。<br>在此背景下，该程序员fork了vim项目，并在此基础上发起了neovim项目。<br>neovim是基于vim项目开发的新项目，它能够完全兼容vim，并且提供了一些vim不具备的优秀功能。</p>
 <span id="more"></span>
 <h4 id="neovim的特点"><a href="#neovim的特点" class="headerlink" title="neovim的特点"></a>neovim的特点</h4><p>&#x2F;&#x2F;todo<br>我是在网上调研了neovim比vim更加易用，因此我才使用neovim，后期补充自己对neovim的使用感受以及特点</p>
@@ -397,59 +459,6 @@
       </categories>
       <tags>
         <tag>工具</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>mysql索引</title>
-    <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
-<span id="more"></span>
-
-<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
-<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
-<ul>
-<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
-<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
-</ul>
-<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
-<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
-<li>优势：在查询数据时，基于索引进行查询速度很快</li>
-<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
-</ul>
-<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
-<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
-<blockquote>
-<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
-</blockquote>
-<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
-<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
-<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
-<blockquote>
-<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
-</blockquote>
-<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
-<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
-<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
-<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
-<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
-<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
-<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
-<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
-<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
-<ul>
-<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
-</ul>
-<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
-<ul>
-<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
-</ul>
-<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
-]]></content>
-      <categories>
-        <category>mysql</category>
-      </categories>
-      <tags>
-        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
@@ -602,14 +611,5 @@
       <tags>
         <tag>工具</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>行式/列式/列族式数据库</title>
-    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
-    <content><![CDATA[<p>TODO</p>
-]]></content>
-      <categories>
-        <category>基础</category>
-      </categories>
   </entry>
 </search>
