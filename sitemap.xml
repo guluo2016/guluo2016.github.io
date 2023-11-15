@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://guluo2016.github.io/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95-md/</loc>
+    
+    <lastmod>2023-11-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://guluo2016.github.io/2023/08/23/neovim%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88/</loc>
     
     <lastmod>2023-08-22</lastmod>
@@ -65,7 +74,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/tags/index.html</loc>
+    <loc>https://guluo2016.github.io/categories/index.html</loc>
     
     <lastmod>2023-05-30</lastmod>
     
@@ -74,7 +83,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/categories/index.html</loc>
+    <loc>https://guluo2016.github.io/tags/index.html</loc>
     
     <lastmod>2023-05-30</lastmod>
     
@@ -92,7 +101,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</loc>
+    <loc>https://guluo2016.github.io/2022/07/07/hello-world/</loc>
     
     <lastmod>2023-05-30</lastmod>
     
@@ -101,7 +110,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/2022/07/07/hello-world/</loc>
+    <loc>https://guluo2016.github.io/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</loc>
     
     <lastmod>2023-05-30</lastmod>
     
@@ -139,7 +148,7 @@
 
   <url>
     <loc>https://guluo2016.github.io/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -147,42 +156,42 @@
   
   <url>
     <loc>https://guluo2016.github.io/tags/%E7%AE%97%E6%B3%95/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://guluo2016.github.io/tags/%E7%B4%A2%E5%BC%95/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://guluo2016.github.io/tags/%E4%BA%8B%E5%8A%A1/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://guluo2016.github.io/tags/bigdata/</loc>
-    <lastmod>2023-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://guluo2016.github.io/tags/shell/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://guluo2016.github.io/tags/%E5%B7%A5%E5%85%B7/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://guluo2016.github.io/tags/shell/</loc>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -191,56 +200,56 @@
   
   <url>
     <loc>https://guluo2016.github.io/categories/%E5%9F%BA%E7%A1%80/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://guluo2016.github.io/categories/es/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://guluo2016.github.io/categories/phoenix/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://guluo2016.github.io/categories/hbase/</loc>
-    <lastmod>2023-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://guluo2016.github.io/categories/linux/</loc>
-    <lastmod>2023-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://guluo2016.github.io/categories/hadoop/</loc>
-    <lastmod>2023-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://guluo2016.github.io/categories/mysql/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://guluo2016.github.io/categories/%E5%B7%AE%E7%94%9F%E6%96%87%E5%85%B7%E5%A4%9A/</loc>
-    <lastmod>2023-08-22</lastmod>
+    <lastmod>2023-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://guluo2016.github.io/categories/hadoop/</loc>
+    <lastmod>2023-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://guluo2016.github.io/categories/linux/</loc>
+    <lastmod>2023-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://guluo2016.github.io/categories/mysql/</loc>
+    <lastmod>2023-11-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
