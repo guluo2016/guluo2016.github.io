@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Elasticsearch的选举机制</title>
-    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<p>TODO</p>
-]]></content>
-      <categories>
-        <category>es</category>
-      </categories>
-  </entry>
-  <entry>
     <title>2PC算法和共识算法</title>
     <url>/2023/05/30/2PC%E7%AE%97%E6%B3%95%E5%92%8C%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/</url>
     <content><![CDATA[<p>TODO</p>
@@ -20,6 +11,27 @@
       <tags>
         <tag>算法</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>archlinux安装部署记录</title>
+    <url>/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p>&#x2F;&#x2F;TODO</p>
+]]></content>
+      <categories>
+        <category>差生文具多</category>
+      </categories>
+      <tags>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Elasticsearch的选举机制</title>
+    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>es</category>
+      </categories>
   </entry>
   <entry>
     <title>Phoenix索引</title>
@@ -66,16 +78,24 @@
       </tags>
   </entry>
   <entry>
-    <title>archlinux安装部署记录</title>
-    <url>/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p>&#x2F;&#x2F;TODO</p>
+    <title>Hello World</title>
+    <url>/2022/07/07/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<span id="more"></span>
+
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
-      <categories>
-        <category>差生文具多</category>
-      </categories>
-      <tags>
-        <tag>工具</tag>
-      </tags>
   </entry>
   <entry>
     <title>hbase事务</title>
@@ -136,24 +156,37 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2022/07/07/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+    <title>linux中很有用的命令</title>
+    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
+<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
+<ul>
+<li>Windows中的文件格式为dos  </li>
+<li>Linux中的文件格式为unix</li>
+</ul>
 <span id="more"></span>
 
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
+<ul>
+<li><p>1 替换文本内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2 删除匹配行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3 插入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
+</ul>
 ]]></content>
+      <categories>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
   </entry>
   <entry>
     <title>hadoop2.7.2集群搭建</title>
@@ -217,39 +250,6 @@
       </categories>
       <tags>
         <tag>bigdata</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>linux中很有用的命令</title>
-    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
-<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
-<ul>
-<li>Windows中的文件格式为dos  </li>
-<li>Linux中的文件格式为unix</li>
-</ul>
-<span id="more"></span>
-
-<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
-
-<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
-<ul>
-<li><p>1 替换文本内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>2 删除匹配行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>3 插入</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>linux</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
       </tags>
   </entry>
   <entry>
