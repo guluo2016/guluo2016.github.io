@@ -176,14 +176,14 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/tags/bigdata/</loc>
+    <loc>https://guluo2016.github.io/tags/%E4%BA%8B%E5%8A%A1/</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/tags/%E4%BA%8B%E5%8A%A1/</loc>
+    <loc>https://guluo2016.github.io/tags/bigdata/</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -199,14 +199,14 @@
 
   
   <url>
-    <loc>https://guluo2016.github.io/categories/es/</loc>
+    <loc>https://guluo2016.github.io/categories/%E5%9F%BA%E7%A1%80/</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/categories/%E5%9F%BA%E7%A1%80/</loc>
+    <loc>https://guluo2016.github.io/categories/es/</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -227,13 +227,6 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/categories/hadoop/</loc>
-    <lastmod>2024-04-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://guluo2016.github.io/categories/hbase/</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>weekly</changefreq>
@@ -241,7 +234,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/categories/linux/</loc>
+    <loc>https://guluo2016.github.io/categories/hadoop/</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -249,6 +242,13 @@
   
   <url>
     <loc>https://guluo2016.github.io/categories/mysql/</loc>
+    <lastmod>2024-04-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://guluo2016.github.io/categories/linux/</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
