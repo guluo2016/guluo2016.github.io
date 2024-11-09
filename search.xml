@@ -22,15 +22,47 @@
       </categories>
   </entry>
   <entry>
-    <title>archlinux安装部署记录</title>
-    <url>/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p>&#x2F;&#x2F;TODO</p>
+    <title>Phoenix索引</title>
+    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
+<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
+<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
+<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
+<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
+<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
+<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
+<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
+<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
+<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
+<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
+<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
+<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
+<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
+<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
+<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
+<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
+<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
+<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
 ]]></content>
       <categories>
-        <category>差生文具多</category>
+        <category>phoenix</category>
       </categories>
       <tags>
-        <tag>工具</tag>
+        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
@@ -94,108 +126,6 @@
       </categories>
       <tags>
         <tag>日志</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hbase事务</title>
-    <url>/2022/08/16/hbase%E4%BA%8B%E5%8A%A1/</url>
-    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>HBase支持行级事务，也即用户对于HBase的一条数据的读写，HBase可以保证其原子性。对于多行事务，HBase并不能保证其原子性。</p>
-<p>为了保证行级事务，需要考虑写写控制和读写控制，对于读读操作，由于不涉及到数据的修改，因此无须进行并发控制。如果不考虑这两种控制，可能会出现数据不一致情况，也就不是事务了。</p>
-<p>下面对于写写控制和读写控制，分别考虑。</p>
-<span id="more"></span>
-
-<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><h4 id="无并发控制"><a href="#无并发控制" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>先考虑不进行并发控制的情况。</p>
-<p>假设有两个写线程，同一时间段内，对一行数据进行修改，由于HBase的写入需要经过好两个步骤：</p>
-<ul>
-<li>写WAL</li>
-<li>写入memstore</li>
-</ul>
-<p>如果不进行并发，那么在更新完WAL之后，在更新memstore时，可能第二个写线程先更新info:company,第一个写线程后更新info:company； 第一个线程先更新info:role，第二个线程后更新info:role，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
-<p>那么我们最终读取到的数据就是下面这样，即数据出现不一致。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
-<h4 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了行锁机制，以rowkey为锁，当写线程需要更新数据时，需要先获取行锁，然后才能更新，对于没有获取到行锁的写线程，只能等待，直至获取到行锁。具体的流程如下。</p>
-<ul>
-<li>写操作开始</li>
-<li>获取行锁</li>
-<li>更新WAL</li>
-<li>更新memstore</li>
-<li>释放锁</li>
-</ul>
-<h3 id="读写控制"><a href="#读写控制" class="headerlink" title="读写控制"></a>读写控制</h3><h4 id="无并发控制-1"><a href="#无并发控制-1" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>读写场景，同样先考虑不进行并发控制，可能会出现的情况。</p>
-<p>假如现在有两个写线程要更新同一行数据，同时一个读线程要对该行数据进行读取操作。读线程读取的时机是红线部分，此时第一个写线程已经完成，第二个写线程更新了一部分，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
-<p>那么读线程读取的数据就是下面这样子，同样会出现数据不一致情况。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
-<h4 id="并发控制-1"><a href="#并发控制-1" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBas引入了MVCC机制，采用无锁机制，实现读写控制。为了实现该机制，HBase在进行写操作时，会进行如下操作：</p>
-<ul>
-<li>获取行锁</li>
-<li>分配一个写事务id</li>
-<li>更新WAL</li>
-<li>更新memstore</li>
-<li>完成写事务id</li>
-<li>释放锁</li>
-</ul>
-<p>与此同时，对于每一次的读操作，HBase都会为其分配一个已经完成、且值最大的写事务id。</p>
-<p>如图所示，两个写线程开启写事务时，HBase分别为其分配一个写id，当读事务开启时，由于写事务1已经完成，而写事务2还未完成，因此分配的已完成、其值最大的写事务id是1，称之为read point。因此对该读事务而言，所有小于等于read point的数据都是对其可见的，大于read point的数据是不可见的。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
-<p>因此，在这种情况下，读线程最终读取的结果是这个样子。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
-<li><a href="https://blogs.apache.org/hbase/entry/apache_hbase_internals_locking_and"><strong>Apache HBase Internals: Locking and Multiversion Concurrency Control</strong></a></li>
-<li><a href="http://hbasefly.com/2017/07/26/transaction-2/"><strong>数据库事务系列－HBase行级事务模型</strong></a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>hbase</category>
-      </categories>
-      <tags>
-        <tag>事务</tag>
-        <tag>bigdata</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Phoenix索引</title>
-    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
-<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
-<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
-<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
-<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
-<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
-<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
-<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
-<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
-<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
-<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
-<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
-<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
-<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
-<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
-<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
-<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
-<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
-<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
-]]></content>
-      <categories>
-        <category>phoenix</category>
-      </categories>
-      <tags>
-        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
@@ -263,6 +193,174 @@
       </tags>
   </entry>
   <entry>
+    <title>hbase事务</title>
+    <url>/2022/08/16/hbase%E4%BA%8B%E5%8A%A1/</url>
+    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>HBase支持行级事务，也即用户对于HBase的一条数据的读写，HBase可以保证其原子性。对于多行事务，HBase并不能保证其原子性。</p>
+<p>为了保证行级事务，需要考虑写写控制和读写控制，对于读读操作，由于不涉及到数据的修改，因此无须进行并发控制。如果不考虑这两种控制，可能会出现数据不一致情况，也就不是事务了。</p>
+<p>下面对于写写控制和读写控制，分别考虑。</p>
+<span id="more"></span>
+
+<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><h4 id="无并发控制"><a href="#无并发控制" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>先考虑不进行并发控制的情况。</p>
+<p>假设有两个写线程，同一时间段内，对一行数据进行修改，由于HBase的写入需要经过好两个步骤：</p>
+<ul>
+<li>写WAL</li>
+<li>写入memstore</li>
+</ul>
+<p>如果不进行并发，那么在更新完WAL之后，在更新memstore时，可能第二个写线程先更新info:company,第一个写线程后更新info:company； 第一个线程先更新info:role，第二个线程后更新info:role，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
+<p>那么我们最终读取到的数据就是下面这样，即数据出现不一致。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<h4 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了行锁机制，以rowkey为锁，当写线程需要更新数据时，需要先获取行锁，然后才能更新，对于没有获取到行锁的写线程，只能等待，直至获取到行锁。具体的流程如下。</p>
+<ul>
+<li>写操作开始</li>
+<li>获取行锁</li>
+<li>更新WAL</li>
+<li>更新memstore</li>
+<li>释放锁</li>
+</ul>
+<h3 id="读写控制"><a href="#读写控制" class="headerlink" title="读写控制"></a>读写控制</h3><h4 id="无并发控制-1"><a href="#无并发控制-1" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>读写场景，同样先考虑不进行并发控制，可能会出现的情况。</p>
+<p>假如现在有两个写线程要更新同一行数据，同时一个读线程要对该行数据进行读取操作。读线程读取的时机是红线部分，此时第一个写线程已经完成，第二个写线程更新了一部分，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
+<p>那么读线程读取的数据就是下面这样子，同样会出现数据不一致情况。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<h4 id="并发控制-1"><a href="#并发控制-1" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBas引入了MVCC机制，采用无锁机制，实现读写控制。为了实现该机制，HBase在进行写操作时，会进行如下操作：</p>
+<ul>
+<li>获取行锁</li>
+<li>分配一个写事务id</li>
+<li>更新WAL</li>
+<li>更新memstore</li>
+<li>完成写事务id</li>
+<li>释放锁</li>
+</ul>
+<p>与此同时，对于每一次的读操作，HBase都会为其分配一个已经完成、且值最大的写事务id。</p>
+<p>如图所示，两个写线程开启写事务时，HBase分别为其分配一个写id，当读事务开启时，由于写事务1已经完成，而写事务2还未完成，因此分配的已完成、其值最大的写事务id是1，称之为read point。因此对该读事务而言，所有小于等于read point的数据都是对其可见的，大于read point的数据是不可见的。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
+<p>因此，在这种情况下，读线程最终读取的结果是这个样子。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://blogs.apache.org/hbase/entry/apache_hbase_internals_locking_and"><strong>Apache HBase Internals: Locking and Multiversion Concurrency Control</strong></a></li>
+<li><a href="http://hbasefly.com/2017/07/26/transaction-2/"><strong>数据库事务系列－HBase行级事务模型</strong></a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>hbase</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+        <tag>事务</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hbase的MOB文件清理机制</title>
+    <url>/2024/08/12/hbase%E7%9A%84MOB%E6%96%87%E4%BB%B6%E6%B8%85%E7%90%86%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<h4 id="清理MOB文件的线程"><a href="#清理MOB文件的线程" class="headerlink" title="清理MOB文件的线程"></a>清理MOB文件的线程</h4><p>MOB表中的mob文件有时候也需要清理，当MOB文件满足如下条件时，需要对其进行清理。  </p>
+<ul>
+<li>MOB文件中的数据已经过期无用，此时该MOB文件就可以被清理删除</li>
+<li>若干个小的MOB文件被合并之后，老的MOB文件不再被任何region所引用，此时也可以被清理删除</li>
+</ul>
+<p>针对MOB文件的清理，HBase提供了两个线程任务来执行，分别是<code>RSMobFileCleanerChore</code>和<code>MobFileCleanerChore</code>,两者的特点如下。</p>
+<ul>
+<li><code>MobFileCleanerChore</code><ul>
+<li>调用者：HMaster服务调用执行</li>
+<li>范围：针对整个HBase集群的MOB文件进行清理</li>
+<li>清理对象： 创建时间超过TTL时间的MOB文件</li>
+</ul>
+</li>
+<li><code>RSMobFileCleanerChore</code><ul>
+<li>调用者： RegionServer</li>
+<li>范围： 仅清理位于当前RegionServer上的Region所引用的MOB文件</li>
+<li>清理对象：没有被任何region引用的MOB文件，属于被清理的对象</li>
+</ul>
+</li>
+</ul>
+<span id="more"></span>
+
+<p>下面针对这两个MOB清理任务，分别进行详细说明。</p>
+<h4 id="MobFileCleanerChore工作机制"><a href="#MobFileCleanerChore工作机制" class="headerlink" title="MobFileCleanerChore工作机制"></a><code>MobFileCleanerChore</code>工作机制</h4><h5 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h5><p>只有满足如要条件的列族，<code>MobFileCleanerChore</code>才会对其执行清理操作</p>
+<ul>
+<li>列族是MOB类型</li>
+<li>列族配置的最小保存版本数为0，如果不为0，则不执行</li>
+<li>列族配置了TTL</li>
+</ul>
+<p>如下所示。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 检查列族是否是MOB类型， 最小保存的版本数是否为0</span></span><br><span class="line"><span class="keyword">if</span> (hcd.isMobEnabled() &amp;&amp; hcd.getMinVersions() == <span class="number">0</span>) &#123;</span><br><span class="line">	cleaner.cleanExpiredMobFiles(htd.getTableName().getNameAsString(), hcd);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断TTL</span></span><br><span class="line"><span class="type">long</span> <span class="variable">timeToLive</span> <span class="operator">=</span> columnDescriptor.getTimeToLive();  </span><br><span class="line"><span class="keyword">if</span> (Integer.MAX_VALUE == timeToLive) &#123;  </span><br><span class="line">  <span class="comment">// no need to clean, because the TTL is not set.  </span></span><br><span class="line">  <span class="keyword">return</span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="MobFileCleanerChore的判定条件"><a href="#MobFileCleanerChore的判定条件" class="headerlink" title="MobFileCleanerChore的判定条件"></a><code>MobFileCleanerChore</code>的判定条件</h5><h6 id="获取过期时间"><a href="#获取过期时间" class="headerlink" title="获取过期时间"></a>获取过期时间</h6><p><code>MobFileCleanerChore</code>任务是周期性任务，默认情况下，一天执行一次。<br>在执行时，会首先获取当前时间<code>current</code>，然后根据列族的TTL时间，计算一个过期时间，然后MOB文件时间在这个过期时间之前的，都认为是已经过期的文件，是可以被删除的。<br>如现在时间是<code>2024-09-26 12:00:00</code>, TTL是1天，则计算的过期时间是<code>2024-09-26 12:00:00</code>，然后再对时分秒清零，因此过期时间是<code>2024-09-26 00:00:00+000</code></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">Calendar</span> <span class="variable">calendar</span> <span class="operator">=</span> Calendar.getInstance();  </span><br><span class="line">calendar.setTimeInMillis(current - timeToLive * <span class="number">1000</span>);  </span><br><span class="line">calendar.set(Calendar.HOUR_OF_DAY, <span class="number">0</span>);  </span><br><span class="line">calendar.set(Calendar.MINUTE, <span class="number">0</span>);  </span><br><span class="line">calendar.set(Calendar.SECOND, <span class="number">0</span>);  </span><br><span class="line">calendar.set(Calendar.MILLISECOND, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这里需要说明下为什么要对时分秒清零？<br>因为MOB文件名中包含时间字符串，但是该字符串是不包含时分秒等数据。</p>
+</blockquote>
+<h6 id="获取MOB文件的时间"><a href="#获取MOB文件的时间" class="headerlink" title="获取MOB文件的时间"></a>获取MOB文件的时间</h6><p>MOB文件名的格式如下所示。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">d41d8cd98f00b204e9800998ecf8427e20240925221150b7685c4bf5bcba54c97658e3dd_63f50cb1b677b063afc5bcd56c703e2e</span><br></pre></td></tr></table></figure>
+<p>其中文件名字符串的<strong>32-39</strong>位表示的是该文件的创建时间，HBase通过解析该文件名字符串获取到MOB文件的创建时间。</p>
+<h6 id="MOB文件的时间来源"><a href="#MOB文件的时间来源" class="headerlink" title="MOB文件的时间来源"></a>MOB文件的时间来源</h6><p>MOB数据，在写入的时候也是会首先写入到Memstore，只是在flush的时候，会将元数据信息存放在hfile中，真实的数据会存储在MOB文件中。<br>HBase在flush的时候，会根据暂存在memstore中的KV数据的时间戳来确定MOB文件的时间，如果存在多个KV，则以最新的时间戳最为生成MOB文件的时间。</p>
+<p>示例：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1727061887ms = 1970-01-01 08:00:02</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1727061887000ms = 2024-09-23 11:24:47</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1727061889ms = 1970-01-21 07:44:21</span></span><br><span class="line">put &#x27;mob&#x27;, &#x27;r1&#x27;, &#x27;info:name&#x27;, bigdata_value, 1727061887</span><br><span class="line">put &#x27;mob&#x27;, &#x27;r2&#x27;, &#x27;info:name&#x27;, bigdata_value, 1727061887000</span><br><span class="line">put &#x27;mob&#x27;, &#x27;r3&#x27;, &#x27;info:name&#x27;, bigdata_value, 1727061889</span><br></pre></td></tr></table></figure>
+
+<p>如上所示，我们往mob表中写入了3个KV，其中最新的时间戳是第二个，时间是<code>1727061887000</code>, 因此生成的MOB文件时间就是<code>*20240923*</code>。</p>
+<h6 id="对比时间"><a href="#对比时间" class="headerlink" title="对比时间"></a>对比时间</h6><p>由于MOB文件时间是当前文件中最新KV的时间戳，因此只要该时间过期，那么意味着该文件中的所有数据都是过期的，因此都可以删除。<br>通过过期时间和MOB文件时间的对比，如果MOB文件时间处于过期时间之前的，则认为过期。</p>
+<blockquote>
+<p>比较时间的时候，忽略时分秒是否会删除未过期的数据？<br>答案是不会。</p>
+<p>原因：<br>对于MOB过期文件，hbase是允许多存一些时间的。<br>比较过期时间时，忽略了时分秒，意味着是以天为单位来进行比较的；且比较时是将早于过期时间的MOB文件判定为过期<code>fileDate &lt; 过期时间</code>，这意味着即使当天过期的MOB文件，也会继续保留一段时间，在第二天才会被删除，因此不会删除未过期的时间。</p>
+<p>举例说明：<br>ttl&#x3D;1s，MOB文件时间是<code>2024-10-20</code>，假设已经过期, <code>MobFileCleanerChore</code>在<code>2024-10-20 12:00:00</code>开始运行，计算出的过期时间是<code>2024-10-20 00:00:00</code>，由于<code>fileDate &lt; 过期时间</code>这个条件不成立，因此本次运行不会将其认定为过期。 只有在<code>2024-10-21 00:00:01</code>时刻及之后，该任务运行，才会判定该MOB文件过期。 </p>
+</blockquote>
+<h4 id="RSMobFileCleanerChore工作机制"><a href="#RSMobFileCleanerChore工作机制" class="headerlink" title="RSMobFileCleanerChore工作机制"></a><code>RSMobFileCleanerChore</code>工作机制</h4><h5 id="前提条件-1"><a href="#前提条件-1" class="headerlink" title="前提条件"></a>前提条件</h5><p>只有满足如下如要条件的列族，<code>RSMobFileCleanerChore</code>才会对其执行清理操作 </p>
+<ul>
+<li>列族是MOB类型</li>
+</ul>
+<p>代码如下所示。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;ColumnFamilyDescriptor&gt; list = MobUtils.getMobColumnFamilies(htd);</span><br></pre></td></tr></table></figure>
+
+<h5 id="RSMobFileCleanerChore的执行流程"><a href="#RSMobFileCleanerChore的执行流程" class="headerlink" title="RSMobFileCleanerChore的执行流程"></a><code>RSMobFileCleanerChore</code>的执行流程</h5><ol>
+<li>获取当前RegionServer上的表，针对每个表，有如下操作</li>
+<li>遍历每个表的Region</li>
+<li>针对每个Region，遍历其所有列族<ol>
+<li>找到该region下的MOB列族，遍历列族下的所有hfile文件，并进行如下操作<ol>
+<li>读取hfile，获取元数据信息</li>
+<li>元数据信息获取该hfile文件是否引用有MOB文件（原因是MOB列族中也可能写入小数据，此时是不生成MOB文件的）</li>
+<li>如果hfile文件引用有MOB文件，则记录该MOB文件信息；没有继续进行下一个hfile文件的判断</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>针对一个表，记录完毕所有满足条件的MOB文件信息</li>
+<li>再次针对这个表的MOB列族，进行如下操作</li>
+<li>遍历每个MOB列族</li>
+<li>针对每个MOB列族，获取对应的mobdir目录下的所有mob文件，针对文件，进行如下操作<ol>
+<li>根据文件名信息获取引用该MOB文件的region name</li>
+<li>基于region name判断该region是否在当前的这个RegionServer上，如果不在，跳过该MOB文件；如果在，进行下一步操作</li>
+<li>判断该MOB文件是否被region引用（和上面的记录信息比较），如果存在，则跳过该MOB文件；如果不存在，则说明没有引用，可以进行下一步操作</li>
+<li>判断该MOB文件的最后更新时间是否超过阈值（默认是1h），如果超过，则将其归档清理；不超过，则不归档</li>
+</ol>
+</li>
+</ol>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>虽然HBase中存在两类清理MOB文件的线程，<code>RSMobFileCleanerChore</code>和<code>MobFileCleanerChore</code>。<br>但是两者的作用是完全不同的。</p>
+<ul>
+<li><code>MobFileCleanerChore</code>线程，主要用于清理TTL过期的MOB文件，针对的是设置有TTL配置的MOB列族</li>
+<li><code>RSMobFileCleanerChore</code>线程，主要用于清理无用的MOB文件，针对的是MOB表中的所有MOB列族。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>hbase</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>archlinux安装部署记录</title>
+    <url>/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p>&#x2F;&#x2F;TODO</p>
+]]></content>
+      <categories>
+        <category>差生文具多</category>
+      </categories>
+      <tags>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2022/07/07/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -281,6 +379,39 @@
 
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>linux中很有用的命令</title>
+    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
+<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
+<ul>
+<li>Windows中的文件格式为dos  </li>
+<li>Linux中的文件格式为unix</li>
+</ul>
+<span id="more"></span>
+
+<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
+
+<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
+<ul>
+<li><p>1 替换文本内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2 删除匹配行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3 插入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
   </entry>
   <entry>
     <title>mysql中的mvcc</title>
@@ -442,92 +573,6 @@
       </tags>
   </entry>
   <entry>
-    <title>linux中很有用的命令</title>
-    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
-<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
-<ul>
-<li>Windows中的文件格式为dos  </li>
-<li>Linux中的文件格式为unix</li>
-</ul>
-<span id="more"></span>
-
-<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
-
-<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
-<ul>
-<li><p>1 替换文本内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>2 删除匹配行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>3 插入</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>linux</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>mysql索引</title>
-    <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
-<span id="more"></span>
-
-<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
-<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
-<ul>
-<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
-<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
-</ul>
-<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
-<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
-<li>优势：在查询数据时，基于索引进行查询速度很快</li>
-<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
-</ul>
-<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
-<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
-<blockquote>
-<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
-</blockquote>
-<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
-<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
-<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
-<blockquote>
-<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
-</blockquote>
-<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
-<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
-<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
-<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
-<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
-<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
-<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
-<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
-<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
-<ul>
-<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
-</ul>
-<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
-<ul>
-<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
-</ul>
-<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
-]]></content>
-      <categories>
-        <category>mysql</category>
-      </categories>
-      <tags>
-        <tag>索引</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>使用Hexo+Next+github搭建个人博客</title>
     <url>/2022/07/14/%E4%BD%BF%E7%94%A8Hexo-Next-github%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</url>
     <content><![CDATA[<p>Hexo 是一个快速、简洁且高效的博客框架。Hexo使用Markdown解析文章，在几秒内，即可利用靓丽的主题生成静态网页。这些静态资源文件可以托管在github或者其他服务器，形成我们自己的个人博客网站。</p>
@@ -676,6 +721,59 @@
       </categories>
       <tags>
         <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql索引</title>
+    <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
+<span id="more"></span>
+
+<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
+<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
+<ul>
+<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
+<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
+</ul>
+<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
+<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
+<li>优势：在查询数据时，基于索引进行查询速度很快</li>
+<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
+</ul>
+<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
+<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
+<blockquote>
+<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
+</blockquote>
+<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
+<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
+<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
+<blockquote>
+<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
+</blockquote>
+<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
+<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
+<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
+<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
+<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
+<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
+<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
+<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
+<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
+<ul>
+<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
+</ul>
+<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
+<ul>
+<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
+</ul>
+<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
