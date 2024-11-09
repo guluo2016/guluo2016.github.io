@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://guluo2016.github.io/2024/08/12/hbase%E7%9A%84MOB%E6%96%87%E4%BB%B6%E6%B8%85%E7%90%86%E6%9C%BA%E5%88%B6/</loc>
+    <loc>https://guluo2016.github.io/2024/11/09/hbase%E7%9A%84MOB%E6%96%87%E4%BB%B6%E6%B8%85%E7%90%86%E6%9C%BA%E5%88%B6/</loc>
     
     <lastmod>2024-11-09</lastmod>
     
@@ -101,7 +101,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/archives/index.html</loc>
+    <loc>https://guluo2016.github.io/categories/index.html</loc>
     
     <lastmod>2023-05-30</lastmod>
     
@@ -110,7 +110,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/categories/index.html</loc>
+    <loc>https://guluo2016.github.io/archives/index.html</loc>
     
     <lastmod>2023-05-30</lastmod>
     
@@ -155,7 +155,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</loc>
+    <loc>https://guluo2016.github.io/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</loc>
     
     <lastmod>2023-05-30</lastmod>
     
@@ -164,7 +164,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</loc>
+    <loc>https://guluo2016.github.io/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</loc>
     
     <lastmod>2023-05-30</lastmod>
     
@@ -189,14 +189,14 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/tags/%E7%B4%A2%E5%BC%95/</loc>
+    <loc>https://guluo2016.github.io/tags/%E6%97%A5%E5%BF%97/</loc>
     <lastmod>2024-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/tags/%E6%97%A5%E5%BF%97/</loc>
+    <loc>https://guluo2016.github.io/tags/%E5%B7%A5%E5%85%B7/</loc>
     <lastmod>2024-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -217,7 +217,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/tags/%E5%B7%A5%E5%85%B7/</loc>
+    <loc>https://guluo2016.github.io/tags/%E7%B4%A2%E5%BC%95/</loc>
     <lastmod>2024-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -247,7 +247,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/categories/phoenix/</loc>
+    <loc>https://guluo2016.github.io/categories/%E5%B7%AE%E7%94%9F%E6%96%87%E5%85%B7%E5%A4%9A/</loc>
     <lastmod>2024-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -268,7 +268,7 @@
   </url>
   
   <url>
-    <loc>https://guluo2016.github.io/categories/%E5%B7%AE%E7%94%9F%E6%96%87%E5%85%B7%E5%A4%9A/</loc>
+    <loc>https://guluo2016.github.io/categories/phoenix/</loc>
     <lastmod>2024-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
