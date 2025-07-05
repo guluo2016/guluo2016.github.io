@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Elasticsearch的选举机制</title>
-    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<p>TODO</p>
-]]></content>
-      <categories>
-        <category>es</category>
-      </categories>
-  </entry>
-  <entry>
     <title>2PC算法和共识算法</title>
     <url>/2023/05/30/2PC%E7%AE%97%E6%B3%95%E5%92%8C%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/</url>
     <content><![CDATA[<p>TODO</p>
@@ -19,6 +10,107 @@
       </categories>
       <tags>
         <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Elasticsearch的选举机制</title>
+    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>es</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Log4j2使用</title>
+    <url>/2024/05/21/Log4j2%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[<h3 id="log4j2的基础使用方式"><a href="#log4j2的基础使用方式" class="headerlink" title="log4j2的基础使用方式"></a>log4j2的基础使用方式</h3><p>log4j2是apache的一个使用非常广泛的日志框架，用于记录应用程序的日志信息。</p>
+<h4 id="需要的依赖"><a href="#需要的依赖" class="headerlink" title="需要的依赖"></a>需要的依赖</h4><p>要想使用该日志框架，需要引入如下依赖。</p>
+<span id="more"></span>
+
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- &lt;log4j2.version&gt;2.17.2&lt;log4j2.version&gt; --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j2.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j2.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="需要的配置"><a href="#需要的配置" class="headerlink" title="需要的配置"></a>需要的配置</h4><p>同时在resources目录下，创建日志配置文件，指定将日志输出到控制台。</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># log4j2.properties</span></span><br><span class="line"><span class="comment"># 定义log4j2自身内部日志的级别</span></span><br><span class="line"><span class="attr">status</span> = <span class="string">INFO  </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># appender定义</span></span><br><span class="line"><span class="attr">appender.console.type</span> = <span class="string">Console</span></span><br><span class="line"><span class="attr">appender.console.name</span> = <span class="string">STDOUT</span></span><br><span class="line"><span class="attr">appender.console.layout.type</span> = <span class="string">PatternLayout </span></span><br><span class="line"><span class="attr">appender.console.layout.pattern</span> = <span class="string">%d&#123;HH:mm:ss.SSS&#125; [%t] %-5level %logger&#123;36&#125; - %msg%n </span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"># 日志记录器定义  </span></span><br><span class="line"><span class="attr">rootLogger.level</span> = <span class="string">debug  </span></span><br><span class="line"><span class="attr">rootLogger.appenderRefs</span> = <span class="string">stdout  </span></span><br><span class="line"><span class="attr">rootLogger.appenderRef.stdout.ref</span> = <span class="string">STDOUT</span></span><br></pre></td></tr></table></figure>
+
+<p>就上面的日志配置，解释如下。</p>
+<h5 id="log4j2自身内部日志级别"><a href="#log4j2自身内部日志级别" class="headerlink" title="log4j2自身内部日志级别"></a>log4j2自身内部日志级别</h5><p>log4j2作为一个日志框架，其在启动，初始化配置，或者其他事件的时候，也会产生一些日志，这些日志被称之为log4j2自身内部的日志。<br>我们通过<code>status = INFO</code>，实际上是定义了这些日志的级别。</p>
+<h5 id="日志记录器和日志输出器"><a href="#日志记录器和日志输出器" class="headerlink" title="日志记录器和日志输出器"></a>日志记录器和日志输出器</h5><p>在log4j2中，有两个核心概念。</p>
+<ul>
+<li>日志记录器（<code>rootLogger/logger</code>）：用于在代码中输出日志信息。<code>rootLogger</code>是全局的根记录器，负责管理所有日志的默认行为。</li>
+<li>日志输出器（<code>appender</code>）：负责将日志输出到指定的位置，比如控制台或文件。如上所示，我们定义了一个<code>appender</code>，该<code>appender</code>的功能就是可以将日志输出到控制台。</li>
+</ul>
+<h5 id="appender配置的逐行解释"><a href="#appender配置的逐行解释" class="headerlink" title="appender配置的逐行解释"></a>appender配置的逐行解释</h5><ul>
+<li><code>appender.console.type = Console</code>：定义了一个名为<code>console</code>的日志输出器，其类型为<code>Console</code>，表示将日志输出到控制台。</li>
+<li><code>appender.console.name = STDOUT</code>：定义了一个名字叫<code>STDOUT</code>的输出器，这个是该appender的唯一标识符，logger可以通过该name引用这个appender。</li>
+<li><code>appender.console.layout.type = PatternLayout</code>：定义了appender的布局类型为<code>PatternLayout</code>，表示日志内容的格式化方式，<code>PatternLayout</code>允许你通过一个模式字符串来完全自定义日志消息的输出格式。其他布局类型还包括<code>JSONLayout</code>、<code>XMLLayout</code>等。</li>
+<li><code>appender.console.layout.pattern = %d&#123;HH:mm:ss.SSS&#125; [%t] %-5level %logger&#123;36&#125; - %msg%n</code>：定义了日志输出的格式模式。</li>
+</ul>
+<p>其中<code>appender.console.layout.pattern</code>的格式说明如下：</p>
+<ul>
+<li><code>%d&#123;HH:mm:ss.SSS&#125;</code>：表示日志事件的时间戳，格式为小时:分钟:秒.毫秒。</li>
+<li><code>[%t]</code>：表示当前线程的名称。</li>
+<li><code>%-5level</code>：表示日志级别，左对齐，占5个字符宽度。</li>
+<li><code>%logger&#123;36&#125;</code>：表示日志记录器的名称，最多显示36个字符。</li>
+<li><code>-</code>：表示日志消息前的分隔符，只是为了格式美观</li>
+<li><code>%msg</code>：表示日志消息内容</li>
+<li><code>%n</code>：表示换行符, 确保每条日志消息后都有一个换行。</li>
+</ul>
+<h5 id="logger配置的逐行解释"><a href="#logger配置的逐行解释" class="headerlink" title="logger配置的逐行解释"></a>logger配置的逐行解释</h5><ul>
+<li><code>rootLogger.level = debug</code>：定义了根记录器的日志级别为<code>debug</code>。</li>
+<li><code>rootLogger.appenderRefs = stdout</code>：指定<code>rootLogger</code>将引用哪些Appender来输出日志，appenderRefs是一个列表，可以包含多个appender, 表示logger可以将这个日志时间发送给多个appender进行输出。这里仅只定了一个，表示<code>rootLogger</code>将会把日志时间发送给名为<code>stdout</code>的appender。</li>
+<li><code>rootLogger.appenderRef.stdout.ref = STDOUT</code>：这里首先定义一个名字叫<code>stdout</code>的appender引用，该引用实际指向的appender指向上面定义的<code>STDOUT</code>，表示将日志输出到控制台。</li>
+</ul>
+<h4 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h4><p>在Java代码中，使用该日志框架。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.logging.log4j.LogManager;  </span><br><span class="line"><span class="keyword">import</span> org.apache.logging.log4j.Logger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">App</span> &#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">log</span> <span class="operator">=</span> LogManager.getLogger(App.class);  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        log.info(<span class="string">&quot;hello world&quot;</span>);  </span><br><span class="line">        log.debug(<span class="string">&quot;--------------&quot;</span>);  </span><br><span class="line">        System.out.println(<span class="string">&quot;aaaa&quot;</span>);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行，在控制台输出如下内容。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">17:18:59.080 [main] INFO  com.guluo.App - hello world</span><br><span class="line">17:18:59.087 [main] DEBUG com.guluo.App - --------------</span><br><span class="line">aaaa</span><br></pre></td></tr></table></figure>
+
+<h3 id="log4j2的实际应用方式"><a href="#log4j2的实际应用方式" class="headerlink" title="log4j2的实际应用方式"></a>log4j2的实际应用方式</h3><p>在实际开发中，我们通常不会直接在 Java 代码中使用 log4j2 的 API，因为这样会导致业务代码与具体日志框架强耦合，不利于后续日志框架的替换和维护。</p>
+<p>为了实现业务代码与实际的日志框架解耦，常用的办法就是引入slf4j。</p>
+<p>slf4j 主要为 Java 日志访问提供了一个标准化的 API 框架，其核心作用是作为日志门面，定义统一的接口，具体的日志实现则由其他框架（如 log4j、logback 等）完成。虽然 slf4j 自身也提供了简单的实现，但实际项目中很少直接使用。通常，Java 项目会选择 slf4j-api 作为日志门面，结合具体实现框架（如 log4j2、logback），并通过桥接器进行集成。</p>
+<p>例如，项目中以 slf4j 作为统一日志入口，实际日志实现采用 log4j2 时，可以使用 <code>log4j-slf4j-impl</code> 或 <code>slf4j-log4j12</code> 进行绑定。两者区别在于：</p>
+<ul>
+<li><code>slf4j-log4j12</code> 主要用于对接 log4j 1.x 版本（虽然也可用于 log4j2，但不推荐）；</li>
+<li><code>log4j-slf4j-impl</code> 专为 log4j2 设计，推荐用于 log4j2 集成。</li>
+</ul>
+<p>这样可以实现业务代码与日志实现的解耦，便于后续维护和替换日志框架。</p>
+<h4 id="log4j2与log4j的简单对比"><a href="#log4j2与log4j的简单对比" class="headerlink" title="log4j2与log4j的简单对比"></a>log4j2与log4j的简单对比</h4><p>可以简单认为log4j2是log4j的进阶版本，弥补了log4j日志框架的一些不足。下面是两者的比较。</p>
+<ul>
+<li>安全性：最显著的区别是安全性。log4j存在一些安全漏洞，其中最为严重的是远程代码执行漏洞，可能导致系统被攻击。log4j2在安全性方面做了改进，修复了这些漏洞，提高了系统的安全性。<br>  详情参考： <a href="https://kingx.me/Patch-log4j.html">Log4j 严重漏洞修复方案参考 CVE-2021-44228 – KINGX</a></li>
+<li>性能：log4j2在设计上进行了优化，采用异步日志记录机制，因此在性能方面通常比log4j更高效。log4j2能够更好地处理大量日志记录并提供更好的性能表现。</li>
+<li>配置灵活性：log4j2提供了更灵活的配置选项和功能，使得开发人员可以更好地控制日志记录的行为。相对而言，log4j2在配置方面更加灵活和强大。</li>
+</ul>
+<p>总的来说，log4j2相对于log4j在安全性、性能和配置灵活性方面都有所改进和优势，因此在选择日志框架时，更推荐使用log4j2以获得更好的体验和保障。</p>
+<h4 id="集成方式"><a href="#集成方式" class="headerlink" title="集成方式"></a>集成方式</h4><p>由于目前log4j2使用更为普遍，因此在采用<code>log4j-slf4j-impl</code>作为桥接器实现log4j2和slf4j的集成。</p>
+<p>在基础使用方式的基础上，再添加依赖，如下所示。</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-slf4j-impl<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.17.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，日志仍然是<code>log4j2.properties</code>，我们额外添加了一个普通<code>logger</code>。</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="attr">status</span> = <span class="string">INFO  </span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"># 定义控制台输出  </span></span><br><span class="line"><span class="attr">appender.console.type</span> = <span class="string">Console  </span></span><br><span class="line"><span class="attr">appender.console.name</span> = <span class="string">STDOUT  </span></span><br><span class="line"><span class="attr">appender.console.layout.type</span> = <span class="string">PatternLayout  </span></span><br><span class="line"><span class="attr">appender.console.layout.pattern</span> = <span class="string">%d&#123;HH:mm:ss.SSS&#125; [%t] %-5level %logger&#123;36&#125; - %msg%n  </span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"># 根记录器配置  </span></span><br><span class="line"><span class="attr">rootLogger.level</span> = <span class="string">debug  </span></span><br><span class="line"><span class="attr">rootLogger.appenderRefs</span> = <span class="string">stdout  </span></span><br><span class="line"><span class="attr">rootLogger.appenderRef.stdout.ref</span> = <span class="string">STDOUT  </span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"># 定义一个普通的logger</span></span><br><span class="line"><span class="attr">logger.http.name</span> = <span class="string">test-name</span></span><br><span class="line"><span class="attr">logger.http.level</span> = <span class="string">info</span></span><br><span class="line"><span class="attr">logger.http.appenderRefs</span> = <span class="string">console</span></span><br><span class="line"><span class="attr">logger.http.appenderRef.console.ref</span> = <span class="string">STDOUT</span></span><br><span class="line"><span class="comment"># 表示不再传递给父 Logger</span></span><br><span class="line"><span class="attr">logger.http.additivity</span> = <span class="string">false</span></span><br></pre></td></tr></table></figure>
+
+<p>Java代码如下所示。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;  </span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SlfLogTest</span> &#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">LOG</span> <span class="operator">=</span> LoggerFactory.getLogger(SlfLogTest.class);  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">test_log</span> <span class="operator">=</span> LoggerFactory.getLogger(<span class="string">&quot;test-name&quot;</span>);  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        LOG.info(<span class="string">&quot;hello world.....&quot;</span>);  </span><br><span class="line">        LOG.debug(<span class="string">&quot;sssssssssssssssssssssss&quot;</span>);  </span><br><span class="line">  </span><br><span class="line">        test_log.info(<span class="string">&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&quot;</span>);  </span><br><span class="line">        test_log.debug(<span class="string">&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;</span>);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出如下所示。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">11:34:03.573 [main] INFO  com.guluo.SlfLogTest - hello world.....</span><br><span class="line">11:34:03.582 [main] DEBUG com.guluo.SlfLogTest - sssssssssssssssssssssss</span><br><span class="line">11:34:03.583 [main] INFO  test-name - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</span><br></pre></td></tr></table></figure>
+
+<p>由于<code>test-name</code>配置的是，仅输出<code>info</code>级别及以上的日志，因此<code>test_log.debug()</code>日志不会输出，结果也与预期一致。</p>
+<h4 id="快速切换日志实现"><a href="#快速切换日志实现" class="headerlink" title="快速切换日志实现"></a>快速切换日志实现</h4><p>如果此时因为业务需要，我们需要将程序中的日志实现，从log4j2切换到logback，只需要做如下修改。</p>
+<p><strong>更新日志实现的依赖</strong><br>删除上述依赖，并添加如下依赖。</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>ch.qos.logback<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>logback-classic<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.slf4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>slf4j-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.7.30<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>更新日志配置文件</strong><br>删除<code>log4j2.properties</code>，并添加<code>logback.xml</code>，内容如下。</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span> <span class="attr">scan</span>=<span class="string">&quot;true&quot;</span> <span class="attr">scanPeriod</span>=<span class="string">&quot;60 seconds&quot;</span> <span class="attr">debug</span>=<span class="string">&quot;false&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">&quot;STDOUT&quot;</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.ConsoleAppender&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">encoder</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>%d&#123;HH:mm:ss.SSS&#125; [%thread] %-5level %logger&#123;36&#125; - %msg%n<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">level</span>=<span class="string">&quot;debug&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">&quot;STDOUT&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">root</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">logger</span> <span class="attr">name</span>=<span class="string">&quot;test-name&quot;</span> <span class="attr">level</span>=<span class="string">&quot;info&quot;</span> <span class="attr">additivity</span>=<span class="string">&quot;false&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">&quot;STDOUT&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">logger</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>完成上述步骤，即可实现日志框架的快速切换。可以发现，我们仅仅是修改了依赖和配置文件，而业务代码完全不需要修改。<br>这就是使用日志门面（如 slf4j）和具体日志实现（如 log4j2、logback）的好处。通过这种方式，我们可以轻松地在不同的日志框架之间切换，而不需要修改业务代码，从而实现了日志框架的解耦和灵活性。</p>
+]]></content>
+      <categories>
+        <category>基础</category>
+      </categories>
+      <tags>
+        <tag>日志</tag>
       </tags>
   </entry>
   <entry>
@@ -34,126 +126,19 @@
       </tags>
   </entry>
   <entry>
-    <title>Log4j2使用</title>
-    <url>/2024/05/21/Log4j2%E4%BD%BF%E7%94%A8/</url>
-    <content><![CDATA[<h3 id="log4j2的基础使用方式"><a href="#log4j2的基础使用方式" class="headerlink" title="log4j2的基础使用方式"></a>log4j2的基础使用方式</h3><p>log4j2是apache的一个使用非常广泛的日志框架，用于记录应用程序的日志信息。</p>
-<h4 id="需要的依赖"><a href="#需要的依赖" class="headerlink" title="需要的依赖"></a>需要的依赖</h4><p>要想使用该日志框架，需要引入如下依赖。</p>
-<span id="more"></span>
-
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j2.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j2.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="需要的配置"><a href="#需要的配置" class="headerlink" title="需要的配置"></a>需要的配置</h4><p>同时在resources目录下，创建日志配置文件，指定将日志输出到控制台。</p>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># log4j2.properties</span></span><br><span class="line"><span class="attr">status</span> = <span class="string">INFO  </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"># 定义控制台输出  </span></span><br><span class="line"><span class="attr">appender.console.type</span> = <span class="string">Console  </span></span><br><span class="line"><span class="attr">appender.console.name</span> = <span class="string">STDOUT  </span></span><br><span class="line"><span class="attr">appender.console.layout.type</span> = <span class="string">PatternLayout  </span></span><br><span class="line"><span class="attr">appender.console.layout.pattern</span> = <span class="string">%d&#123;HH:mm:ss.SSS&#125; [%t] %-5level %logger&#123;36&#125; - %msg%n  </span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"># 根记录器配置  </span></span><br><span class="line"><span class="attr">rootLogger.level</span> = <span class="string">debug  </span></span><br><span class="line"><span class="attr">rootLogger.appenderRefs</span> = <span class="string">stdout  </span></span><br><span class="line"><span class="attr">rootLogger.appenderRef.stdout.ref</span> = <span class="string">STDOUT</span></span><br></pre></td></tr></table></figure>
-<h4 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h4><p>在Java代码中，使用该日志框架。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.logging.log4j.LogManager;  </span><br><span class="line"><span class="keyword">import</span> org.apache.logging.log4j.Logger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">App</span> &#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">log</span> <span class="operator">=</span> LogManager.getLogger(App.class);  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        log.info(<span class="string">&quot;hello world&quot;</span>);  </span><br><span class="line">        log.debug(<span class="string">&quot;--------------&quot;</span>);  </span><br><span class="line">        System.out.println(<span class="string">&quot;aaaa&quot;</span>);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行，在控制台输出如下内容。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">17:18:59.080 [main] INFO  com.guluo.App - hello world</span><br><span class="line">17:18:59.087 [main] DEBUG com.guluo.App - --------------</span><br><span class="line">aaaa</span><br></pre></td></tr></table></figure>
-
-<h3 id="log4j2的通常使用方式"><a href="#log4j2的通常使用方式" class="headerlink" title="log4j2的通常使用方式"></a>log4j2的通常使用方式</h3><p>在实际中，我们并不会在Java代码中，直接通过这种方式来使用log4j2，原因是这样我们业务代码就与该日志框架强绑定了，不利于后面可能出现的日志框架切换问题。</p>
-<p>为了实现业务代码与实际的日志框架解耦，常用的办法就是引入slf4j。</p>
-<h4 id="slf4j简单介绍"><a href="#slf4j简单介绍" class="headerlink" title="slf4j简单介绍"></a>slf4j简单介绍</h4><p>slf4j主要是为了给Java日志访问提供一个标准、规范的API框架，其主要意义在于提供接口，具体的实现可以交由其他日志框架，例如log4j和logback等。<br>当然slf4j自己也提供了功能较为简单的实现，但是一般很少用到。<br>对于一般的Java项目而言，日志框架会选择slf4j-api作为门面，配上具体的实现框架（log4j、logback等），中间使用桥接器完成桥接。</p>
-<p>比如在项目中，使用slf4j作为日志统一入口，具体的日志实现使用log4j2。<br>那么我们可以使用，<code>log4j-slf4j-impl</code>或者<code>slf4j-log4j12</code>，实现slf4j与具体的日志实现框架log4j2的绑定。两者的区别在于</p>
-<ul>
-<li><code>slf4j-log4j12</code>主要是为了对接log4j 1.x版本的日志框架 【虽然基于该依赖，也可以对接log4j2日志框架】</li>
-<li><code>log4j-slf4j-impl</code> 主要是为了对接log4j2日志框架</li>
-</ul>
-<h4 id="log4j2与log4j的简单对比"><a href="#log4j2与log4j的简单对比" class="headerlink" title="log4j2与log4j的简单对比"></a>log4j2与log4j的简单对比</h4><p>可以简单认为log4j2是log4j的进阶版本，弥补了log4j日志框架的一些不足。下面是两者的比较。</p>
-<ul>
-<li>安全性：最显著的区别是安全性。log4j存在一些安全漏洞，其中最为严重的是远程代码执行漏洞，可能导致系统被攻击。log4j2在安全性方面做了改进，修复了这些漏洞，提高了系统的安全性。<br>  详情参考： <a href="https://kingx.me/Patch-log4j.html">Log4j 严重漏洞修复方案参考 CVE-2021-44228 – KINGX</a></li>
-<li>性能：log4j2在设计上进行了优化，采用异步日志记录机制，因此在性能方面通常比log4j更高效。log4j2能够更好地处理大量日志记录并提供更好的性能表现。</li>
-<li>配置灵活性：log4j2提供了更灵活的配置选项和功能，使得开发人员可以更好地控制日志记录的行为。相对而言，log4j2在配置方面更加灵活和强大。</li>
-</ul>
-<p>总的来说，log4j2相对于log4j在安全性、性能和配置灵活性方面都有所改进和优势，因此在选择日志框架时，更推荐使用log4j2以获得更好的体验和保障。</p>
-<h4 id="集成方式"><a href="#集成方式" class="headerlink" title="集成方式"></a>集成方式</h4><p>由于目前log4j2使用更为普遍，因此在采用<code>log4j-slf4j-impl</code>作为桥接器实现log4j2和slf4j的集成。</p>
-<p>在基础使用方式的基础上，再添加依赖，如下所示。</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-slf4j-impl<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.17.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>然后，进行如下配置。</p>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="attr">status</span> = <span class="string">INFO  </span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"># 定义控制台输出  </span></span><br><span class="line"><span class="attr">appender.console.type</span> = <span class="string">Console  </span></span><br><span class="line"><span class="attr">appender.console.name</span> = <span class="string">STDOUT  </span></span><br><span class="line"><span class="attr">appender.console.layout.type</span> = <span class="string">PatternLayout  </span></span><br><span class="line"><span class="attr">appender.console.layout.pattern</span> = <span class="string">%d&#123;HH:mm:ss.SSS&#125; [%t] %-5level %logger&#123;36&#125; - %msg%n  </span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"># 根记录器配置  </span></span><br><span class="line"><span class="attr">rootLogger.level</span> = <span class="string">debug  </span></span><br><span class="line"><span class="attr">rootLogger.appenderRefs</span> = <span class="string">stdout  </span></span><br><span class="line"><span class="attr">rootLogger.appenderRef.stdout.ref</span> = <span class="string">STDOUT  </span></span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="attr">logger.http.name</span> = <span class="string">test-name  </span></span><br><span class="line"><span class="attr">logger.http</span> = <span class="string">info,Console</span></span><br></pre></td></tr></table></figure>
-
-<p>需要注意的是，<code>logger.http = debug,Console</code>这个简写形式的配置，是自2.17.2版本才开始支持的，如果是之前的版本，并不支持简写，需要写成如下方式。</p>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="attr">logger.http.level</span> = <span class="string">info</span></span><br><span class="line"><span class="attr">logger.http.appender</span> = <span class="string">Console</span></span><br></pre></td></tr></table></figure>
-
-<p>详情见：<a href="https://issues.apache.org/jira/browse/LOG4J2-3341">LOG4J2-3341 Support passing something like ‘-Dlog4j.rootLogger&#x3D;INFO,Console’ from command line to set level and appenders at once - ASF JIRA (apache.org)</a></p>
-<p>上述配置的意思是。</p>
-<ul>
-<li>名字为test-name的日志，按照logger.http* 方式控制</li>
-<li>其余日志按照rootLogger方式控制</li>
-</ul>
-<p>Java代码如下所示。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;  </span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SlfLogTest</span> &#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">LOG</span> <span class="operator">=</span> LoggerFactory.getLogger(SlfLogTest.class);  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">test_log</span> <span class="operator">=</span> LoggerFactory.getLogger(<span class="string">&quot;test-name&quot;</span>);  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;  </span><br><span class="line">        LOG.info(<span class="string">&quot;hello world.....&quot;</span>);  </span><br><span class="line">        LOG.debug(<span class="string">&quot;sssssssssssssssssssssss&quot;</span>);  </span><br><span class="line">  </span><br><span class="line">        test_log.info(<span class="string">&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&quot;</span>);  </span><br><span class="line">        test_log.debug(<span class="string">&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;</span>);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出如下所示。</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">11:34:03.573 [main] INFO  com.guluo.SlfLogTest - hello world.....</span><br><span class="line">11:34:03.582 [main] DEBUG com.guluo.SlfLogTest - sssssssssssssssssssssss</span><br><span class="line">11:34:03.583 [main] INFO  test-name - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</span><br></pre></td></tr></table></figure>
-
-<p>由于<code>test-name</code>配置的是，仅输出info级别及以上的日志，因此<code>test_log.debug()</code>日志不会输出，结果也与预期一致。</p>
-]]></content>
-      <categories>
-        <category>基础</category>
-      </categories>
-      <tags>
-        <tag>日志</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Phoenix索引</title>
-    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
-<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
-<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
-<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
-<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
-<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
-<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
-<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
-<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
-<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
-<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
-<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
-<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
-<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
-<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
-<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
-<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
-<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
-<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
-]]></content>
-      <categories>
-        <category>phoenix</category>
-      </categories>
-      <tags>
-        <tag>索引</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>github自定义codespace</title>
-    <url>/2025/01/06/github%E8%87%AA%E5%AE%9A%E4%B9%89codespace/</url>
+    <url>/2025/01/07/github%E8%87%AA%E5%AE%9A%E4%B9%89codespace/</url>
     <content><![CDATA[<h3 id="github-codespace的作用"><a href="#github-codespace的作用" class="headerlink" title="github codespace的作用"></a>github codespace的作用</h3><p>github提供的codespace功能，实际上就是一台docker虚拟机（默认2核8GB内存32GB磁盘空间），且默认情况下，该虚拟机已经为我们默认安装了一些基础的开发环境，如java、python环境等等。<br>好处是该虚拟机位于外网，在编译各种软件时，可以通过极快的网速下载各种依赖，几乎不会出现像国内网络经常遇到的下载某个依赖失败的情况（Timeout）。</p>
-<p>免费版版本的限制：</p>
+<p>免费版的限制：</p>
 <ul>
 <li>codespace不能作为常驻服务器使用，因为一段时间不使用，就会自动关闭</li>
 <li>codespace可使用的资源（cpu，内存和磁盘）有限制，但是提供的资源几乎可以满足个人的绝大部分需求了</li>
 </ul>
 <span id="more"></span>
 
-<p>默认情况下，Github的codespace的虚拟机是一个Ubuntu系统，可能不一定能够满足我们的需求（比如说我们可能需要一个centos环境）。<br>幸运的是，codespace也支持自定义，因此我们可以自定义一套满足自身需求的codespace。</p>
+<p>默认情况下，Github的codespace的虚拟机是一个Ubuntu系统，可能不一定能够满足我们的需求（比如说我们可能需要一个centos环境）。<br>同时，codespace也支持自定义，因此我们可以自定义一套满足自身需求的codespace。</p>
 <h3 id="自定义codespace"><a href="#自定义codespace" class="headerlink" title="自定义codespace"></a>自定义codespace</h3><p>自定义配置如下。</p>
-<h4 id="制定-devcontainer"><a href="#制定-devcontainer" class="headerlink" title="制定.devcontainer"></a>制定<code>.devcontainer</code></h4><p>在指定仓库中的根目录下，创建一个文件夹：<code>.devcontainer</code>.<br>在该文件夹中创建两个文件。</p>
+<h4 id="创建-devcontainer"><a href="#创建-devcontainer" class="headerlink" title="创建.devcontainer"></a>创建<code>.devcontainer</code></h4><p>在指定仓库中的根目录下，创建一个文件夹：<code>.devcontainer</code>.<br>在该文件夹中创建两个文件。</p>
 <ul>
 <li><code>devcontainer.json</code>，该文件用于声明容器的环境</li>
 <li><code>Dockerfile</code>，用于定义docker镜像</li>
@@ -164,7 +149,7 @@
 <p>其中</p>
 <ul>
 <li><code>name</code>用于声明docker容器的名字。</li>
-<li><code>build</code>制定如何构建镜像，这里选择使用Dockerfile</li>
+<li><code>build</code>，用于指定如何构建镜像，这里选择使用Dockerfile</li>
 <li><code>settings</code>,用于配置VSCode在docker容器中的默认配置</li>
 <li><code>extensions</code>，用于配置VSCode的扩展插件</li>
 <li><code>remoteUser</code>,用于指明登录该docker容器的用户</li>
@@ -178,14 +163,13 @@
 <ul>
 <li><code>branch</code>: 选择<code>.devcontainer</code>所推送的那个分支</li>
 <li><code>Dev container configuration</code>，会自动解析<code>devcontainer.json</code>中的name，并在此展示</li>
-<li><code>region</code>保持默认和<code>Machine type</code>保持默认即可</li>
+<li><code>region</code>保持默认和<code>Machine type</code>保持默认即可<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106235831116.png" alt="IMG-20250106235831116"></li>
 </ul>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106235831116.png" alt="IMG-20250106235831116"></p>
 <p>点击<code>Create codespace</code>即可在github上创建一个自定义的Docker容器。</p>
 <h3 id="打开codespace的方式"><a href="#打开codespace的方式" class="headerlink" title="打开codespace的方式"></a>打开codespace的方式</h3><p>当codespace创建OK之后，github支持多种打开方式，常用的如下。</p>
 <ul>
 <li>使用浏览器直接打开</li>
-<li>使用VSCode打开 （需要本机安装VSCode，注意衍生的版本不行，如Cusor,VSCodium就不支持）<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106234150677.png" alt="IMG-20250106234150677"></li>
+<li>使用VSCode打开（需要本机安装VSCode，注意衍生版本不支持，如Cursor、VSCodium等）<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106234150677.png" alt="IMG-20250106234150677"></li>
 </ul>
 ]]></content>
       <categories>
@@ -251,232 +235,6 @@
       <tags>
         <tag>事务</tag>
         <tag>bigdata</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hadoop2.7.2集群搭建</title>
-    <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">主机名分别是：master,salve1,salve2</span></span><br><span class="line">192.168.0.11  </span><br><span class="line">192.168.0.12  </span><br><span class="line">192.168.0.13</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<h2 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h2><p>修改hosts文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">127.0.0.1 localhost</span><br><span class="line">192.168.0.11    master</span><br><span class="line">192.168.0.12    slave1</span><br><span class="line">192.168.0.13    slave2</span><br></pre></td></tr></table></figure>
-<h2 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h2><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装ssh服务端</span><br><span class="line">yum install openssh-server -y</span><br><span class="line">#安装ssh客户端</span><br><span class="line">yum install openssh-clients -y</span><br></pre></td></tr></table></figure>
-<p>使用命令:<code>ssh-keygen</code>生成本机密钥和公钥，这些文件在{USER_HOME}&#x2F;.ssh目录下，进入该目录，执行命令：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#authorized_keys文件若没有，首先创建一个</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br></pre></td></tr></table></figure>
-<p>将authorize_keys文件分发到其他主机上，并追加到对应的authorized_keys文件中。即可实现在master主机上，免密登录其他主机。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh slave1   //免密登录</span><br></pre></td></tr></table></figure>
-
-<h2 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h2><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf jdk-XXX.tar.gz -C /opt</span><br><span class="line"></span><br><span class="line">#修改/etc/profile，添加如下语句</span><br><span class="line">export JAVA_HOME=/opt/jdk-XXX</span><br><span class="line">export PATH=&#123;JABA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
-
-<h2 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h2><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf hadoop-2.7.1.XXX.tar.gz -C /opt</span><br></pre></td></tr></table></figure>
-
-<p>进入hadoop安装目录，修改etc&#x2F;hadoop目录下的各个配置文件：<br>修改core-site.xml文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9002&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.default.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;file:/home/hadoop/tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改hdfs-site.xml文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:9001&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">         &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">         &lt;value&gt;file:/home/hadoop/dfs/name&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">          &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">          &lt;value&gt;file:/home/hadoop/dfs/data&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">           &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">           &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改mapred-site.xml文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master10020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19888&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改yarn-site.xml文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8032&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8030&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8031&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.admin.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8033&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8088&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改slaves文件,用于指定slave节点：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">slave1 </span><br><span class="line">slave2</span><br></pre></td></tr></table></figure>
-
-<p>修改hadoop-env.sh文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将export JAVA_HOME行修改成如下：</span><br><span class="line">export JAVA_HOME=/opt/jdk.XXX</span><br></pre></td></tr></table></figure>
-
-<p>修改&#x2F;etc&#x2F;profile文件：   </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export HADOOP_HOME=/opt/hadoop-2.7.1</span><br><span class="line">export PATH=&#123;HADOOP_HOME&#125;/bin:$&#123;JAVA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#指令命令：</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
-
-<p>到此，hadoop已经配置成功了，通过scp命令将hadoop解压包分发到各个节点上：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br></pre></td></tr></table></figure>
-<p>到此，hadoop集群搭建完毕，开始进行hdfs文件系统的格式化操作：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop namenode -format</span><br></pre></td></tr></table></figure>
-<p>当出现如下日志信息时，表示格式化hdfs成功：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">Storage directory /home/hadoop/dfs/name has been successfully formated.</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h2 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h2><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hdfs dfs -mkdir  /input</span><br><span class="line"></span><br><span class="line">hdfs dfs -put /home/word.txt /input</span><br></pre></td></tr></table></figure>
-
-<p>使用hadoop自带的wordcount类来统计word.txt中的字数：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop jar /opt/hadoop-2.7.1/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.XX.jar worcount /input/* /out  </span><br><span class="line"></span><br><span class="line">使用如下指令查看统计结果：</span><br><span class="line">hdfs dfs -cat /out/*</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>hadoop</category>
-      </categories>
-      <tags>
-        <tag>bigdata</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>linux中很有用的命令</title>
-    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
-<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
-<ul>
-<li>Windows中的文件格式为dos  </li>
-<li>Linux中的文件格式为unix</li>
-</ul>
-<span id="more"></span>
-
-<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
-
-<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
-<ul>
-<li><p>1 替换文本内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>2 删除匹配行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>3 插入</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>linux</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2022/07/07/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<span id="more"></span>
-
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>mysql索引</title>
-    <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
-<span id="more"></span>
-
-<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
-<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
-<ul>
-<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
-<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
-</ul>
-<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
-<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
-<li>优势：在查询数据时，基于索引进行查询速度很快</li>
-<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
-</ul>
-<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
-<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
-<blockquote>
-<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
-</blockquote>
-<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
-<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
-<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
-<blockquote>
-<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
-</blockquote>
-<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
-<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
-<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
-<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
-<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
-<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
-<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
-<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
-<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
-<ul>
-<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
-</ul>
-<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
-<ul>
-<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
-</ul>
-<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
-]]></content>
-      <categories>
-        <category>mysql</category>
-      </categories>
-      <tags>
-        <tag>索引</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>mysql中的mvcc</title>
-    <url>/2022/08/16/mysql%E4%B8%AD%E7%9A%84mvcc/</url>
-    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>MVCC全称多版本并发控制。</p>
-<p>主要原理就是对于同一份数据，在数据库中存储多份，每一份都是一个版本。然后根据事务发生的先后顺序，来决定哪些版本的数据对该事务可见，从而实现并发控制。</p>
-<p><strong>MVCC主要解决的问题</strong></p>
-<p>MVCC主要解决的是读写并发问题，可以在无锁情况下实现读写并发，从而可以提交读写效率。</p>
-<p>关系型数据库中的读已提交、可重复读事务的隔离等级就是基于MVCC实现的。</p>
-<span id="more"></span>
-<h3 id="MVCC在mysql中的应用"><a href="#MVCC在mysql中的应用" class="headerlink" title="MVCC在mysql中的应用"></a>MVCC在mysql中的应用</h3><p>mysql中的Innodb存储引擎支持MVCC，对于Innodb表，mysql会默认为表创建几个隐藏列，其中比较重要的就是</p>
-<ul>
-<li><p>tx_id ,事务id列，用于表明修改该行数据的事务id</p>
-</li>
-<li><p>回滚指针列，由于Innodb支持事务，且默认事务的隔离等级为可重复读，其内部对于一行数据，会存储多个版本，回滚指针用于指向在事务修改该行数据之前，该行数据的样子(即该行数据的上一个版本)，如下图所示，图片来自 <a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么</a></p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/bVbyzV9" alt="Undo Log回滚历史记录"></p>
-</li>
-</ul>
-<h4 id="mvcc实现可重复读"><a href="#mvcc实现可重复读" class="headerlink" title="mvcc实现可重复读"></a>mvcc实现可重复读</h4><p>mysql会按照事务的先后顺序，以严格递增方式为每一个事务分配一个唯一的事务id。</p>
-<p>当mysql开启一个事务时，会立即形成一个快照，称之为<code>read view</code>,<code>read view</code>中记录了所有当前活跃的事务id(<strong>所谓活跃，是指事务已经开始，但是还没有结束</strong>)。在<code>read view</code>中的活跃事务集合中，存在一个最小id的事务，假设称之为<code>low_tx_id</code>, 存在一个最大事务id，<code>high_tx_id</code>。当前事务称之为<code>cur_tx_id</code>，假定<code>cur_tx_id</code>要读取的那行数据的隐藏事务列为<code>tx_id</code>，则可能存在如下几种情况。</p>
-<blockquote>
-<p><strong>这里需要说明一点，当前事务id不一定是<code>read view</code>中的最大值，因为在开启事务时，生成<code>read view</code>之前，可能会有新的事务进来，这个时候就会出现<code>read view</code>中的<code>rv_max_tx_id</code>比当前事务id大的情况</strong></p>
-</blockquote>
-<ul>
-<li><code>cur_tx_id = tx_id</code>，表示这行数据就是由当前事务修改的，必然对该事务可见</li>
-<li><code>tx_id &lt; low_tx_id</code>，表示在当前事务开启的时候，<code>tx_id</code>所代表的事务已经提交了，因此这行的该版本数据，对当前事务可见</li>
-<li><code>low_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务还未提交，因此这行数据的这个版本对当前事务不可见</li>
-<li>l<code>ow_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>不在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务已经提交，因此这行数据对当前事务可见</li>
-<li><code>tx_id &gt; high_tx_id</code>，表示<code>tx_id</code>事务是在当前事务开启之后提交的，因此数据对当前事务不可见</li>
-</ul>
-<p>mvcc通过如上原理，再加上回滚指针，按照如下流程就行读取。</p>
-<ul>
-<li><p>当读取的数据版本，对当前事务可见时，则可以直接读取，结束</p>
-</li>
-<li><p>当读取的数据版本，对当前事务不可见时，则按照改行的隐藏列回滚指针列，去读取这上数据的上一个版本（这个数据是存储在undo日志中的）</p>
-</li>
-<li><p>首先读取这个版本对应的事务id列，获取<code>tx_id</code>，并与上述规则进行匹配，成功，则该版本数据对当前事务可见，结束； 否则继续第二步</p>
-</li>
-</ul>
-<h4 id="MVCC实现读已提交"><a href="#MVCC实现读已提交" class="headerlink" title="MVCC实现读已提交"></a>MVCC实现读已提交</h4><p>在读提提交隔离级别，MVCC遵循的规则和上面一致，不同的点是，在事务执行过程中，每一次的读操作，都会创建一个<code>read view</code>。</p>
-<p>这样的话，<code>read view</code>不断更新，因此之前不可见的数据，随着对应事务的提交，也会对当前事务可见，从而就实现了读已提交。具体流程如下。</p>
-<ul>
-<li>读事务开启</li>
-<li>当要进行读取操作时，立即生成一个<code>read view</code>,并获取对应行数据，安装MVCC规则进行匹配，匹配成功，则该版本数据对当前事务可见，否则根据回滚指针读取上一个版本的数据，直至读取到对当前事务可见的版本</li>
-<li>其他操作</li>
-<li>当再次涉及到读操作时，继续进行第二步操作</li>
-</ul>
-<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><p>MVCC实现了读写之前的无锁并发控制，而对于写写操作，Innodb表采用锁机制来进行并发控制，不过它采用的是行锁来进行控制，与表锁相比，它的粒度更细，锁定的范围更小，因此效率更高。</p>
-<p><strong>参考：<a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么？</a>    <a href="https://segmentfault.com/a/1190000037557620">https://segmentfault.com/a/1190000037557620</a></strong></p>
-]]></content>
-      <categories>
-        <category>mysql</category>
-      </categories>
-      <tags>
-        <tag>事务</tag>
       </tags>
   </entry>
   <entry>
@@ -575,6 +333,276 @@
       </categories>
       <tags>
         <tag>bigdata</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Phoenix索引</title>
+    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
+<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
+<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
+<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
+<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
+<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
+<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
+<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
+<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
+<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
+<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
+<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
+<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
+<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
+<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
+<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
+<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
+<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
+<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
+]]></content>
+      <categories>
+        <category>phoenix</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hadoop2.7.2集群搭建</title>
+    <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">主机名分别是：master,salve1,salve2</span></span><br><span class="line">192.168.0.11  </span><br><span class="line">192.168.0.12  </span><br><span class="line">192.168.0.13</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h2 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h2><p>修改hosts文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">127.0.0.1 localhost</span><br><span class="line">192.168.0.11    master</span><br><span class="line">192.168.0.12    slave1</span><br><span class="line">192.168.0.13    slave2</span><br></pre></td></tr></table></figure>
+<h2 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h2><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装ssh服务端</span><br><span class="line">yum install openssh-server -y</span><br><span class="line">#安装ssh客户端</span><br><span class="line">yum install openssh-clients -y</span><br></pre></td></tr></table></figure>
+<p>使用命令:<code>ssh-keygen</code>生成本机密钥和公钥，这些文件在{USER_HOME}&#x2F;.ssh目录下，进入该目录，执行命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#authorized_keys文件若没有，首先创建一个</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br></pre></td></tr></table></figure>
+<p>将authorize_keys文件分发到其他主机上，并追加到对应的authorized_keys文件中。即可实现在master主机上，免密登录其他主机。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh slave1   //免密登录</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h2><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf jdk-XXX.tar.gz -C /opt</span><br><span class="line"></span><br><span class="line">#修改/etc/profile，添加如下语句</span><br><span class="line">export JAVA_HOME=/opt/jdk-XXX</span><br><span class="line">export PATH=&#123;JABA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h2><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf hadoop-2.7.1.XXX.tar.gz -C /opt</span><br></pre></td></tr></table></figure>
+
+<p>进入hadoop安装目录，修改etc&#x2F;hadoop目录下的各个配置文件：<br>修改core-site.xml文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9002&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.default.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;file:/home/hadoop/tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改hdfs-site.xml文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:9001&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">         &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">         &lt;value&gt;file:/home/hadoop/dfs/name&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">          &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">          &lt;value&gt;file:/home/hadoop/dfs/data&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">           &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">           &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改mapred-site.xml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master10020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19888&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改yarn-site.xml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8032&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8030&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8031&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.admin.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8033&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8088&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改slaves文件,用于指定slave节点：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">slave1 </span><br><span class="line">slave2</span><br></pre></td></tr></table></figure>
+
+<p>修改hadoop-env.sh文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将export JAVA_HOME行修改成如下：</span><br><span class="line">export JAVA_HOME=/opt/jdk.XXX</span><br></pre></td></tr></table></figure>
+
+<p>修改&#x2F;etc&#x2F;profile文件：   </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export HADOOP_HOME=/opt/hadoop-2.7.1</span><br><span class="line">export PATH=&#123;HADOOP_HOME&#125;/bin:$&#123;JAVA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#指令命令：</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<p>到此，hadoop已经配置成功了，通过scp命令将hadoop解压包分发到各个节点上：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br></pre></td></tr></table></figure>
+<p>到此，hadoop集群搭建完毕，开始进行hdfs文件系统的格式化操作：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop namenode -format</span><br></pre></td></tr></table></figure>
+<p>当出现如下日志信息时，表示格式化hdfs成功：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">Storage directory /home/hadoop/dfs/name has been successfully formated.</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h2><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hdfs dfs -mkdir  /input</span><br><span class="line"></span><br><span class="line">hdfs dfs -put /home/word.txt /input</span><br></pre></td></tr></table></figure>
+
+<p>使用hadoop自带的wordcount类来统计word.txt中的字数：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop jar /opt/hadoop-2.7.1/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.XX.jar worcount /input/* /out  </span><br><span class="line"></span><br><span class="line">使用如下指令查看统计结果：</span><br><span class="line">hdfs dfs -cat /out/*</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>hadoop</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2022/07/07/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<span id="more"></span>
+
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>linux中很有用的命令</title>
+    <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>记录一些常用的Linux指令。</p>
+<h2 id="dos2unix"><a href="#dos2unix" class="headerlink" title="dos2unix"></a>dos2unix</h2><p>把Windows上创建的文件，拷贝到Linux机器上，通常会出现文件格式不正确问题，从而导致会出现一些问题，最明显的就是shell脚本，这事因为Windows中的换行符是<code>\r\n</code>,而在Linux中，文件换行符是<code>\n</code></p>
+<ul>
+<li>Windows中的文件格式为dos  </li>
+<li>Linux中的文件格式为unix</li>
+</ul>
+<span id="more"></span>
+
+<p>为了把dos文件转换成unix，可以使用dos2unix工具，不仅可以对单个文件进行转换，还可以批量转换，很好用</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#单个文件转换</span><br><span class="line">dos2unix fileName</span><br><span class="line"></span><br><span class="line">#批量转换</span><br><span class="line">find ./ -type f | xargs dos2unix</span><br></pre></td></tr></table></figure>
+
+<h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
+<ul>
+<li><p>1 替换文本内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2 删除匹配行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3 插入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
+      <categories>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql中的mvcc</title>
+    <url>/2022/08/16/mysql%E4%B8%AD%E7%9A%84mvcc/</url>
+    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>MVCC全称多版本并发控制。</p>
+<p>主要原理就是对于同一份数据，在数据库中存储多份，每一份都是一个版本。然后根据事务发生的先后顺序，来决定哪些版本的数据对该事务可见，从而实现并发控制。</p>
+<p><strong>MVCC主要解决的问题</strong></p>
+<p>MVCC主要解决的是读写并发问题，可以在无锁情况下实现读写并发，从而可以提交读写效率。</p>
+<p>关系型数据库中的读已提交、可重复读事务的隔离等级就是基于MVCC实现的。</p>
+<span id="more"></span>
+<h3 id="MVCC在mysql中的应用"><a href="#MVCC在mysql中的应用" class="headerlink" title="MVCC在mysql中的应用"></a>MVCC在mysql中的应用</h3><p>mysql中的Innodb存储引擎支持MVCC，对于Innodb表，mysql会默认为表创建几个隐藏列，其中比较重要的就是</p>
+<ul>
+<li><p>tx_id ,事务id列，用于表明修改该行数据的事务id</p>
+</li>
+<li><p>回滚指针列，由于Innodb支持事务，且默认事务的隔离等级为可重复读，其内部对于一行数据，会存储多个版本，回滚指针用于指向在事务修改该行数据之前，该行数据的样子(即该行数据的上一个版本)，如下图所示，图片来自 <a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/bVbyzV9" alt="Undo Log回滚历史记录"></p>
+</li>
+</ul>
+<h4 id="mvcc实现可重复读"><a href="#mvcc实现可重复读" class="headerlink" title="mvcc实现可重复读"></a>mvcc实现可重复读</h4><p>mysql会按照事务的先后顺序，以严格递增方式为每一个事务分配一个唯一的事务id。</p>
+<p>当mysql开启一个事务时，会立即形成一个快照，称之为<code>read view</code>,<code>read view</code>中记录了所有当前活跃的事务id(<strong>所谓活跃，是指事务已经开始，但是还没有结束</strong>)。在<code>read view</code>中的活跃事务集合中，存在一个最小id的事务，假设称之为<code>low_tx_id</code>, 存在一个最大事务id，<code>high_tx_id</code>。当前事务称之为<code>cur_tx_id</code>，假定<code>cur_tx_id</code>要读取的那行数据的隐藏事务列为<code>tx_id</code>，则可能存在如下几种情况。</p>
+<blockquote>
+<p><strong>这里需要说明一点，当前事务id不一定是<code>read view</code>中的最大值，因为在开启事务时，生成<code>read view</code>之前，可能会有新的事务进来，这个时候就会出现<code>read view</code>中的<code>rv_max_tx_id</code>比当前事务id大的情况</strong></p>
+</blockquote>
+<ul>
+<li><code>cur_tx_id = tx_id</code>，表示这行数据就是由当前事务修改的，必然对该事务可见</li>
+<li><code>tx_id &lt; low_tx_id</code>，表示在当前事务开启的时候，<code>tx_id</code>所代表的事务已经提交了，因此这行的该版本数据，对当前事务可见</li>
+<li><code>low_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务还未提交，因此这行数据的这个版本对当前事务不可见</li>
+<li>l<code>ow_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>不在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务已经提交，因此这行数据对当前事务可见</li>
+<li><code>tx_id &gt; high_tx_id</code>，表示<code>tx_id</code>事务是在当前事务开启之后提交的，因此数据对当前事务不可见</li>
+</ul>
+<p>mvcc通过如上原理，再加上回滚指针，按照如下流程就行读取。</p>
+<ul>
+<li><p>当读取的数据版本，对当前事务可见时，则可以直接读取，结束</p>
+</li>
+<li><p>当读取的数据版本，对当前事务不可见时，则按照改行的隐藏列回滚指针列，去读取这上数据的上一个版本（这个数据是存储在undo日志中的）</p>
+</li>
+<li><p>首先读取这个版本对应的事务id列，获取<code>tx_id</code>，并与上述规则进行匹配，成功，则该版本数据对当前事务可见，结束； 否则继续第二步</p>
+</li>
+</ul>
+<h4 id="MVCC实现读已提交"><a href="#MVCC实现读已提交" class="headerlink" title="MVCC实现读已提交"></a>MVCC实现读已提交</h4><p>在读提提交隔离级别，MVCC遵循的规则和上面一致，不同的点是，在事务执行过程中，每一次的读操作，都会创建一个<code>read view</code>。</p>
+<p>这样的话，<code>read view</code>不断更新，因此之前不可见的数据，随着对应事务的提交，也会对当前事务可见，从而就实现了读已提交。具体流程如下。</p>
+<ul>
+<li>读事务开启</li>
+<li>当要进行读取操作时，立即生成一个<code>read view</code>,并获取对应行数据，安装MVCC规则进行匹配，匹配成功，则该版本数据对当前事务可见，否则根据回滚指针读取上一个版本的数据，直至读取到对当前事务可见的版本</li>
+<li>其他操作</li>
+<li>当再次涉及到读操作时，继续进行第二步操作</li>
+</ul>
+<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><p>MVCC实现了读写之前的无锁并发控制，而对于写写操作，Innodb表采用锁机制来进行并发控制，不过它采用的是行锁来进行控制，与表锁相比，它的粒度更细，锁定的范围更小，因此效率更高。</p>
+<p><strong>参考：<a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么？</a>    <a href="https://segmentfault.com/a/1190000037557620">https://segmentfault.com/a/1190000037557620</a></strong></p>
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>事务</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql索引</title>
+    <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
+<span id="more"></span>
+
+<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
+<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
+<ul>
+<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
+<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
+</ul>
+<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
+<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
+<li>优势：在查询数据时，基于索引进行查询速度很快</li>
+<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
+</ul>
+<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
+<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
+<blockquote>
+<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
+</blockquote>
+<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
+<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
+<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
+<blockquote>
+<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
+</blockquote>
+<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
+<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
+<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
+<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
+<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
+<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
+<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
+<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
+<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
+<ul>
+<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
+</ul>
+<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
+<ul>
+<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
+</ul>
+<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
