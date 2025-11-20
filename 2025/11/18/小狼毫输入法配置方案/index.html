@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/guluo_logo-32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/guluo_logo-16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="工具," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="小狼毫输入法是Rime输入法的Windows实现版本，英文名字叫Weasel。Rime输入法（中文名字中州韵），是一个开源可定制的输入法框架，具有如下几个比较优秀的特点：    开源免费 支持自定义，如可以自定义词库、自定义输入方案、自定义输入界面字体等 保护隐私，Rime的词库、配置都是本地存储，不会上传到远程服务器 没有广告">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小狼毫输入法配置方案">
+<meta property="og:url" content="https://guluo2016.github.io/2025/11/18/%E5%B0%8F%E7%8B%BC%E6%AF%AB%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="孤落">
+<meta property="og:description" content="小狼毫输入法是Rime输入法的Windows实现版本，英文名字叫Weasel。Rime输入法（中文名字中州韵），是一个开源可定制的输入法框架，具有如下几个比较优秀的特点：    开源免费 支持自定义，如可以自定义词库、自定义输入方案、自定义输入界面字体等 保护隐私，Rime的词库、配置都是本地存储，不会上传到远程服务器 没有广告">
+<meta property="og:locale">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20001803.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20102430.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20103426.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20103616.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20011345.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20105328.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/68747470733a2f2f73746f726167652e64656570696e2e6f72672f7468726561642f3230323530323230303335383130343938375f2545362539352538382545362539452539432e706e67.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20110339.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20111544.png">
+<meta property="article:published_time" content="2025-11-18T14:40:00.000Z">
+<meta property="article:modified_time" content="2025-11-20T01:42:14.290Z">
+<meta property="article:author" content="孤落">
+<meta property="article:tag" content="工具">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20001803.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://guluo2016.github.io/2025/11/18/小狼毫输入法配置方案/"/>
+
+
+
+
+
+  <title>小狼毫输入法配置方案 | 孤落</title>
+  
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.0.0/style.css" />
+  <style>
+  body,div.post-body,h1,h2,h3,h4,h5,time {
+    font-family: "LXGW WenKai LITE", sans-serif;
+    font-size: 95%;
+  }
+  </style>
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title" style="font-family: LXGW WenKai LITE, sans-serif;" >孤落</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://guluo2016.github.io/2025/11/18/%E5%B0%8F%E7%8B%BC%E6%AF%AB%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="孤落">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://github.com/guluo2016/picture/raw/dev/img/guluo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="孤落">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">小狼毫输入法配置方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2025-11-18T22:40:00+08:00">
+                2025-11-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%AE%E7%94%9F%E6%96%87%E5%85%B7%E5%A4%9A/" itemprop="url" rel="index">
+                    <span itemprop="name" style="font-family: LXGW WenKai LITE, sans-serif;" >差生文具多</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>小狼毫输入法是Rime输入法的Windows实现版本，英文名字叫Weasel。<br>Rime输入法（中文名字中州韵），是一个开源可定制的输入法框架，具有如下几个比较优秀的特点：  </p>
+<ul>
+<li>开源免费</li>
+<li>支持自定义，如可以自定义词库、自定义输入方案、自定义输入界面字体等</li>
+<li>保护隐私，Rime的词库、配置都是本地存储，不会上传到远程服务器</li>
+<li>没有广告</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>目前主流输入法存在的问题：</p>
+<ul>
+<li>搜狗输入法，广告有点烦人<br>之前一直使用的是搜狗输入法，但是弹框广告真的是太烦人了，且怎么也关不掉，类似于这样的广告（有时候还会有同城交友的广告，有点难绷😓）。</li>
+</ul>
+<img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20001803.png" alt="搜狗输入法的广告" width="400" />
+
+<ul>
+<li>Windows自带的微软输入法<br>中文词库不太丰富，有些词组都不知道</li>
+</ul>
+<p>所以才换用了小狼毫输入法，使用了大约半年时间，发现还是比较适合自己的。</p>
+<p>小狼毫的缺点就是很多功能需要自己进行自定义配置，实际上并没有做到像搜狗那样开箱即用，需要使用者自己折腾配置才行。<br>所以喜欢尝试和折腾的人可能会更喜欢小狼毫。<br>个人认为，作为技术工作者，喜欢折腾和自定义本身就是一个比较好的技术习惯。</p>
+<h3 id="小狼毫配置方案"><a href="#小狼毫配置方案" class="headerlink" title="小狼毫配置方案"></a>小狼毫配置方案</h3><p>我的配置方案是：小狼毫 + 雾凇输入法 + 万象模型</p>
+<ul>
+<li>小狼毫是Rime输入法引擎在Windows平台的前端实现，负责与系统交互并运行各种输入方案。</li>
+<li>雾凇输入法是一套基于Rime的输入方案集合，内含丰富的词库、美化配置和智能联想功能。</li>
+<li>万象模型主要用于提升长句联想能力</li>
+</ul>
+<h4 id="安装小狼毫"><a href="#安装小狼毫" class="headerlink" title="安装小狼毫"></a>安装小狼毫</h4><p>直接在Rime官网，下载小狼毫的安装包并进行安装即可。<br>官网地址： <a target="_blank" rel="noopener" href="https://rime.im/">https://rime.im/</a></p>
+<p>安装后的小狼毫效果：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20102430.png" alt="初始状态下的小狼毫效果"></p>
+<p>特点是： </p>
+<ul>
+<li>候选框纵向展示</li>
+<li>有繁体</li>
+</ul>
+<p>此时对于中文简体用户和习惯候选词横向的用户而言，并不友好，甚至可以说是不可用。</p>
+<h4 id="安装雾凇输入法"><a href="#安装雾凇输入法" class="headerlink" title="安装雾凇输入法"></a>安装雾凇输入法</h4><p>切换到<code>%USERPROFILE%\AppData\Roaming</code>目录下，删除Rime文件夹，然后clone一个雾凇输入法的github仓库到这个目录中：</p>
+<blockquote>
+<p>在删除Rime文件夹的时候可能正在使用，无法删除<br>针对这个问题，点击小狼毫的退出算法服务，并且不使用小狼毫输入法，再次删除Rime就可以</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --depth 10 https://github.com/iDvel/rime-ice.git Rime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 更新</span></span><br><span class="line"><span class="built_in">cd</span> Rime</span><br><span class="line">git pull</span><br></pre></td></tr></table></figure>
+
+<p>然后右键点击右下角”中”或者”A”，小狼毫重新部署，实现雾凇输入法的应用。<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20103426.png" alt="重新部署"></p>
+<p>重新部署后的初始效果展示：  </p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20103616.png" alt="雾凇输入法的初始效果展示"></p>
+<p>小狼毫支持自定义配置，我们可以通过修改 <code>%USERPROFILE%\AppData\Roaming\Rime</code> 目录下的配置文件，使其更加符合个人需求。我主要修改了如下配置。</p>
+<h4 id="常用个性化配置"><a href="#常用个性化配置" class="headerlink" title="常用个性化配置"></a>常用个性化配置</h4><p>本节介绍常用的个性化设置，包括字体、候选词个数、默认输入模式及快捷键调整等。</p>
+<h5 id="字体"><a href="#字体" class="headerlink" title="字体"></a>字体</h5><p>字体我选择了霞鹜等宽字体，该字体为免费开源字体，下载安装地址：<a target="_blank" rel="noopener" href="https://github.com/lxgw/LxgwWenKai%E3%80%82">https://github.com/lxgw/LxgwWenKai。</a><br>修改 <code>weasel.yaml</code>，如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">style:</span></span><br><span class="line">  <span class="attr">color_scheme:</span> <span class="string">purity_of_form_custom</span>      <span class="comment"># 默认配色方案</span></span><br><span class="line">  <span class="comment"># color_scheme_dark: nord                # 深色模式下，Weasel 的配色方案，Windows 10 1809+ 可用</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 全局字体</span></span><br><span class="line">  <span class="comment"># 格式：字体1:起始码位:结束码位:字重:字形,字体2……，字体会依次 fallback</span></span><br><span class="line">  <span class="comment"># 详细设定请参考 &lt;https://github.com/rime/weasel/wiki/字體設定&gt;</span></span><br><span class="line">  <span class="comment"># font_face: &quot;Segoe UI Emoji, Microsoft YaHei, SF Pro, Noto Color Emoji&quot;</span></span><br><span class="line">  <span class="attr">font_face:</span> <span class="string">&quot;霞鹜文楷等宽&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="候选词个数"><a href="#候选词个数" class="headerlink" title="候选词个数"></a>候选词个数</h5><p>默认候选词个数是5个，我将其调整为9个。修改配置为<code>default.yaml</code>。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 菜单</span></span><br><span class="line"><span class="attr">menu:</span></span><br><span class="line">  <span class="attr">page_size:</span> <span class="number">9</span>  <span class="comment"># 候选词个数</span></span><br><span class="line">  <span class="comment"># alternative_select_labels: [ ①, ②, ③, ④, ⑤, ⑥, ⑦, ⑧, ⑨, ⑩ ]  # 修改候选项标签</span></span><br><span class="line">  <span class="comment"># alternative_select_keys: ASDFGHJKL  # 如编码字符占用数字键，则需另设选字键（注意在雾凇中，大写字母也作为编码了）</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="默认为英文格式"><a href="#默认为英文格式" class="headerlink" title="默认为英文格式"></a>默认为英文格式</h5><p>雾凇输入法的默认格式是中文，按 Shift 之后，可以切换成英文格式。我根据自己实际习惯，将默认格式设置为英文。<br>修改配置 <code>rime_ice.schema.yaml</code>，如下所示：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 开关</span></span><br><span class="line"><span class="comment"># reset: 默认状态。注释掉后，切换窗口时不会重置到默认状态。</span></span><br><span class="line"><span class="comment"># states: 方案选单显示的名称。可以注释掉，仍可以通过快捷键切换。</span></span><br><span class="line"><span class="comment"># abbrev: 默认的缩写取 states 的第一个字符，abbrev 可自定义一个字符</span></span><br><span class="line"><span class="attr">switches:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">ascii_mode</span></span><br><span class="line">    <span class="attr">states:</span> [ <span class="string">中</span>, <span class="string">Ａ</span> ]</span><br><span class="line">    <span class="attr">reset:</span> <span class="number">1</span>  <span class="comment"># 将这个设置为1</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="禁用快捷键-ctrl-96"><a href="#禁用快捷键-ctrl-96" class="headerlink" title="禁用快捷键 ctrl + &#96;"></a>禁用快捷键 ctrl + &#96;</h5><p>该快捷键与VSCode的快捷键冲突了，所以我将其禁用掉。修改配置<code>weasel.yaml</code>，如下所示。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">switcher:</span></span><br><span class="line">  <span class="attr">caption:</span> <span class="string">「方案选单」</span></span><br><span class="line">  <span class="attr">hotkeys:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">F4</span></span><br><span class="line">    <span class="comment"># - Control+grave   # 注释掉这个了</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Control+Shift+grave</span></span><br><span class="line">    <span class="comment"># - Alt+grave</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="候选框色彩配置"><a href="#候选框色彩配置" class="headerlink" title="候选框色彩配置"></a>候选框色彩配置</h5><p>直接在GitHub上的<code>rime/weasel</code>仓库的issue中，找到了一款比较符合自己需求的配色，我选择的是win11暗色这一款。<br>链接地址： <a target="_blank" rel="noopener" href="https://github.com/rime/weasel/issues/1205#issuecomment-2077123155">https://github.com/rime/weasel/issues/1205#issuecomment-2077123155</a></p>
+<p>修改配置文件 <code>weasel.custom.yaml</code>，在 <code>patch</code> 模块添加内容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># weasel.custom.yaml</span></span><br><span class="line"><span class="attr">patch:</span></span><br><span class="line">  <span class="string">style/+:</span></span><br><span class="line">    <span class="attr">label_format:</span> <span class="string">&quot;%s&quot;</span></span><br><span class="line">    <span class="attr">inline_preedit:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">font_point:</span> <span class="number">15</span></span><br><span class="line">    <span class="attr">label_font_point:</span> <span class="number">15</span></span><br><span class="line">    <span class="attr">comment_font_point:</span> <span class="number">15</span></span><br><span class="line">    <span class="attr">horizontal:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">color_scheme:</span> <span class="string">win11light</span></span><br><span class="line">    <span class="attr">color_scheme_dark:</span> <span class="string">win11dark</span></span><br><span class="line">    <span class="attr">layout:</span></span><br><span class="line">      <span class="attr">min_width:</span> <span class="number">10</span></span><br><span class="line">      <span class="attr">margin_x:</span> <span class="number">16</span></span><br><span class="line">      <span class="attr">margin_y:</span> <span class="number">8</span></span><br><span class="line">      <span class="attr">border:</span> <span class="number">2</span></span><br><span class="line">      <span class="attr">spacing:</span> <span class="number">20</span></span><br><span class="line">      <span class="attr">candidate_spacing:</span> <span class="number">22</span></span><br><span class="line">      <span class="attr">hilite_spacing:</span> <span class="number">6</span></span><br><span class="line">      <span class="attr">hilite_padding:</span> <span class="number">2</span></span><br><span class="line">      <span class="attr">hilite_padding_x:</span> <span class="number">8</span></span><br><span class="line">      <span class="attr">corner_radius:</span> <span class="number">10</span></span><br><span class="line">      <span class="attr">round_corner:</span> <span class="number">8</span></span><br><span class="line">      <span class="attr">shadow_radius:</span> <span class="number">8</span></span><br><span class="line">  <span class="string">preset_color_schemes/+:</span></span><br><span class="line">    <span class="attr">win11light:</span></span><br><span class="line">      <span class="attr">name:</span> <span class="string">&quot; Win11浅色 / Win11light&quot;</span></span><br><span class="line">      <span class="attr">text_color:</span> <span class="number">0x191919</span></span><br><span class="line">      <span class="attr">label_color:</span> <span class="number">0x191919</span></span><br><span class="line">      <span class="attr">hilited_label_color:</span> <span class="number">0x191919</span></span><br><span class="line">      <span class="attr">back_color:</span> <span class="number">0xf9f9f9</span></span><br><span class="line">      <span class="attr">border_color:</span> <span class="number">0x009e5a00</span></span><br><span class="line">      <span class="attr">hilited_mark_color:</span> <span class="number">0xc06700</span></span><br><span class="line">      <span class="attr">hilited_candidate_back_color:</span> <span class="number">0xf0f0f0</span></span><br><span class="line">      <span class="attr">shadow_color:</span> <span class="number">0x20000000</span></span><br><span class="line">    <span class="attr">win11dark:</span></span><br><span class="line">      <span class="attr">name:</span> <span class="string">&quot;Win11暗色 / Win11Dark&quot;</span></span><br><span class="line">      <span class="attr">text_color:</span> <span class="number">0xf9f9f9</span></span><br><span class="line">      <span class="attr">label_color:</span> <span class="number">0xf9f9f9</span></span><br><span class="line">      <span class="attr">back_color:</span> <span class="number">0x2C2C2C</span></span><br><span class="line">      <span class="attr">hilited_label_color:</span> <span class="number">0xf9f9f9</span></span><br><span class="line">      <span class="attr">border_color:</span> <span class="number">0x002C2C2C</span></span><br><span class="line">      <span class="attr">hilited_mark_color:</span> <span class="number">0xFFC24C</span></span><br><span class="line">      <span class="attr">hilited_candidate_back_color:</span> <span class="number">0x383838</span></span><br><span class="line">      <span class="attr">shadow_color:</span> <span class="number">0x20000000</span></span><br><span class="line">  <span class="attr">&quot;style/color_scheme&quot;:</span> <span class="string">win11dark</span> <span class="comment"># 这里选择了win11 暗黑色系</span></span><br></pre></td></tr></table></figure>
+
+<p>点击小狼毫的重新部署，使其修改的配置生效。</p>
+<h5 id="配置后的效果展示"><a href="#配置后的效果展示" class="headerlink" title="配置后的效果展示"></a>配置后的效果展示</h5><p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20011345.png" alt="sss"></p>
+<ul>
+<li>候选框是9个候选词</li>
+<li>色系是暗黑色系</li>
+<li>字体是霞鹜字体</li>
+</ul>
+<h4 id="万象模型"><a href="#万象模型" class="headerlink" title="万象模型"></a>万象模型</h4><p>万象模型实际上就是让提示联想更加智能化，以官网例子说明。</p>
+<p>在没有配置之前，我的输入是这样子：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20105328.png" alt="没有万象模型之前"></p>
+<p>配置完万象模型之后的效果展示：<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/68747470733a2f2f73746f726167652e64656570696e2e6f72672f7468726561642f3230323530323230303335383130343938375f2545362539352538382545362539452539432e706e67.png" alt="效果展示"></p>
+<p>官网展示的效果信息地址：<a target="_blank" rel="noopener" href="https://github.com/amzxyz/rime_wanxiang">https://github.com/amzxyz/rime_wanxiang</a></p>
+<p>安装方式：</p>
+<p>去官网地址，下载万象语言模型，我这里下载的是 <code>LTS</code> 版本 <code>wanxiang-lts-zh-hans.gram</code>。<br>下载地址：<a target="_blank" rel="noopener" href="https://github.com/amzxyz/RIME-LMDG/releases">https://github.com/amzxyz/RIME-LMDG/releases</a></p>
+<p>将下载好的模型文件放到 <code>%USERPROFILE%\AppData\Roaming\Rime</code> 目录下，同时修改 <code>rime_ice.schema.yaml</code> 文件。修改这个文件是因为我的输入法方案是雾凇输入法，其他输入法方案的话，选择对应的配置文件即可。<br>在文件末尾加上如下配置信息： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">__include: octagram   #启用语法模型</span><br><span class="line">#语法模型</span><br><span class="line">octagram:</span><br><span class="line">  __patch:</span><br><span class="line">    grammar:</span><br><span class="line">      language: wanxiang-lts-zh-hans  # 这里的模型文件选择上面下载的即可，不带后缀名gram </span><br><span class="line">      collocation_max_length: 5</span><br><span class="line">      collocation_min_length: 2</span><br><span class="line">    translator/contextual_suggestions: true</span><br><span class="line">    translator/max_homophones: 7</span><br><span class="line">    translator/max_homographs: 7</span><br></pre></td></tr></table></figure>
+
+<p>配置完成之后，再次重新部署，展示效果如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20110339.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20111544.png"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"># 工具</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2025/01/07/github%E8%87%AA%E5%AE%9A%E4%B9%89codespace/" rel="next" title="github自定义codespace">
+                <i class="fa fa-chevron-left"></i> github自定义codespace
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div id="gitalk-container"></div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://github.com/guluo2016/picture/raw/dev/img/guluo.jpg"
+                alt="孤落" />
+            
+              <p class="site-author-name" itemprop="name">孤落</p>
+              <p class="site-description motion-element" itemprop="description">大漠孤烟直，长河落日圆</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/guluo2016" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="lupeng@apache.org" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%8B%BC%E6%AF%AB%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">小狼毫配置方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%B0%8F%E7%8B%BC%E6%AF%AB"><span class="nav-number">2.1.</span> <span class="nav-text">安装小狼毫</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E9%9B%BE%E5%87%87%E8%BE%93%E5%85%A5%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">安装雾凇输入法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E4%B8%AA%E6%80%A7%E5%8C%96%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.</span> <span class="nav-text">常用个性化配置</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AD%97%E4%BD%93"><span class="nav-number">2.3.1.</span> <span class="nav-text">字体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%80%99%E9%80%89%E8%AF%8D%E4%B8%AA%E6%95%B0"><span class="nav-number">2.3.2.</span> <span class="nav-text">候选词个数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E4%B8%BA%E8%8B%B1%E6%96%87%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.3.3.</span> <span class="nav-text">默认为英文格式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A6%81%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE-ctrl-96"><span class="nav-number">2.3.4.</span> <span class="nav-text">禁用快捷键 ctrl + &#96;</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%80%99%E9%80%89%E6%A1%86%E8%89%B2%E5%BD%A9%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.5.</span> <span class="nav-text">候选框色彩配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%90%8E%E7%9A%84%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="nav-number">2.3.6.</span> <span class="nav-text">配置后的效果展示</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%87%E8%B1%A1%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.4.</span> <span class="nav-text">万象模型</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">孤落</span>
+
+  
+</div>
+
+<!--
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+-->
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="/js/src/md5.min.js"></script>
+  <script src="/js/src/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '04ad5a3d7e218cc24cec',
+          clientSecret: '9a61ca1a681744d443642667dfb77e2d9d4f033c',
+          repo: 'guluo2016.github.io',
+          owner: 'guluo2016',
+          admin: ['guluo2016'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')
+       </script>
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

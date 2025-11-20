@@ -79,15 +79,15 @@
 
 
 
-<meta name="description" content="清理MOB文件的线程MOB表中的mob文件有时候也需要清理，当MOB文件满足如下条件时，需要对其进行清理。    MOB文件中的数据已经过期无用，此时该MOB文件就可以被清理删除 若干个小的MOB文件被合并之后，老的MOB文件不再被任何region所引用，此时也可以被清理删除  针对MOB文件的清理，HBase提供了两个线程任务来执行，分别是RSMobFileCleanerChore和MobFil">
+<meta name="description" content="清理MOB文件的线程MOB表中的mob文件有时候也需要清理，当MOB文件满足如下条件时，需要对其进行清理：    MOB文件中的数据已经过期无用，此时该MOB文件就可以被清理删除 若干个小的MOB文件被合并之后，老的MOB文件不再被任何region所引用，此时也可以被清理删除  针对MOB文件的清理，HBase提供了两个线程任务来执行，分别是RSMobFileCleanerChore和MobFil">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hbase的MOB文件清理机制">
 <meta property="og:url" content="https://guluo2016.github.io/2024/11/09/hbase%E7%9A%84MOB%E6%96%87%E4%BB%B6%E6%B8%85%E7%90%86%E6%9C%BA%E5%88%B6/index.html">
 <meta property="og:site_name" content="孤落">
-<meta property="og:description" content="清理MOB文件的线程MOB表中的mob文件有时候也需要清理，当MOB文件满足如下条件时，需要对其进行清理。    MOB文件中的数据已经过期无用，此时该MOB文件就可以被清理删除 若干个小的MOB文件被合并之后，老的MOB文件不再被任何region所引用，此时也可以被清理删除  针对MOB文件的清理，HBase提供了两个线程任务来执行，分别是RSMobFileCleanerChore和MobFil">
+<meta property="og:description" content="清理MOB文件的线程MOB表中的mob文件有时候也需要清理，当MOB文件满足如下条件时，需要对其进行清理：    MOB文件中的数据已经过期无用，此时该MOB文件就可以被清理删除 若干个小的MOB文件被合并之后，老的MOB文件不再被任何region所引用，此时也可以被清理删除  针对MOB文件的清理，HBase提供了两个线程任务来执行，分别是RSMobFileCleanerChore和MobFil">
 <meta property="og:locale">
 <meta property="article:published_time" content="2024-11-09T14:36:13.000Z">
-<meta property="article:modified_time" content="2024-12-26T03:47:38.891Z">
+<meta property="article:modified_time" content="2025-11-20T01:37:02.044Z">
 <meta property="article:author" content="孤落">
 <meta property="article:tag" content="bigdata">
 <meta name="twitter:card" content="summary">
@@ -383,12 +383,12 @@
       
 
       
-        <h4 id="清理MOB文件的线程"><a href="#清理MOB文件的线程" class="headerlink" title="清理MOB文件的线程"></a>清理MOB文件的线程</h4><p>MOB表中的mob文件有时候也需要清理，当MOB文件满足如下条件时，需要对其进行清理。  </p>
+        <h4 id="清理MOB文件的线程"><a href="#清理MOB文件的线程" class="headerlink" title="清理MOB文件的线程"></a>清理MOB文件的线程</h4><p>MOB表中的mob文件有时候也需要清理，当MOB文件满足如下条件时，需要对其进行清理：  </p>
 <ul>
 <li>MOB文件中的数据已经过期无用，此时该MOB文件就可以被清理删除</li>
 <li>若干个小的MOB文件被合并之后，老的MOB文件不再被任何region所引用，此时也可以被清理删除</li>
 </ul>
-<p>针对MOB文件的清理，HBase提供了两个线程任务来执行，分别是<code>RSMobFileCleanerChore</code>和<code>MobFileCleanerChore</code>,两者的特点如下。</p>
+<p>针对MOB文件的清理，HBase提供了两个线程任务来执行，分别是<code>RSMobFileCleanerChore</code>和<code>MobFileCleanerChore</code>，两者的特点如下。</p>
 <ul>
 <li><code>MobFileCleanerChore</code><ul>
 <li>调用者：HMaster服务调用执行</li>
@@ -406,7 +406,7 @@
 <span id="more"></span>
 
 <p>下面针对这两个MOB清理任务，分别进行详细说明。</p>
-<h4 id="MobFileCleanerChore工作机制"><a href="#MobFileCleanerChore工作机制" class="headerlink" title="MobFileCleanerChore工作机制"></a><code>MobFileCleanerChore</code>工作机制</h4><h5 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h5><p>只有满足如要条件的列族，<code>MobFileCleanerChore</code>才会对其执行清理操作</p>
+<h4 id="MobFileCleanerChore工作机制"><a href="#MobFileCleanerChore工作机制" class="headerlink" title="MobFileCleanerChore工作机制"></a><code>MobFileCleanerChore</code>工作机制</h4><h5 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h5><p>只有满足如下条件的列族，<code>MobFileCleanerChore</code>才会对其执行清理操作</p>
 <ul>
 <li>列族是MOB类型</li>
 <li>列族配置的最小保存版本数为0，如果不为0，则不执行</li>
@@ -415,7 +415,7 @@
 <p>如下所示。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 检查列族是否是MOB类型， 最小保存的版本数是否为0</span></span><br><span class="line"><span class="keyword">if</span> (hcd.isMobEnabled() &amp;&amp; hcd.getMinVersions() == <span class="number">0</span>) &#123;</span><br><span class="line">	cleaner.cleanExpiredMobFiles(htd.getTableName().getNameAsString(), hcd);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断TTL</span></span><br><span class="line"><span class="type">long</span> <span class="variable">timeToLive</span> <span class="operator">=</span> columnDescriptor.getTimeToLive();  </span><br><span class="line"><span class="keyword">if</span> (Integer.MAX_VALUE == timeToLive) &#123;  </span><br><span class="line">  <span class="comment">// no need to clean, because the TTL is not set.  </span></span><br><span class="line">  <span class="keyword">return</span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h5 id="MobFileCleanerChore的判定条件"><a href="#MobFileCleanerChore的判定条件" class="headerlink" title="MobFileCleanerChore的判定条件"></a><code>MobFileCleanerChore</code>的判定条件</h5><h6 id="获取过期时间"><a href="#获取过期时间" class="headerlink" title="获取过期时间"></a>获取过期时间</h6><p><code>MobFileCleanerChore</code>任务是周期性任务，默认情况下，一天执行一次。<br>在执行时，会首先获取当前时间<code>current</code>，然后根据列族的TTL时间，计算一个过期时间，然后MOB文件时间在这个过期时间之前的，都认为是已经过期的文件，是可以被删除的。<br>如现在时间是<code>2024-09-26 12:00:00</code>, TTL是1天，则计算的过期时间是<code>2024-09-26 12:00:00</code>，然后再对时分秒清零，因此过期时间是<code>2024-09-26 00:00:00+000</code></p>
+<h5 id="MobFileCleanerChore的判定条件"><a href="#MobFileCleanerChore的判定条件" class="headerlink" title="MobFileCleanerChore的判定条件"></a><code>MobFileCleanerChore</code>的判定条件</h5><h6 id="获取过期时间"><a href="#获取过期时间" class="headerlink" title="获取过期时间"></a>获取过期时间</h6><p><code>MobFileCleanerChore</code>任务是周期性任务，默认情况下，一天执行一次。<br>在执行时，会首先获取当前时间<code>current</code>，然后根据列族的TTL时间，计算一个过期时间，然后MOB文件时间在这个过期时间之前的，都认为是已经过期的文件，是可以被删除的。<br>如现在时间是<code>2024-09-26 12:00:00</code>，TTL是1天，则计算的过期时间是<code>2024-09-25 12:00:00</code>，然后再对时分秒清零，因此过期时间是<code>2024-09-25 00:00:00+000</code>。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Calendar</span> <span class="variable">calendar</span> <span class="operator">=</span> Calendar.getInstance();  </span><br><span class="line">calendar.setTimeInMillis(current - timeToLive * <span class="number">1000</span>);  </span><br><span class="line">calendar.set(Calendar.HOUR_OF_DAY, <span class="number">0</span>);  </span><br><span class="line">calendar.set(Calendar.MINUTE, <span class="number">0</span>);  </span><br><span class="line">calendar.set(Calendar.SECOND, <span class="number">0</span>);  </span><br><span class="line">calendar.set(Calendar.MILLISECOND, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
 
 <blockquote>
@@ -428,14 +428,14 @@
 <p>示例：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1727061887ms = 1970-01-01 08:00:02</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1727061887000ms = 2024-09-23 11:24:47</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1727061889ms = 1970-01-21 07:44:21</span></span><br><span class="line">put &#x27;mob&#x27;, &#x27;r1&#x27;, &#x27;info:name&#x27;, bigdata_value, 1727061887</span><br><span class="line">put &#x27;mob&#x27;, &#x27;r2&#x27;, &#x27;info:name&#x27;, bigdata_value, 1727061887000</span><br><span class="line">put &#x27;mob&#x27;, &#x27;r3&#x27;, &#x27;info:name&#x27;, bigdata_value, 1727061889</span><br></pre></td></tr></table></figure>
 
-<p>如上所示，我们往mob表中写入了3个KV，其中最新的时间戳是第二个，时间是<code>1727061887000</code>, 因此生成的MOB文件时间就是<code>*20240923*</code>。</p>
+<p>如上所示，我们往mob表中写入了3个KV，其中最新的时间戳是第二个，时间是<code>1727061887000</code>，因此生成的MOB文件时间就是<code>*20240923*</code>。</p>
 <h6 id="对比时间"><a href="#对比时间" class="headerlink" title="对比时间"></a>对比时间</h6><p>由于MOB文件时间是当前文件中最新KV的时间戳，因此只要该时间过期，那么意味着该文件中的所有数据都是过期的，因此都可以删除。<br>通过过期时间和MOB文件时间的对比，如果MOB文件时间处于过期时间之前的，则认为过期。</p>
 <blockquote>
 <p>比较时间的时候，忽略时分秒是否会删除未过期的数据？<br>答案是不会。</p>
 <p>原因：<br>对于MOB过期文件，hbase是允许多存一些时间的。<br>比较过期时间时，忽略了时分秒，意味着是以天为单位来进行比较的；且比较时是将早于过期时间的MOB文件判定为过期<code>fileDate &lt; 过期时间</code>，这意味着即使当天过期的MOB文件，也会继续保留一段时间，在第二天才会被删除，因此不会删除未过期的时间。</p>
 <p>举例说明：<br>ttl&#x3D;1s，MOB文件时间是<code>2024-10-20</code>，假设已经过期, <code>MobFileCleanerChore</code>在<code>2024-10-20 12:00:00</code>开始运行，计算出的过期时间是<code>2024-10-20 00:00:00</code>，由于<code>fileDate &lt; 过期时间</code>这个条件不成立，因此本次运行不会将其认定为过期。 只有在<code>2024-10-21 00:00:01</code>时刻及之后，该任务运行，才会判定该MOB文件过期。 </p>
 </blockquote>
-<h4 id="RSMobFileCleanerChore工作机制"><a href="#RSMobFileCleanerChore工作机制" class="headerlink" title="RSMobFileCleanerChore工作机制"></a><code>RSMobFileCleanerChore</code>工作机制</h4><h5 id="前提条件-1"><a href="#前提条件-1" class="headerlink" title="前提条件"></a>前提条件</h5><p>只有满足如下如要条件的列族，<code>RSMobFileCleanerChore</code>才会对其执行清理操作 </p>
+<h4 id="RSMobFileCleanerChore工作机制"><a href="#RSMobFileCleanerChore工作机制" class="headerlink" title="RSMobFileCleanerChore工作机制"></a><code>RSMobFileCleanerChore</code>工作机制</h4><h5 id="前提条件-1"><a href="#前提条件-1" class="headerlink" title="前提条件"></a>前提条件</h5><p>只有满足如下条件的列族，<code>RSMobFileCleanerChore</code>才会对其执行清理操作 </p>
 <ul>
 <li>列族是MOB类型</li>
 </ul>
@@ -509,6 +509,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2025/01/07/github%E8%87%AA%E5%AE%9A%E4%B9%89codespace/" rel="prev" title="github自定义codespace">
+                github自定义codespace <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -592,7 +596,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
