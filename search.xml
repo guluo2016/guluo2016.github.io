@@ -203,18 +203,6 @@ x=[1,2,3,\ldots,1024]
       </categories>
   </entry>
   <entry>
-    <title>archlinux安装部署记录</title>
-    <url>/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p>&#x2F;&#x2F;TODO</p>
-]]></content>
-      <categories>
-        <category>差生文具多</category>
-      </categories>
-      <tags>
-        <tag>工具</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Log4j2使用</title>
     <url>/2024/05/21/Log4j2%E4%BD%BF%E7%94%A8/</url>
     <content><![CDATA[<h3 id="log4j2的基础使用方式"><a href="#log4j2的基础使用方式" class="headerlink" title="log4j2的基础使用方式"></a>log4j2的基础使用方式</h3><p>log4j2是apache的一个使用非常广泛的日志框架，用于记录应用程序的日志信息。</p>
@@ -351,51 +339,9 @@ x=[1,2,3,\ldots,1024]
       </tags>
   </entry>
   <entry>
-    <title>github自定义codespace</title>
-    <url>/2025/01/07/github%E8%87%AA%E5%AE%9A%E4%B9%89codespace/</url>
-    <content><![CDATA[<h3 id="github-codespace的作用"><a href="#github-codespace的作用" class="headerlink" title="github codespace的作用"></a>github codespace的作用</h3><p>github提供的codespace功能，实际上就是一台docker虚拟机（默认2核8GB内存32GB磁盘空间），且默认情况下，该虚拟机已经为我们默认安装了一些基础的开发环境，如java、python环境等等。<br>好处是该虚拟机位于外网，在编译各种软件时，可以通过极快的网速下载各种依赖，几乎不会出现像国内网络经常遇到的下载某个依赖失败的情况（Timeout）。</p>
-<p>免费版的限制：</p>
-<ul>
-<li>codespace不能作为常驻服务器使用，因为一段时间不使用，就会自动关闭</li>
-<li>codespace可使用的资源（cpu，内存和磁盘）有限制，但是提供的资源几乎可以满足个人的绝大部分需求了</li>
-</ul>
-<span id="more"></span>
-
-<p>默认情况下，Github的codespace的虚拟机是一个Ubuntu系统，可能不一定能够满足我们的需求（比如说我们可能需要一个centos环境）。<br>同时，codespace也支持自定义，因此我们可以自定义一套满足自身需求的codespace。</p>
-<h3 id="自定义codespace"><a href="#自定义codespace" class="headerlink" title="自定义codespace"></a>自定义codespace</h3><p>自定义配置如下。</p>
-<h4 id="创建-devcontainer"><a href="#创建-devcontainer" class="headerlink" title="创建.devcontainer"></a>创建<code>.devcontainer</code></h4><p>在指定仓库中的根目录下，创建一个文件夹：<code>.devcontainer</code>.<br>在该文件夹中创建两个文件。</p>
-<ul>
-<li><code>devcontainer.json</code>，该文件用于声明容器的环境</li>
-<li><code>Dockerfile</code>，用于定义docker镜像</li>
-</ul>
-<h5 id="devcontainer-json文件"><a href="#devcontainer-json文件" class="headerlink" title="devcontainer.json文件"></a><code>devcontainer.json</code>文件</h5><p>下面就是<code>devcontainer.json</code>的一个案例。</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;CentOS Dev Container001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;dockerfile&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Dockerfile&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.defaultProfile.linux&quot;</span><span class="punctuation">:</span> <span class="string">&quot;bash&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;extensions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;ms-python.python&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;redhat.vscode-yaml&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;remoteUser&quot;</span><span class="punctuation">:</span> <span class="string">&quot;root&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>其中</p>
-<ul>
-<li><code>name</code>用于声明docker容器的名字。</li>
-<li><code>build</code>，用于指定如何构建镜像，这里选择使用Dockerfile</li>
-<li><code>settings</code>,用于配置VSCode在docker容器中的默认配置</li>
-<li><code>extensions</code>，用于配置VSCode的扩展插件</li>
-<li><code>remoteUser</code>,用于指明登录该docker容器的用户</li>
-</ul>
-<h5 id="Dockerfile文件"><a href="#Dockerfile文件" class="headerlink" title="Dockerfile文件"></a>Dockerfile文件</h5><p><code>Dockerfile</code>案例如下所示，和普通的<code>Dockerfile</code>文件完全一样。</p>
-<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 使用 CentOS 作为基础镜像</span></span><br><span class="line"><span class="keyword">FROM</span> bigtop/slaves:<span class="number">3.3</span>.<span class="number">0</span>-centos-<span class="number">7</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认用户和工作目录</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /opt</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="将-devcontainer推送到github仓库"><a href="#将-devcontainer推送到github仓库" class="headerlink" title="将.devcontainer推送到github仓库"></a>将<code>.devcontainer</code>推送到github仓库</h4><p>将<code>.devcontainer</code>文件夹及内部的文件作为一次修改，推送到github上的远程仓库中。</p>
-<h4 id="在github上创建容器"><a href="#在github上创建容器" class="headerlink" title="在github上创建容器"></a>在github上创建容器</h4><p>登录github，选择你上一步推送的仓库。<br>按照如下方式，开始创建自定义codespace。<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/Pasted%20image%2020250106232418.png" alt="Pasted image 20250106232418"></p>
-<p>在新弹出的页面中，进行如下选择。<br>其中：</p>
-<ul>
-<li><code>branch</code>: 选择<code>.devcontainer</code>所推送的那个分支</li>
-<li><code>Dev container configuration</code>，会自动解析<code>devcontainer.json</code>中的name，并在此展示</li>
-<li><code>region</code>保持默认和<code>Machine type</code>保持默认即可<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106235831116.png" alt="IMG-20250106235831116"></li>
-</ul>
-<p>点击<code>Create codespace</code>即可在github上创建一个自定义的Docker容器。</p>
-<h3 id="打开codespace的方式"><a href="#打开codespace的方式" class="headerlink" title="打开codespace的方式"></a>打开codespace的方式</h3><p>当codespace创建OK之后，github支持多种打开方式，常用的如下。</p>
-<ul>
-<li>使用浏览器直接打开</li>
-<li>使用VSCode打开（需要本机安装VSCode，注意衍生版本不支持，如Cursor、VSCodium等）<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106234150677.png" alt="IMG-20250106234150677"></li>
-</ul>
+    <title>archlinux安装部署记录</title>
+    <url>/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p>&#x2F;&#x2F;TODO</p>
 ]]></content>
       <categories>
         <category>差生文具多</category>
@@ -453,6 +399,60 @@ x=[1,2,3,\ldots,1024]
 <li>同样地，mmap技术方便程序快速获取到arrow数据，在加上arrow自身功能加持，程序读取到的arrow数据与在内存对象数据是一致的，无须进行解析操作，省去了CPU密集型的操作，因此加载数据时耗时几乎和数据量无关，因此数据量越大越能体现arrow的优势</li>
 </ul>
 ]]></content>
+  </entry>
+  <entry>
+    <title>github自定义codespace</title>
+    <url>/2025/01/07/github%E8%87%AA%E5%AE%9A%E4%B9%89codespace/</url>
+    <content><![CDATA[<h3 id="github-codespace的作用"><a href="#github-codespace的作用" class="headerlink" title="github codespace的作用"></a>github codespace的作用</h3><p>github提供的codespace功能，实际上就是一台docker虚拟机（默认2核8GB内存32GB磁盘空间），且默认情况下，该虚拟机已经为我们默认安装了一些基础的开发环境，如java、python环境等等。<br>好处是该虚拟机位于外网，在编译各种软件时，可以通过极快的网速下载各种依赖，几乎不会出现像国内网络经常遇到的下载某个依赖失败的情况（Timeout）。</p>
+<p>免费版的限制：</p>
+<ul>
+<li>codespace不能作为常驻服务器使用，因为一段时间不使用，就会自动关闭</li>
+<li>codespace可使用的资源（cpu，内存和磁盘）有限制，但是提供的资源几乎可以满足个人的绝大部分需求了</li>
+</ul>
+<span id="more"></span>
+
+<p>默认情况下，Github的codespace的虚拟机是一个Ubuntu系统，可能不一定能够满足我们的需求（比如说我们可能需要一个centos环境）。<br>同时，codespace也支持自定义，因此我们可以自定义一套满足自身需求的codespace。</p>
+<h3 id="自定义codespace"><a href="#自定义codespace" class="headerlink" title="自定义codespace"></a>自定义codespace</h3><p>自定义配置如下。</p>
+<h4 id="创建-devcontainer"><a href="#创建-devcontainer" class="headerlink" title="创建.devcontainer"></a>创建<code>.devcontainer</code></h4><p>在指定仓库中的根目录下，创建一个文件夹：<code>.devcontainer</code>.<br>在该文件夹中创建两个文件。</p>
+<ul>
+<li><code>devcontainer.json</code>，该文件用于声明容器的环境</li>
+<li><code>Dockerfile</code>，用于定义docker镜像</li>
+</ul>
+<h5 id="devcontainer-json文件"><a href="#devcontainer-json文件" class="headerlink" title="devcontainer.json文件"></a><code>devcontainer.json</code>文件</h5><p>下面就是<code>devcontainer.json</code>的一个案例。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;CentOS Dev Container001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;dockerfile&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Dockerfile&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.defaultProfile.linux&quot;</span><span class="punctuation">:</span> <span class="string">&quot;bash&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;extensions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;ms-python.python&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;redhat.vscode-yaml&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;remoteUser&quot;</span><span class="punctuation">:</span> <span class="string">&quot;root&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中</p>
+<ul>
+<li><code>name</code>用于声明docker容器的名字。</li>
+<li><code>build</code>，用于指定如何构建镜像，这里选择使用Dockerfile</li>
+<li><code>settings</code>,用于配置VSCode在docker容器中的默认配置</li>
+<li><code>extensions</code>，用于配置VSCode的扩展插件</li>
+<li><code>remoteUser</code>,用于指明登录该docker容器的用户</li>
+</ul>
+<h5 id="Dockerfile文件"><a href="#Dockerfile文件" class="headerlink" title="Dockerfile文件"></a>Dockerfile文件</h5><p><code>Dockerfile</code>案例如下所示，和普通的<code>Dockerfile</code>文件完全一样。</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 使用 CentOS 作为基础镜像</span></span><br><span class="line"><span class="keyword">FROM</span> bigtop/slaves:<span class="number">3.3</span>.<span class="number">0</span>-centos-<span class="number">7</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认用户和工作目录</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /opt</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="将-devcontainer推送到github仓库"><a href="#将-devcontainer推送到github仓库" class="headerlink" title="将.devcontainer推送到github仓库"></a>将<code>.devcontainer</code>推送到github仓库</h4><p>将<code>.devcontainer</code>文件夹及内部的文件作为一次修改，推送到github上的远程仓库中。</p>
+<h4 id="在github上创建容器"><a href="#在github上创建容器" class="headerlink" title="在github上创建容器"></a>在github上创建容器</h4><p>登录github，选择你上一步推送的仓库。<br>按照如下方式，开始创建自定义codespace。<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/Pasted%20image%2020250106232418.png" alt="Pasted image 20250106232418"></p>
+<p>在新弹出的页面中，进行如下选择。<br>其中：</p>
+<ul>
+<li><code>branch</code>: 选择<code>.devcontainer</code>所推送的那个分支</li>
+<li><code>Dev container configuration</code>，会自动解析<code>devcontainer.json</code>中的name，并在此展示</li>
+<li><code>region</code>保持默认和<code>Machine type</code>保持默认即可<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106235831116.png" alt="IMG-20250106235831116"></li>
+</ul>
+<p>点击<code>Create codespace</code>即可在github上创建一个自定义的Docker容器。</p>
+<h3 id="打开codespace的方式"><a href="#打开codespace的方式" class="headerlink" title="打开codespace的方式"></a>打开codespace的方式</h3><p>当codespace创建OK之后，github支持多种打开方式，常用的如下。</p>
+<ul>
+<li>使用浏览器直接打开</li>
+<li>使用VSCode打开（需要本机安装VSCode，注意衍生版本不支持，如Cursor、VSCodium等）<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106234150677.png" alt="IMG-20250106234150677"></li>
+</ul>
+]]></content>
+      <categories>
+        <category>差生文具多</category>
+      </categories>
+      <tags>
+        <tag>工具</tag>
+      </tags>
   </entry>
   <entry>
     <title>hadoop2.7.2集群搭建</title>
@@ -516,64 +516,6 @@ x=[1,2,3,\ldots,1024]
       </categories>
       <tags>
         <tag>bigdata</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hbase事务</title>
-    <url>/2022/08/16/hbase%E4%BA%8B%E5%8A%A1/</url>
-    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>HBase支持行级事务，也即用户对于HBase的一条数据的读写，HBase可以保证其原子性。对于多行事务，HBase并不能保证其原子性。</p>
-<p>为了保证行级事务，需要考虑写写控制和读写控制。对于读读操作，由于不涉及到数据的修改，因此无须进行并发控制。如果不考虑这两种控制，可能会出现数据不一致情况，也就不是事务了。</p>
-<p>下面对于写写控制和读写控制，分别考虑。</p>
-<span id="more"></span>
-
-<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><h4 id="无并发控制"><a href="#无并发控制" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>先考虑不进行并发控制的情况。</p>
-<p>假设有两个写线程，同一时间段内，对一行数据进行修改，由于HBase的写入需要经过两个步骤：</p>
-<ul>
-<li>写WAL</li>
-<li>写入memstore</li>
-</ul>
-<p>如果不进行并发控制，那么在更新完WAL之后，在更新memstore时，可能第二个写线程先更新info:company，第一个写线程后更新info:company；第一个线程先更新info:role，第二个线程后更新info:role，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
-<p>那么我们最终读取到的数据就是下面这样，即数据出现不一致。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
-<h4 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了行锁机制，以rowkey为锁，当写线程需要更新数据时，需要先获取行锁，然后才能更新，对于没有获取到行锁的写线程，只能等待，直至获取到行锁。具体的流程如下。</p>
-<ul>
-<li>写操作开始</li>
-<li>获取行锁</li>
-<li>更新WAL</li>
-<li>更新memstore</li>
-<li>释放锁</li>
-</ul>
-<h3 id="读写控制"><a href="#读写控制" class="headerlink" title="读写控制"></a>读写控制</h3><h4 id="无并发控制-1"><a href="#无并发控制-1" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>读写场景，同样先考虑不进行并发控制，可能会出现的情况。</p>
-<p>假如现在有两个写线程要更新同一行数据，同时一个读线程要对该行数据进行读取操作。读线程读取的时机是红线部分，此时第一个写线程已经完成，第二个写线程更新了一部分，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
-<p>那么读线程读取的数据就是下面这样子，同样会出现数据不一致情况。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
-<h4 id="并发控制-1"><a href="#并发控制-1" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了MVCC机制，采用无锁机制，实现读写控制。为了实现该机制，HBase在进行写操作时，会进行如下操作：</p>
-<ul>
-<li>获取行锁</li>
-<li>分配一个写事务id</li>
-<li>更新WAL</li>
-<li>更新memstore</li>
-<li>完成写事务id</li>
-<li>释放锁</li>
-</ul>
-<p>与此同时，对于每一次的读操作，HBase都会为其分配一个已经完成且值最大的写事务id。</p>
-<p>如图所示，两个写线程开启写事务时，HBase分别为其分配一个写id，当读事务开启时，由于写事务1已经完成，而写事务2还未完成，因此分配的已完成且值最大的写事务id是1，称之为read point。因此对该读事务而言，所有小于等于read point的数据都是对其可见的，大于read point的数据是不可见的。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
-<p>因此，在这种情况下，读线程最终读取的结果是这个样子。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
-<li><a href="https://blogs.apache.org/hbase/entry/apache_hbase_internals_locking_and"><strong>Apache HBase Internals: Locking and Multiversion Concurrency Control</strong></a></li>
-<li><a href="http://hbasefly.com/2017/07/26/transaction-2/"><strong>数据库事务系列－HBase行级事务模型</strong></a></li>
-</ul>
-]]></content>
-      <categories>
-        <category>hbase</category>
-      </categories>
-      <tags>
-        <tag>bigdata</tag>
-        <tag>事务</tag>
       </tags>
   </entry>
   <entry>
@@ -675,6 +617,84 @@ x=[1,2,3,\ldots,1024]
       </tags>
   </entry>
   <entry>
+    <title>hbase事务</title>
+    <url>/2022/08/16/hbase%E4%BA%8B%E5%8A%A1/</url>
+    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>HBase支持行级事务，也即用户对于HBase的一条数据的读写，HBase可以保证其原子性。对于多行事务，HBase并不能保证其原子性。</p>
+<p>为了保证行级事务，需要考虑写写控制和读写控制。对于读读操作，由于不涉及到数据的修改，因此无须进行并发控制。如果不考虑这两种控制，可能会出现数据不一致情况，也就不是事务了。</p>
+<p>下面对于写写控制和读写控制，分别考虑。</p>
+<span id="more"></span>
+
+<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><h4 id="无并发控制"><a href="#无并发控制" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>先考虑不进行并发控制的情况。</p>
+<p>假设有两个写线程，同一时间段内，对一行数据进行修改，由于HBase的写入需要经过两个步骤：</p>
+<ul>
+<li>写WAL</li>
+<li>写入memstore</li>
+</ul>
+<p>如果不进行并发控制，那么在更新完WAL之后，在更新memstore时，可能第二个写线程先更新info:company，第一个写线程后更新info:company；第一个线程先更新info:role，第二个线程后更新info:role，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/7effbc3f-0c1c-4135-9dc3-f310e9c8b652" alt="img"></p>
+<p>那么我们最终读取到的数据就是下面这样，即数据出现不一致。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<h4 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了行锁机制，以rowkey为锁，当写线程需要更新数据时，需要先获取行锁，然后才能更新，对于没有获取到行锁的写线程，只能等待，直至获取到行锁。具体的流程如下。</p>
+<ul>
+<li>写操作开始</li>
+<li>获取行锁</li>
+<li>更新WAL</li>
+<li>更新memstore</li>
+<li>释放锁</li>
+</ul>
+<h3 id="读写控制"><a href="#读写控制" class="headerlink" title="读写控制"></a>读写控制</h3><h4 id="无并发控制-1"><a href="#无并发控制-1" class="headerlink" title="无并发控制"></a>无并发控制</h4><p>读写场景，同样先考虑不进行并发控制，可能会出现的情况。</p>
+<p>假如现在有两个写线程要更新同一行数据，同时一个读线程要对该行数据进行读取操作。读线程读取的时机是红线部分，此时第一个写线程已经完成，第二个写线程更新了一部分，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/30530bc9-0305-47a1-a5c2-86281119799c" alt="img"></p>
+<p>那么读线程读取的数据就是下面这样子，同样会出现数据不一致情况。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/1194e8c1-7a84-4da1-9953-1a6d74d07a4f" alt="img"></p>
+<h4 id="并发控制-1"><a href="#并发控制-1" class="headerlink" title="并发控制"></a>并发控制</h4><p>为了解决上面的问题，HBase引入了MVCC机制，采用无锁机制，实现读写控制。为了实现该机制，HBase在进行写操作时，会进行如下操作：</p>
+<ul>
+<li>获取行锁</li>
+<li>分配一个写事务id</li>
+<li>更新WAL</li>
+<li>更新memstore</li>
+<li>完成写事务id</li>
+<li>释放锁</li>
+</ul>
+<p>与此同时，对于每一次的读操作，HBase都会为其分配一个已经完成且值最大的写事务id。</p>
+<p>如图所示，两个写线程开启写事务时，HBase分别为其分配一个写id，当读事务开启时，由于写事务1已经完成，而写事务2还未完成，因此分配的已完成且值最大的写事务id是1，称之为read point。因此对该读事务而言，所有小于等于read point的数据都是对其可见的，大于read point的数据是不可见的。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220815203852275.png" alt="image-20220815203852275"></p>
+<p>因此，在这种情况下，读线程最终读取的结果是这个样子。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/12b2c8a4-551b-4aa5-8629-874e220a91bd" alt="img"></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://blogs.apache.org/hbase/entry/apache_hbase_internals_locking_and"><strong>Apache HBase Internals: Locking and Multiversion Concurrency Control</strong></a></li>
+<li><a href="http://hbasefly.com/2017/07/26/transaction-2/"><strong>数据库事务系列－HBase行级事务模型</strong></a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>hbase</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+        <tag>事务</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2022/07/07/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<span id="more"></span>
+
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>linux中很有用的命令</title>
     <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
     <content><![CDATA[<p>记录一些常用的Linux指令。</p>
@@ -708,135 +728,6 @@ x=[1,2,3,\ldots,1024]
       </categories>
       <tags>
         <tag>shell</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2022/07/07/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<span id="more"></span>
-
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>mysql中的mvcc</title>
-    <url>/2022/08/16/mysql%E4%B8%AD%E7%9A%84mvcc/</url>
-    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>MVCC全称多版本并发控制。</p>
-<p>主要原理就是对于同一份数据，在数据库中存储多份，每一份都是一个版本。然后根据事务发生的先后顺序，来决定哪些版本的数据对该事务可见，从而实现并发控制。</p>
-<p><strong>MVCC主要解决的问题</strong></p>
-<p>MVCC主要解决的是读写并发问题，可以在无锁情况下实现读写并发，从而可以提交读写效率。</p>
-<p>关系型数据库中的读已提交、可重复读事务的隔离等级就是基于MVCC实现的。</p>
-<span id="more"></span>
-<h3 id="MVCC在mysql中的应用"><a href="#MVCC在mysql中的应用" class="headerlink" title="MVCC在mysql中的应用"></a>MVCC在mysql中的应用</h3><p>mysql中的Innodb存储引擎支持MVCC，对于Innodb表，mysql会默认为表创建几个隐藏列，其中比较重要的就是</p>
-<ul>
-<li><p>tx_id ,事务id列，用于表明修改该行数据的事务id</p>
-</li>
-<li><p>回滚指针列，由于Innodb支持事务，且默认事务的隔离等级为可重复读，其内部对于一行数据，会存储多个版本，回滚指针用于指向在事务修改该行数据之前，该行数据的样子(即该行数据的上一个版本)，如下图所示，图片来自 <a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么</a></p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/bVbyzV9" alt="Undo Log回滚历史记录"></p>
-</li>
-</ul>
-<h4 id="mvcc实现可重复读"><a href="#mvcc实现可重复读" class="headerlink" title="mvcc实现可重复读"></a>mvcc实现可重复读</h4><p>mysql会按照事务的先后顺序，以严格递增方式为每一个事务分配一个唯一的事务id。</p>
-<p>当mysql开启一个事务时，会立即形成一个快照，称之为<code>read view</code>,<code>read view</code>中记录了所有当前活跃的事务id(<strong>所谓活跃，是指事务已经开始，但是还没有结束</strong>)。在<code>read view</code>中的活跃事务集合中，存在一个最小id的事务，假设称之为<code>low_tx_id</code>, 存在一个最大事务id，<code>high_tx_id</code>。当前事务称之为<code>cur_tx_id</code>，假定<code>cur_tx_id</code>要读取的那行数据的隐藏事务列为<code>tx_id</code>，则可能存在如下几种情况。</p>
-<blockquote>
-<p><strong>这里需要说明一点，当前事务id不一定是<code>read view</code>中的最大值，因为在开启事务时，生成<code>read view</code>之前，可能会有新的事务进来，这个时候就会出现<code>read view</code>中的<code>rv_max_tx_id</code>比当前事务id大的情况</strong></p>
-</blockquote>
-<ul>
-<li><code>cur_tx_id = tx_id</code>，表示这行数据就是由当前事务修改的，必然对该事务可见</li>
-<li><code>tx_id &lt; low_tx_id</code>，表示在当前事务开启的时候，<code>tx_id</code>所代表的事务已经提交了，因此这行的该版本数据，对当前事务可见</li>
-<li><code>low_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务还未提交，因此这行数据的这个版本对当前事务不可见</li>
-<li>l<code>ow_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>不在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务已经提交，因此这行数据对当前事务可见</li>
-<li><code>tx_id &gt; high_tx_id</code>，表示<code>tx_id</code>事务是在当前事务开启之后提交的，因此数据对当前事务不可见</li>
-</ul>
-<p>mvcc通过如上原理，再加上回滚指针，按照如下流程就行读取。</p>
-<ul>
-<li><p>当读取的数据版本，对当前事务可见时，则可以直接读取，结束</p>
-</li>
-<li><p>当读取的数据版本，对当前事务不可见时，则按照改行的隐藏列回滚指针列，去读取这上数据的上一个版本（这个数据是存储在undo日志中的）</p>
-</li>
-<li><p>首先读取这个版本对应的事务id列，获取<code>tx_id</code>，并与上述规则进行匹配，成功，则该版本数据对当前事务可见，结束； 否则继续第二步</p>
-</li>
-</ul>
-<h4 id="MVCC实现读已提交"><a href="#MVCC实现读已提交" class="headerlink" title="MVCC实现读已提交"></a>MVCC实现读已提交</h4><p>在读提提交隔离级别，MVCC遵循的规则和上面一致，不同的点是，在事务执行过程中，每一次的读操作，都会创建一个<code>read view</code>。</p>
-<p>这样的话，<code>read view</code>不断更新，因此之前不可见的数据，随着对应事务的提交，也会对当前事务可见，从而就实现了读已提交。具体流程如下。</p>
-<ul>
-<li>读事务开启</li>
-<li>当要进行读取操作时，立即生成一个<code>read view</code>,并获取对应行数据，安装MVCC规则进行匹配，匹配成功，则该版本数据对当前事务可见，否则根据回滚指针读取上一个版本的数据，直至读取到对当前事务可见的版本</li>
-<li>其他操作</li>
-<li>当再次涉及到读操作时，继续进行第二步操作</li>
-</ul>
-<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><p>MVCC实现了读写之前的无锁并发控制，而对于写写操作，Innodb表采用锁机制来进行并发控制，不过它采用的是行锁来进行控制，与表锁相比，它的粒度更细，锁定的范围更小，因此效率更高。</p>
-<p><strong>参考：<a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么？</a>    <a href="https://segmentfault.com/a/1190000037557620">https://segmentfault.com/a/1190000037557620</a></strong></p>
-]]></content>
-      <categories>
-        <category>mysql</category>
-      </categories>
-      <tags>
-        <tag>事务</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>mysql索引</title>
-    <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
-<span id="more"></span>
-
-<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
-<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
-<ul>
-<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
-<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
-</ul>
-<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
-<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
-<li>优势：在查询数据时，基于索引进行查询速度很快</li>
-<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
-</ul>
-<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
-<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
-<blockquote>
-<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
-</blockquote>
-<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
-<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
-<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
-<blockquote>
-<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
-</blockquote>
-<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
-<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
-<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
-<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
-<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
-<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
-<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
-<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
-<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
-<ul>
-<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
-</ul>
-<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
-<ul>
-<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
-</ul>
-<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
-]]></content>
-      <categories>
-        <category>mysql</category>
-      </categories>
-      <tags>
-        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
@@ -1091,6 +982,115 @@ x=[1,2,3,\ldots,1024]
       </categories>
       <tags>
         <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql中的mvcc</title>
+    <url>/2022/08/16/mysql%E4%B8%AD%E7%9A%84mvcc/</url>
+    <content><![CDATA[<h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>MVCC全称多版本并发控制。</p>
+<p>主要原理就是对于同一份数据，在数据库中存储多份，每一份都是一个版本。然后根据事务发生的先后顺序，来决定哪些版本的数据对该事务可见，从而实现并发控制。</p>
+<p><strong>MVCC主要解决的问题</strong></p>
+<p>MVCC主要解决的是读写并发问题，可以在无锁情况下实现读写并发，从而可以提交读写效率。</p>
+<p>关系型数据库中的读已提交、可重复读事务的隔离等级就是基于MVCC实现的。</p>
+<span id="more"></span>
+<h3 id="MVCC在mysql中的应用"><a href="#MVCC在mysql中的应用" class="headerlink" title="MVCC在mysql中的应用"></a>MVCC在mysql中的应用</h3><p>mysql中的Innodb存储引擎支持MVCC，对于Innodb表，mysql会默认为表创建几个隐藏列，其中比较重要的就是</p>
+<ul>
+<li><p>tx_id ,事务id列，用于表明修改该行数据的事务id</p>
+</li>
+<li><p>回滚指针列，由于Innodb支持事务，且默认事务的隔离等级为可重复读，其内部对于一行数据，会存储多个版本，回滚指针用于指向在事务修改该行数据之前，该行数据的样子(即该行数据的上一个版本)，如下图所示，图片来自 <a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/bVbyzV9" alt="Undo Log回滚历史记录"></p>
+</li>
+</ul>
+<h4 id="mvcc实现可重复读"><a href="#mvcc实现可重复读" class="headerlink" title="mvcc实现可重复读"></a>mvcc实现可重复读</h4><p>mysql会按照事务的先后顺序，以严格递增方式为每一个事务分配一个唯一的事务id。</p>
+<p>当mysql开启一个事务时，会立即形成一个快照，称之为<code>read view</code>,<code>read view</code>中记录了所有当前活跃的事务id(<strong>所谓活跃，是指事务已经开始，但是还没有结束</strong>)。在<code>read view</code>中的活跃事务集合中，存在一个最小id的事务，假设称之为<code>low_tx_id</code>, 存在一个最大事务id，<code>high_tx_id</code>。当前事务称之为<code>cur_tx_id</code>，假定<code>cur_tx_id</code>要读取的那行数据的隐藏事务列为<code>tx_id</code>，则可能存在如下几种情况。</p>
+<blockquote>
+<p><strong>这里需要说明一点，当前事务id不一定是<code>read view</code>中的最大值，因为在开启事务时，生成<code>read view</code>之前，可能会有新的事务进来，这个时候就会出现<code>read view</code>中的<code>rv_max_tx_id</code>比当前事务id大的情况</strong></p>
+</blockquote>
+<ul>
+<li><code>cur_tx_id = tx_id</code>，表示这行数据就是由当前事务修改的，必然对该事务可见</li>
+<li><code>tx_id &lt; low_tx_id</code>，表示在当前事务开启的时候，<code>tx_id</code>所代表的事务已经提交了，因此这行的该版本数据，对当前事务可见</li>
+<li><code>low_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务还未提交，因此这行数据的这个版本对当前事务不可见</li>
+<li>l<code>ow_tx_id &lt;= tx_id  &lt;= high_tx_id</code>, 且<code>tx_id</code>不在<code>read view</code>集合中，表示当前事务开启时，<code>tx_id</code>事务已经提交，因此这行数据对当前事务可见</li>
+<li><code>tx_id &gt; high_tx_id</code>，表示<code>tx_id</code>事务是在当前事务开启之后提交的，因此数据对当前事务不可见</li>
+</ul>
+<p>mvcc通过如上原理，再加上回滚指针，按照如下流程就行读取。</p>
+<ul>
+<li><p>当读取的数据版本，对当前事务可见时，则可以直接读取，结束</p>
+</li>
+<li><p>当读取的数据版本，对当前事务不可见时，则按照改行的隐藏列回滚指针列，去读取这上数据的上一个版本（这个数据是存储在undo日志中的）</p>
+</li>
+<li><p>首先读取这个版本对应的事务id列，获取<code>tx_id</code>，并与上述规则进行匹配，成功，则该版本数据对当前事务可见，结束； 否则继续第二步</p>
+</li>
+</ul>
+<h4 id="MVCC实现读已提交"><a href="#MVCC实现读已提交" class="headerlink" title="MVCC实现读已提交"></a>MVCC实现读已提交</h4><p>在读提提交隔离级别，MVCC遵循的规则和上面一致，不同的点是，在事务执行过程中，每一次的读操作，都会创建一个<code>read view</code>。</p>
+<p>这样的话，<code>read view</code>不断更新，因此之前不可见的数据，随着对应事务的提交，也会对当前事务可见，从而就实现了读已提交。具体流程如下。</p>
+<ul>
+<li>读事务开启</li>
+<li>当要进行读取操作时，立即生成一个<code>read view</code>,并获取对应行数据，安装MVCC规则进行匹配，匹配成功，则该版本数据对当前事务可见，否则根据回滚指针读取上一个版本的数据，直至读取到对当前事务可见的版本</li>
+<li>其他操作</li>
+<li>当再次涉及到读操作时，继续进行第二步操作</li>
+</ul>
+<h3 id="写写控制"><a href="#写写控制" class="headerlink" title="写写控制"></a>写写控制</h3><p>MVCC实现了读写之前的无锁并发控制，而对于写写操作，Innodb表采用锁机制来进行并发控制，不过它采用的是行锁来进行控制，与表锁相比，它的粒度更细，锁定的范围更小，因此效率更高。</p>
+<p><strong>参考：<a href="https://segmentfault.com/a/1190000037557620">MySQL的多版本并发控制(MVCC)是什么？</a>    <a href="https://segmentfault.com/a/1190000037557620">https://segmentfault.com/a/1190000037557620</a></strong></p>
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>事务</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>mysql索引</title>
+    <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
+<span id="more"></span>
+
+<h5 id="为什么基于索引的查询要比普通查询快"><a href="#为什么基于索引的查询要比普通查询快" class="headerlink" title="为什么基于索引的查询要比普通查询快?"></a>为什么基于索引的查询要比普通查询快?</h5><p>由于索引时按照特定数据结构进行组织的（如B+树、Hash），因此在查询数据的时候，可以在低于O(N)(全部扫描)的方式，查询到目标数据，所以其查询速度就非常快。<br>基于索引的查询速度比较快的最本质原因就是，减少了本次查询的IO次数，从而加快了索引。</p>
+<p>举个例子，假设一张mysql表有1000页，我们查询的数据恰巧在第1000页的最后。看看两种查询的效果。   </p>
+<ul>
+<li>全表扫描：一页一页的顺序遍历，最后在第1000页的最后一行找到我们想要的数据，最后计算查询总共进行了1000次IO  </li>
+<li>基于索引的查询： 假设索引结构是一个B+树结构，且层高为3层，那么查询时，首先基于索引进行检索，进行3次IO即可获取目标数据所在的页，然后对该数据页进行加载读取，得到我们需要的数据，最终计算查询总共进行了4次IO</li>
+</ul>
+<p>对比两种查询方式，可以发现在数据量大的情况下，索引查询性能远远优于全表扫描。</p>
+<h5 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h5><ul>
+<li>优势：在查询数据时，基于索引进行查询速度很快</li>
+<li>弊端：mysql索引是真实存在的文件，因此会占用一定的存储空间；在更新表数据的时候，需要同步更新索引树，这会带来额外的开销</li>
+</ul>
+<h3 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h3><p>在mysql中，可以按照不同方式，对索引进行分类。<br>按照索引数据结构可以将索引分为：B+树索引、Hash索引。<br>按照索引中存储的数据，可以将索引分为聚簇索引、辅助索引。<br>按照索引的字段，可以将索引分为单列索引、联合索引。<br>按照索引的字段性质，将以将索引分为主键索引、唯一索引、普通索引</p>
+<h4 id="按照数据结构区分索引"><a href="#按照数据结构区分索引" class="headerlink" title="按照数据结构区分索引"></a>按照数据结构区分索引</h4><p>mysql中最常见的索引就是B+树索引（又称为B树索引）、Hash索引。</p>
+<blockquote>
+<p>B+树索引又叫B树索引，是因为在mysql中，如果索引类型是B+树，显示的结构是:<code>Index_type: BTREE</code>.  </p>
+</blockquote>
+<p>其中mysql的Innodb和Mylsam存储引擎支持B树索引，memory存储引擎支持Hash索引。</p>
+<h5 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+树索引"></a>B+树索引</h5><p>对指定列中的数据，按照B+树数据结构进行构建，非叶节点用于存储索引信息，叶子节点用于存储真实数据，并且是有序的，这里存储对应的字段数据以及指向真实页的索引。  </p>
+<p><em>不仅如此，B+树的叶子节点还会通过双向链表进行连接，以便于进行范围查询。</em></p>
+<blockquote>
+<p>这里存在一个问题：<br>索引为什么采取B+树，而不是B-树？<br>B+ 树非叶节点用于存储索引信息，叶子节点用于存储真实数据。<br>B-树是所有节点均用于存储真实数据,相比于真实数据，索引数据的size是比较小的，这意味着，B+树的非叶节点可以存储更多的数据，因此可以指向更多的叶子节点。<br>因此在相同树高下，B+树可以存储的信息要远远大于B树，这就意味着对相同数据量而言，构建B-树需要更多的层高，那么在极端情况下，查询的数据在叶子节点上，则需要更多的IO，效率太低。<br>另外B+树的数据均存储在叶子节点上，且有序，用链表将叶子节点连接起来，比较适用于范围查询，而B-树则不行。</p>
+</blockquote>
+<h5 id="Hash索引"><a href="#Hash索引" class="headerlink" title="Hash索引"></a>Hash索引</h5><p>所谓Hash索引，就是对指定列的数据，按照Hash表数据结果方式进行构建。基于字段值做hash，散列至hash表的某个位置上，Hash表中存储真实的数据。</p>
+<h4 id="按照索引中的数据区分索引"><a href="#按照索引中的数据区分索引" class="headerlink" title="按照索引中的数据区分索引"></a>按照索引中的数据区分索引</h4><p>按照此类方式来区分索引，mysql中有两类索引：聚簇索引和辅助索引。</p>
+<h5 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h5><p>以B+树数据结构的索引为例，叶子节点上如果存储的是对应表上的真实记录的话，那么就称该索引为聚簇索引。</p>
+<p>对于mysql的Innodb表而言，如果表中存在主键，那么就会基于主键建立一个聚簇索引，如果没有指定主键的话，那么mysql会自动创建一个隐藏的自增字段，并基于该自增字段来建立聚簇索引。</p>
+<h5 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a>辅助索引</h5><p>仍以B树数据结构的索引为例，如果叶子存储的不是对应表中的真实记录，而是存储的是指定字段值与对应表真实记录的映射关系，则称该索引为辅助索引。</p>
+<p>通常情况下，我们对表建立的二级索引，称之为辅助索引。</p>
+<h4 id="按照索引的字段区分索引"><a href="#按照索引的字段区分索引" class="headerlink" title="按照索引的字段区分索引"></a>按照索引的字段区分索引</h4><p>索引可以针对mysql表中的其中一列，也可以针对mysql表中的多列。根据这个特点，可以将索引分为单列索引、联合索引。</p>
+<h5 id="单列索引"><a href="#单列索引" class="headerlink" title="单列索引"></a>单列索引</h5><p>针对表中的其中一列所建立的索引称之为单列索引。</p>
+<h5 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h5><p>针对表中的多列所建立的索引称之为联合索引。</p>
+<ul>
+<li>最左匹配<br>针对联合索引的查询，有一个特点，就是遵循最左匹配原则。<br>联合索引是基于多个字段构建的，在构建时，这些字段是有序的。<br>在针对联合索引的查询，必须要匹配上索引字段的最左字段，否则，联合索引不生效。</li>
+</ul>
+<p>举个例子：联合索引是基于A、B、C字段建立，这三个字段按照ABC排列，在查询的时候，查询条件只有匹配到最左侧的A字段时，联合索引才生效。</p>
+<ul>
+<li>联合索引为什么要遵循最左匹配原则？<br>这是由联合索引的结构所决定的。<br>联合索引构建时，会首先以多个字段的最左侧字段进行排序，当有多行数据最左侧字段值相同时，此时联合索引才会再根据索引字段列中的下一个字段进行排序，以此类推。<br>因此对于联合索引而言，它是针对最左字段整体有序的，针对其他索引字段是局部有序的。</li>
+</ul>
+<p>因此在查询的时候，我们必须要满足最左匹配原则，否则无法确定目标数据在索引中的位置。</p>
+]]></content>
+      <categories>
+        <category>mysql</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
