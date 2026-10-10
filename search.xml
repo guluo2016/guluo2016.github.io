@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Elasticsearch的选举机制</title>
+    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>es</category>
+      </categories>
+  </entry>
+  <entry>
     <title>2PC算法和共识算法</title>
     <url>/2023/05/30/2PC%E7%AE%97%E6%B3%95%E5%92%8C%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95/</url>
     <content><![CDATA[<p>TODO</p>
@@ -13,13 +22,227 @@
       </tags>
   </entry>
   <entry>
-    <title>Elasticsearch的选举机制</title>
-    <url>/2023/05/30/Elasticsearch%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<p>TODO</p>
+    <title>GPU结构与线程调度</title>
+    <url>/2026/10/10/GPU%E7%BB%93%E6%9E%84%E4%B8%8E%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6/</url>
+    <content><![CDATA[<h3 id="1-GPU-的硬件组成"><a href="#1-GPU-的硬件组成" class="headerlink" title="1 GPU 的硬件组成"></a>1 GPU 的硬件组成</h3><p>一个 GPU 芯片由多个 SM（Streaming Multiprocessor，流式多处理器）组成，并配备显存、缓存等硬件资源，以支持大规模并行计算和高效的数据传输。<br>每个 SM 内部包含 Warp 调度器、多个 CUDA Core、多个 Tensor Core（具体数量取决于 GPU 架构）、寄存器文件、共享内存等硬件资源，用于调度和执行并行计算任务。</p>
+<span id="more"></span>
+
+<p>如下图所示：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20261010140805565.png" alt="IMG-20261010140805565|700"></p>
+<h3 id="2-GPU-是如何组织线程的？"><a href="#2-GPU-是如何组织线程的？" class="headerlink" title="2 GPU 是如何组织线程的？"></a>2 GPU 是如何组织线程的？</h3><p>CUDA 编程模型中，线程的组织层级如下：<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/Pasted%20image%2020261010141921.png" alt="Pasted image 20261010141921|600"></p>
+<p>注意：</p>
+<ul>
+<li>一个 Block 只能分配到一个 SM 上执行，不能拆分到多个 SM。</li>
+<li>一个 SM 可以同时驻留多个 Block，前提是硬件资源足够。</li>
+<li>Warp 是 SM 内部进行线程指令调度的重要单位。</li>
+</ul>
+<h3 id="3-线程究竟负责哪部分数据？"><a href="#3-线程究竟负责哪部分数据？" class="headerlink" title="3 线程究竟负责哪部分数据？"></a>3 线程究竟负责哪部分数据？</h3><p>GPU 硬件负责调度线程，而线程处理哪份数据，通常由程序员编写的索引公式决定。</p>
+<p>假设向量有 1024 个元素：<br>$$<br>x&#x3D;[1,2,3,\ldots,1024]<br>$$</p>
+<p>我们要执行计算，让向量中的每个元素都+1。</p>
+<h4 id="3-1-开发自定义线程组织方式"><a href="#3-1-开发自定义线程组织方式" class="headerlink" title="3.1 开发自定义线程组织方式"></a>3.1 开发自定义线程组织方式</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add_one&lt;&lt;&lt;4, 256&gt;&gt;&gt;(x);</span><br></pre></td></tr></table></figure>
+
+<p>表示：</p>
+<ul>
+<li>Grid 包含 4 个 Block。    </li>
+<li>每个 Block 有 256 个线程。</li>
+<li>总计启动 1024 个线程。</li>
+</ul>
+<h4 id="3-2-每个线程计算自己的数据下标"><a href="#3-2-每个线程计算自己的数据下标" class="headerlink" title="3.2 每个线程计算自己的数据下标"></a>3.2 每个线程计算自己的数据下标</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">int i = blockIdx.x * blockDim.x + threadIdx.x;</span><br><span class="line">x[i] = x[i] + 1;</span><br></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>blockIdx.x</code></td>
+<td>当前 Block 的编号</td>
+</tr>
+<tr>
+<td><code>blockDim.x</code></td>
+<td>每个 Block 的线程数</td>
+</tr>
+<tr>
+<td><code>threadIdx.x</code></td>
+<td>当前线程在 Block 内的编号</td>
+</tr>
+<tr>
+<td><code>i</code></td>
+<td>当前线程负责的全局数据下标</td>
+</tr>
+</tbody></table>
+<p>示例如下：</p>
+<table>
+<thead>
+<tr>
+<th>Block 编号</th>
+<th>线程编号</th>
+<th>负责的数据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td><code>x[0]</code></td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td><code>x[1]</code></td>
+</tr>
+<tr>
+<td>0</td>
+<td>255</td>
+<td><code>x[255]</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td><code>x[256]</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>255</td>
+<td><code>x[511]</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>0</td>
+<td><code>x[512]</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>255</td>
+<td><code>x[767]</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>0</td>
+<td><code>x[768]</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>255</td>
+<td><code>x[1023]</code></td>
+</tr>
+</tbody></table>
+<p>这样，要启动的 1024 个线程就分别知道自己要处理哪个元素。</p>
+<h3 id="4-GPU-如何真正执行这些线程？"><a href="#4-GPU-如何真正执行这些线程？" class="headerlink" title="4 GPU 如何真正执行这些线程？"></a>4 GPU 如何真正执行这些线程？</h3><p>完整过程可以理解为：</p>
+<ol>
+<li>启动 Kernel<ol>
+<li>程序员指定 Grid 和 Block 的大小。</li>
+</ol>
+</li>
+<li>分配 Block<ol>
+<li>GPU 将 Block 分配到具有足够资源的 SM。</li>
+</ol>
+</li>
+<li>组织 Warp<ol>
+<li>Block 内的线程按 Warp 分组，NVIDIA GPU 通常每组 32 个线程。</li>
+</ol>
+</li>
+<li>调度 Warp<ol>
+<li>SM 的 Warp 调度器选择可执行的 Warp，向相应的执行管线发射指令。</li>
+</ol>
+</li>
+<li>执行计算<ol>
+<li>线程根据自己的索引定位数据，并执行 <code>x[i] + 1</code>。</li>
+</ol>
+</li>
+<li>写入结果<ol>
+<li>将结果写入目标内存，相关计算完成后，整个向量的操作完成。</li>
+</ol>
+</li>
+</ol>
+<p>需要注意，线程数量不等于同时执行的线程数量。GPU 可以分批执行 Block，并在多个 Warp 之间切换调度，以提高硬件利用率。</p>
+<h3 id="5-和-CPU-线程的区别"><a href="#5-和-CPU-线程的区别" class="headerlink" title="5 和 CPU 线程的区别"></a>5 和 CPU 线程的区别</h3><table>
+<thead>
+<tr>
+<th>对比</th>
+<th>CPU</th>
+<th>GPU（CUDA）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>线程</td>
+<td>OS Thread</td>
+<td>CUDA Thread</td>
+</tr>
+<tr>
+<td>主要调度机制</td>
+<td>OS 调度器</td>
+<td>GPU 硬件调度器</td>
+</tr>
+<tr>
+<td>调度特点</td>
+<td>通常围绕单个软件线程调度</td>
+<td>通常以 Warp 为单位发射指令</td>
+</tr>
+<tr>
+<td>并行组织</td>
+<td>CPU 核心执行线程</td>
+<td>Grid → Block → Warp → Thread</td>
+</tr>
+<tr>
+<td>数据由谁分工</td>
+<td>软件逻辑、线程任务划分</td>
+<td>Kernel 中的索引逻辑通常决定</td>
+</tr>
+</tbody></table>
 ]]></content>
       <categories>
-        <category>es</category>
+        <category>ai</category>
       </categories>
+      <tags>
+        <tag>AI基础</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Phoenix索引</title>
+    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
+    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
+<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
+<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
+<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary key</span> (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary key</span> (id));</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
+<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
+<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
+<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
+<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
+<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
+<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
+<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
+<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
+<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
+<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
+<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
+<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
+<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
+<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
+<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
+]]></content>
+      <categories>
+        <category>phoenix</category>
+      </categories>
+      <tags>
+        <tag>索引</tag>
+      </tags>
   </entry>
   <entry>
     <title>Log4j2使用</title>
@@ -44,14 +267,14 @@
 <li><code>appender.console.type = Console</code>：定义了一个名为<code>console</code>的日志输出器，其类型为<code>Console</code>，表示将日志输出到控制台。</li>
 <li><code>appender.console.name = STDOUT</code>：定义了一个名字叫<code>STDOUT</code>的输出器，这个是该appender的唯一标识符，logger可以通过该name引用这个appender。</li>
 <li><code>appender.console.layout.type = PatternLayout</code>：定义了appender的布局类型为<code>PatternLayout</code>，表示日志内容的格式化方式，<code>PatternLayout</code>允许你通过一个模式字符串来完全自定义日志消息的输出格式。其他布局类型还包括<code>JSONLayout</code>、<code>XMLLayout</code>等。</li>
-<li><code>appender.console.layout.pattern = %d&#123;HH:mm:ss.SSS&#125; [%t] %-5level %logger&#123;36&#125; - %msg%n</code>：定义了日志输出的格式模式。</li>
+<li><code>appender.console.layout.pattern = %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</code>：定义了日志输出的格式模式。</li>
 </ul>
 <p>其中<code>appender.console.layout.pattern</code>的格式说明如下：</p>
 <ul>
-<li><code>%d&#123;HH:mm:ss.SSS&#125;</code>：表示日志事件的时间戳，格式为小时:分钟:秒.毫秒。</li>
+<li><code>%d{HH:mm:ss.SSS}</code>：表示日志事件的时间戳，格式为小时:分钟:秒.毫秒。</li>
 <li><code>[%t]</code>：表示当前线程的名称。</li>
 <li><code>%-5level</code>：表示日志级别，左对齐，占5个字符宽度。</li>
-<li><code>%logger&#123;36&#125;</code>：表示日志记录器的名称，最多显示36个字符。</li>
+<li><code>%logger{36}</code>：表示日志记录器的名称，最多显示36个字符。</li>
 <li><code>-</code>：表示日志消息前的分隔符，只是为了格式美观</li>
 <li><code>%msg</code>：表示日志消息内容</li>
 <li><code>%n</code>：表示换行符, 确保每条日志消息后都有一个换行。</li>
@@ -114,9 +337,51 @@
       </tags>
   </entry>
   <entry>
-    <title>archlinux安装部署记录</title>
-    <url>/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p>&#x2F;&#x2F;TODO</p>
+    <title>github自定义codespace</title>
+    <url>/2025/01/07/github%E8%87%AA%E5%AE%9A%E4%B9%89codespace/</url>
+    <content><![CDATA[<h3 id="github-codespace的作用"><a href="#github-codespace的作用" class="headerlink" title="github codespace的作用"></a>github codespace的作用</h3><p>github提供的codespace功能，实际上就是一台docker虚拟机（默认2核8GB内存32GB磁盘空间），且默认情况下，该虚拟机已经为我们默认安装了一些基础的开发环境，如java、python环境等等。<br>好处是该虚拟机位于外网，在编译各种软件时，可以通过极快的网速下载各种依赖，几乎不会出现像国内网络经常遇到的下载某个依赖失败的情况（Timeout）。</p>
+<p>免费版的限制：</p>
+<ul>
+<li>codespace不能作为常驻服务器使用，因为一段时间不使用，就会自动关闭</li>
+<li>codespace可使用的资源（cpu，内存和磁盘）有限制，但是提供的资源几乎可以满足个人的绝大部分需求了</li>
+</ul>
+<span id="more"></span>
+
+<p>默认情况下，Github的codespace的虚拟机是一个Ubuntu系统，可能不一定能够满足我们的需求（比如说我们可能需要一个centos环境）。<br>同时，codespace也支持自定义，因此我们可以自定义一套满足自身需求的codespace。</p>
+<h3 id="自定义codespace"><a href="#自定义codespace" class="headerlink" title="自定义codespace"></a>自定义codespace</h3><p>自定义配置如下。</p>
+<h4 id="创建-devcontainer"><a href="#创建-devcontainer" class="headerlink" title="创建.devcontainer"></a>创建<code>.devcontainer</code></h4><p>在指定仓库中的根目录下，创建一个文件夹：<code>.devcontainer</code>.<br>在该文件夹中创建两个文件。</p>
+<ul>
+<li><code>devcontainer.json</code>，该文件用于声明容器的环境</li>
+<li><code>Dockerfile</code>，用于定义docker镜像</li>
+</ul>
+<h5 id="devcontainer-json文件"><a href="#devcontainer-json文件" class="headerlink" title="devcontainer.json文件"></a><code>devcontainer.json</code>文件</h5><p>下面就是<code>devcontainer.json</code>的一个案例。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;CentOS Dev Container001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;dockerfile&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Dockerfile&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.defaultProfile.linux&quot;</span><span class="punctuation">:</span> <span class="string">&quot;bash&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;extensions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;ms-python.python&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;redhat.vscode-yaml&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;remoteUser&quot;</span><span class="punctuation">:</span> <span class="string">&quot;root&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中</p>
+<ul>
+<li><code>name</code>用于声明docker容器的名字。</li>
+<li><code>build</code>，用于指定如何构建镜像，这里选择使用Dockerfile</li>
+<li><code>settings</code>,用于配置VSCode在docker容器中的默认配置</li>
+<li><code>extensions</code>，用于配置VSCode的扩展插件</li>
+<li><code>remoteUser</code>,用于指明登录该docker容器的用户</li>
+</ul>
+<h5 id="Dockerfile文件"><a href="#Dockerfile文件" class="headerlink" title="Dockerfile文件"></a>Dockerfile文件</h5><p><code>Dockerfile</code>案例如下所示，和普通的<code>Dockerfile</code>文件完全一样。</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 使用 CentOS 作为基础镜像</span></span><br><span class="line"><span class="keyword">FROM</span> bigtop/slaves:<span class="number">3.3</span>.<span class="number">0</span>-centos-<span class="number">7</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认用户和工作目录</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /opt</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="将-devcontainer推送到github仓库"><a href="#将-devcontainer推送到github仓库" class="headerlink" title="将.devcontainer推送到github仓库"></a>将<code>.devcontainer</code>推送到github仓库</h4><p>将<code>.devcontainer</code>文件夹及内部的文件作为一次修改，推送到github上的远程仓库中。</p>
+<h4 id="在github上创建容器"><a href="#在github上创建容器" class="headerlink" title="在github上创建容器"></a>在github上创建容器</h4><p>登录github，选择你上一步推送的仓库。<br>按照如下方式，开始创建自定义codespace。<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/Pasted%20image%2020250106232418.png" alt="Pasted image 20250106232418"></p>
+<p>在新弹出的页面中，进行如下选择。<br>其中：</p>
+<ul>
+<li><code>branch</code>: 选择<code>.devcontainer</code>所推送的那个分支</li>
+<li><code>Dev container configuration</code>，会自动解析<code>devcontainer.json</code>中的name，并在此展示</li>
+<li><code>region</code>保持默认和<code>Machine type</code>保持默认即可<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106235831116.png" alt="IMG-20250106235831116"></li>
+</ul>
+<p>点击<code>Create codespace</code>即可在github上创建一个自定义的Docker容器。</p>
+<h3 id="打开codespace的方式"><a href="#打开codespace的方式" class="headerlink" title="打开codespace的方式"></a>打开codespace的方式</h3><p>当codespace创建OK之后，github支持多种打开方式，常用的如下。</p>
+<ul>
+<li>使用浏览器直接打开</li>
+<li>使用VSCode打开（需要本机安装VSCode，注意衍生版本不支持，如Cursor、VSCodium等）<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106234150677.png" alt="IMG-20250106234150677"></li>
+</ul>
 ]]></content>
       <categories>
         <category>差生文具多</category>
@@ -126,111 +391,65 @@
       </tags>
   </entry>
   <entry>
-    <title>hadoop2.7.2集群搭建</title>
-    <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
-    <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">主机名分别是：master,salve1,salve2</span></span><br><span class="line">192.168.0.11  </span><br><span class="line">192.168.0.12  </span><br><span class="line">192.168.0.13</span><br></pre></td></tr></table></figure>
-
+    <title>arrow技术初步学习</title>
+    <url>/2026/01/01/arrow%E6%8A%80%E6%9C%AF%E5%88%9D%E6%AD%A5%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<blockquote>
+<p>问题：mmap技术已经可以实现两个进程之间的零拷贝通信了，为什么还要再引入arrow？</p>
+</blockquote>
 <span id="more"></span>
 
-<h2 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h2><p>修改hosts文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">127.0.0.1 localhost</span><br><span class="line">192.168.0.11    master</span><br><span class="line">192.168.0.12    slave1</span><br><span class="line">192.168.0.13    slave2</span><br></pre></td></tr></table></figure>
-<h2 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h2><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装ssh服务端</span><br><span class="line">yum install openssh-server -y</span><br><span class="line">#安装ssh客户端</span><br><span class="line">yum install openssh-clients -y</span><br></pre></td></tr></table></figure>
-<p>使用命令:<code>ssh-keygen</code>生成本机密钥和公钥，这些文件在{USER_HOME}&#x2F;.ssh目录下，进入该目录，执行命令：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#authorized_keys文件若没有，首先创建一个</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br></pre></td></tr></table></figure>
-<p>将authorize_keys文件分发到其他主机上，并追加到对应的authorized_keys文件中。即可实现在master主机上，免密登录其他主机。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh slave1   //免密登录</span><br></pre></td></tr></table></figure>
+<p>mmap打通了两个进程之间的快速通信通道，但若仅依赖于mmap技术，依然存在很严重的性能问题。<br>举个例子，在Linux系统内存中（<code>/dev/shm/</code>），分别创建一个<code>json</code>文件和<code>arrow</code>文件，这两个文件的数据一样，都是100w行数据，如下所示。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> pyarrow <span class="keyword">as</span> pa</span><br><span class="line"><span class="keyword">import</span> pyarrow.ipc <span class="keyword">as</span> ipc</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">NUM_ROWS = <span class="number">1000000</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个100w行的数据</span></span><br><span class="line">ids = np.arange(NUM_ROWS).tolist()</span><br><span class="line">values = np.random.randn(NUM_ROWS).tolist()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在内存中创建一个json文件</span></span><br><span class="line">JSON_FILE = <span class="string">&#x27;/dev/shm/test_data.json&#x27;</span></span><br><span class="line">data_list = [&#123;<span class="string">&quot;id&quot;</span>: i, <span class="string">&quot;val&quot;</span>: v&#125; <span class="keyword">for</span> i, v <span class="keyword">in</span> <span class="built_in">zip</span>(ids, values)]</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(JSON_FILE, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    json.dump(data_list, f)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在内存中创建一个arrow文件</span></span><br><span class="line">ARROW_FILE = <span class="string">&#x27;/dev/shm/test_data.arrow&#x27;</span></span><br><span class="line">table = pa.Table.from_arrays([</span><br><span class="line">    pa.array(ids),</span><br><span class="line">    pa.array(values)</span><br><span class="line">], names=[<span class="string">&#x27;id&#x27;</span>, <span class="string">&#x27;val&#x27;</span>])</span><br><span class="line"><span class="keyword">with</span> pa.OSFile(ARROW_FILE, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">with</span> ipc.new_file(f, table.schema) <span class="keyword">as</span> writer:</span><br><span class="line">        writer.write_table(table)</span><br></pre></td></tr></table></figure>
 
-<h2 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h2><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf jdk-XXX.tar.gz -C /opt</span><br><span class="line"></span><br><span class="line">#修改/etc/profile，添加如下语句</span><br><span class="line">export JAVA_HOME=/opt/jdk-XXX</span><br><span class="line">export PATH=&#123;JABA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+<p>在文件创建完成之后，我们分别直接通过mmap映射方式去读取json文件和读取arrow文件，看看加载效率。</p>
+<ul>
+<li>将<code>json</code>文件通过mmap映射后，再通过<code>json.loads</code>加载解析，我们查看其耗时情况：</li>
+<li>将<code>arrow</code>文件通过<code>pa.memory_map</code>映射后，再通过<code>ipc.open_file().read_all()</code>加载解析，我们查看其耗时情况：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> mmap</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">benchmark</span>():</span><br><span class="line">    <span class="comment"># 加载json文件</span></span><br><span class="line">    start_json = time.time()</span><br><span class="line">    <span class="comment"># 即使在内存中，JSON 也必须全量读取并解析</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(JSON_FILE, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="comment"># 问题：json.loads 必须扫描 100w 行字符串，并创建 100w 个 Python 字典对象</span></span><br><span class="line">        <span class="comment"># 使用 json.loads 来解析 mmap 中的数据 因此：该步骤非常耗时</span></span><br><span class="line">        mapped_file = mmap.mmap(f.fileno(), <span class="number">0</span>, access=mmap.ACCESS_READ)</span><br><span class="line">        json_data = json.loads(mapped_file[:].decode(<span class="string">&quot;utf-8&quot;</span>))</span><br><span class="line">    end_json = time.time()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;方案一 [JSON 解析] 耗时: <span class="subst">&#123;end_json - start_json:<span class="number">.4</span>f&#125;</span> 秒&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 加载arrow</span></span><br><span class="line">    start_arrow = time.time()</span><br><span class="line">    <span class="comment"># 核心：使用 memory_map，这仅仅是建立一个逻辑映射，不发生 CPU 解析</span></span><br><span class="line">    source = pa.memory_map(ARROW_FILE, <span class="string">&#x27;rb&#x27;</span>)</span><br><span class="line">    arrow_table = ipc.open_file(source).read_all()</span><br><span class="line">    end_arrow = time.time()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;方案二 [Arrow 映射] 耗时: <span class="subst">&#123;end_arrow - start_arrow:<span class="number">.4</span>f&#125;</span> 秒&quot;</span>)</span><br><span class="line"></span><br><span class="line">benchmark()</span><br></pre></td></tr></table></figure>
 
-<h2 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h2><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf hadoop-2.7.1.XXX.tar.gz -C /opt</span><br></pre></td></tr></table></figure>
+<p>结果显示：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">方案一 [JSON 解析] 耗时: 1.1515 秒</span><br><span class="line">方案二 [Arrow 映射] 耗时: 0.0114 秒</span><br></pre></td></tr></table></figure>
 
-<p>进入hadoop安装目录，修改etc&#x2F;hadoop目录下的各个配置文件：<br>修改core-site.xml文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9002&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.default.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;file:/home/hadoop/tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改hdfs-site.xml文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:9001&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">         &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">         &lt;value&gt;file:/home/hadoop/dfs/name&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">          &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">          &lt;value&gt;file:/home/hadoop/dfs/data&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">           &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">           &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改mapred-site.xml文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master10020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19888&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改yarn-site.xml文件：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8032&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8030&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8031&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.admin.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8033&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8088&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
-
-<p>修改slaves文件,用于指定slave节点：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">slave1 </span><br><span class="line">slave2</span><br></pre></td></tr></table></figure>
-
-<p>修改hadoop-env.sh文件：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将export JAVA_HOME行修改成如下：</span><br><span class="line">export JAVA_HOME=/opt/jdk.XXX</span><br></pre></td></tr></table></figure>
-
-<p>修改&#x2F;etc&#x2F;profile文件：   </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export HADOOP_HOME=/opt/hadoop-2.7.1</span><br><span class="line">export PATH=&#123;HADOOP_HOME&#125;/bin:$&#123;JAVA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#指令命令：</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
-
-<p>到此，hadoop已经配置成功了，通过scp命令将hadoop解压包分发到各个节点上：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br></pre></td></tr></table></figure>
-<p>到此，hadoop集群搭建完毕，开始进行hdfs文件系统的格式化操作：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop namenode -format</span><br></pre></td></tr></table></figure>
-<p>当出现如下日志信息时，表示格式化hdfs成功：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">Storage directory /home/hadoop/dfs/name has been successfully formated.</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-
-<h2 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h2><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hdfs dfs -mkdir  /input</span><br><span class="line"></span><br><span class="line">hdfs dfs -put /home/word.txt /input</span><br></pre></td></tr></table></figure>
-
-<p>使用hadoop自带的wordcount类来统计word.txt中的字数：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop jar /opt/hadoop-2.7.1/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.XX.jar worcount /input/* /out  </span><br><span class="line"></span><br><span class="line">使用如下指令查看统计结果：</span><br><span class="line">hdfs dfs -cat /out/*</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>数据量</th>
+<th>加载耗时（秒）</th>
+<th>提升效率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JSON</td>
+<td>100w行</td>
+<td>1.1515</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Arrow</td>
+<td>100w行</td>
+<td>0.0114</td>
+<td>101倍</td>
+</tr>
+</tbody></table>
+<p>总结：<br>上面的例子说明，仅仅依靠mmap技术，进程可以快速获取到想要的数据；<br>但是问题是，获取到数据一般不是我们的最终目的，我们的目的一般是要理解这段数据并进行相关处理操作；因此在获取到数据之后，我们还需要对这段数据进行序列化成内存对象，以方便程序进行处理；<br>因此就有了如下区别：</p>
+<ul>
+<li>mmap技术方便程序快速获取到json数据字节，接下来就需要程序自身将其转换成json对象，该阶段需要扫描字符、类型转换、编解码操作，这是一个CPU密集型操作，数据量越大就约耗时</li>
+<li>同样地，mmap技术方便程序快速获取到arrow数据，在加上arrow自身功能加持，程序读取到的arrow数据与在内存对象数据是一致的，无须进行解析操作，省去了CPU密集型的操作，因此加载数据时耗时几乎和数据量无关，因此数据量越大越能体现arrow的优势</li>
+</ul>
 ]]></content>
-      <categories>
-        <category>hadoop</category>
-      </categories>
-      <tags>
-        <tag>bigdata</tag>
-      </tags>
   </entry>
   <entry>
-    <title>Phoenix索引</title>
-    <url>/2022/07/21/Phoenix%E7%B4%A2%E5%BC%95/</url>
-    <content><![CDATA[<h3 id="Phoenix简单介绍"><a href="#Phoenix简单介绍" class="headerlink" title="Phoenix简单介绍"></a>Phoenix简单介绍</h3><p>Phoenix是HBase的sql层，基于Phoenix可以通过sql命令操作HBase，降低了学习HBase的成本，同时方便与代码迁移，之前面向关系型数据库的代码，只需要换下数据库的连接及驱动即可。</p>
-<p>通过Phoenix创建表，必须制定一个主键，内部实际上会以该主键作为rowkey，在HBase中创建一张表。</p>
-<p>在基于Phoenix创建表时，如果没有指定列族的话，会默认自动创建一个名字为0列族。  </p>
-<p>同时也可以指定列族，指定列族的时候需要注意，主键列不能指定，否则会报错。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"># 会默认将这三列均放置在列族<span class="number">0</span>下</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (id <span class="type">integer</span>, name <span class="type">varchar</span>(<span class="number">10</span>), age <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br><span class="line"></span><br><span class="line"># 指定列族名</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test ( &quot;id&quot; <span class="type">integer</span>, &quot;person&quot;.&quot;name&quot; <span class="type">varchar</span>(<span class="number">10</span>), &quot;person&quot;.&quot;age&quot; <span class="type">integer</span>, <span class="keyword">constraint</span> my_pk <span class="keyword">primary</span> key (id));</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<p>Phoenix最有用功能就是为HBase表创建二级索引。在Phoenix表没有二级索引，我们又没有基于主键进行查询的时候，会进行全表扫描，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719194147590.png" alt="image-20220719194147590"></p>
-<p>但是通过Phoenix创建二级索引，可以避免全表扫描，从而提高检索速度。</p>
-<h3 id="Phoenix二级索引"><a href="#Phoenix二级索引" class="headerlink" title="Phoenix二级索引"></a>Phoenix二级索引</h3><p>基于Phoenix可以创建二级索引，二级索引主要由以下几种类型：</p>
-<h4 id="全局索引"><a href="#全局索引" class="headerlink" title="全局索引"></a>全局索引</h4><p>创建全局索引的命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195321460.png" alt="image-20220719195321460"></p>
-<p>创建的全局索引，会在HBase中创建一个真实的表，该索引表的rowkey是原表的索引列和rowkey组合而来的。</p>
-<p><strong>当我们对原表进行select查询时，只有索引列中包含要查询的列时，才会走索引，否则走全表扫描。</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719195907177.png" alt="image-20220719195907177"></p>
-<p>全局索引适合用于读多写少的场景，因为索引表是一个真实存在的表，因此每次的更新都会连带着对全局索引表的更新。</p>
-<h4 id="本地索引"><a href="#本地索引" class="headerlink" title="本地索引"></a>本地索引</h4><p>创建本地索引的命令如下图所示。  </p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201051475.png" alt="image-20220719195321460"></p>
-<p>本地索引的特点是，不会额外在hbase中创建一张新表，而是在原表中新增一行，用于存储索引数据，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201337293.png" alt="image-20220719201337293"></p>
-<p>新增的这行数据的rowkey是由原表中的rowkey，索引列组成的。</p>
-<p>本地索引适合写多读少的场景，因为索引数据和真实数据都是在同一张表中的。</p>
-<p>本地索引的特点就是不管查询的数据索引表中有没有，都会先走索引，如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719201709014.png" alt="image-20220719201709014"></p>
-<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>所谓覆盖索引就是，就是把原数据再索引表中也存储一份，这样仅扫描索引表就可以读取到我们所需要的全部数据，不必再对原表进行扫描，只有从索引表中拿不到的数据，才会去原表中获取，从而提高检索速度。</p>
-<p>覆盖索引同样也会在HBase中创建一张真实的表，创建覆盖索引的命令如下，通过<code>include</code>关键字，将原表中我们需要的列写入到索引表中。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202149788.png" alt="image-20220719202149788"></p>
-<p>覆盖索引的特点，只有基于索引列的查询才会走索引，否则全部扫描，另外能从索引中全部数据的话，就不会去原表再次读取数据。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719202919611.png" alt="image-20220719202919611"></p>
-<h3 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h3><p>删除索引命令如下图所示。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220719200242734.png" alt="image-20220719200242734"></p>
+    <title>archlinux安装部署记录</title>
+    <url>/2023/11/15/archlinux%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p>&#x2F;&#x2F;TODO</p>
 ]]></content>
       <categories>
-        <category>phoenix</category>
+        <category>差生文具多</category>
       </categories>
       <tags>
-        <tag>索引</tag>
+        <tag>工具</tag>
       </tags>
   </entry>
   <entry>
@@ -287,8 +506,8 @@
         <category>hbase</category>
       </categories>
       <tags>
-        <tag>bigdata</tag>
         <tag>事务</tag>
+        <tag>bigdata</tag>
       </tags>
   </entry>
   <entry>
@@ -410,6 +629,70 @@
 ]]></content>
   </entry>
   <entry>
+    <title>hadoop2.7.2集群搭建</title>
+    <url>/2022/07/08/hadoop2-7-2%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</url>
+    <content><![CDATA[<p>这里搭建hadoop集群，使用了三台电脑，分别是：  </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">主机名分别是：master,salve1,salve2</span></span><br><span class="line">192.168.0.11  </span><br><span class="line">192.168.0.12  </span><br><span class="line">192.168.0.13</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h2 id="配置hosts各个主机"><a href="#配置hosts各个主机" class="headerlink" title="配置hosts各个主机"></a>配置hosts各个主机</h2><p>修改hosts文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">127.0.0.1 localhost</span><br><span class="line">192.168.0.11    master</span><br><span class="line">192.168.0.12    slave1</span><br><span class="line">192.168.0.13    slave2</span><br></pre></td></tr></table></figure>
+<h2 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h2><p>安装ssh服务，这里使用的centos环境，需要安装：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装ssh服务端</span><br><span class="line">yum install openssh-server -y</span><br><span class="line">#安装ssh客户端</span><br><span class="line">yum install openssh-clients -y</span><br></pre></td></tr></table></figure>
+<p>使用命令:<code>ssh-keygen</code>生成本机密钥和公钥，这些文件在{USER_HOME}&#x2F;.ssh目录下，进入该目录，执行命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#authorized_keys文件若没有，首先创建一个</span><br><span class="line">cat id_rsa.pub &gt;&gt; authorized_keys</span><br></pre></td></tr></table></figure>
+<p>将authorize_keys文件分发到其他主机上，并追加到对应的authorized_keys文件中。即可实现在master主机上，免密登录其他主机。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh slave1   //免密登录</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装jdk"><a href="#安装jdk" class="headerlink" title="安装jdk"></a>安装jdk</h2><p>下载jdk安装包：jdk-XXX.tar.gz,解压安装  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf jdk-XXX.tar.gz -C /opt</span><br><span class="line"></span><br><span class="line">#修改/etc/profile，添加如下语句</span><br><span class="line">export JAVA_HOME=/opt/jdk-XXX</span><br><span class="line">export PATH=&#123;JABA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装hadoop"><a href="#安装hadoop" class="headerlink" title="安装hadoop"></a>安装hadoop</h2><p>下载hadoop安装包：hadoop-2.7.1.XXX.tar.gz,解压进行安装：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar zxvf hadoop-2.7.1.XXX.tar.gz -C /opt</span><br></pre></td></tr></table></figure>
+
+<p>进入hadoop安装目录，修改etc&#x2F;hadoop目录下的各个配置文件：<br>修改core-site.xml文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9002&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;fs.default.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;file:/home/hadoop/tmp&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改hdfs-site.xml文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">        &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:9001&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">         &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">         &lt;value&gt;file:/home/hadoop/dfs/name&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">          &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">          &lt;value&gt;file:/home/hadoop/dfs/data&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">   &lt;property&gt;</span><br><span class="line">           &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">           &lt;value&gt;3&lt;/value&gt;</span><br><span class="line">   &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改mapred-site.xml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master10020&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;master:19888&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改yarn-site.xml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8032&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8030&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8031&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.admin.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8033&lt;/value&gt;</span><br><span class="line"></span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:8088&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改slaves文件,用于指定slave节点：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">slave1 </span><br><span class="line">slave2</span><br></pre></td></tr></table></figure>
+
+<p>修改hadoop-env.sh文件：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将export JAVA_HOME行修改成如下：</span><br><span class="line">export JAVA_HOME=/opt/jdk.XXX</span><br></pre></td></tr></table></figure>
+
+<p>修改&#x2F;etc&#x2F;profile文件：   </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export HADOOP_HOME=/opt/hadoop-2.7.1</span><br><span class="line">export PATH=&#123;HADOOP_HOME&#125;/bin:$&#123;JAVA_HOME&#125;/bin:$&#123;PATH&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#指令命令：</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+
+<p>到此，hadoop已经配置成功了，通过scp命令将hadoop解压包分发到各个节点上：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br><span class="line">scp /opt/hadoop-2.7.1 slave1@salve1:/opt</span><br></pre></td></tr></table></figure>
+<p>到此，hadoop集群搭建完毕，开始进行hdfs文件系统的格式化操作：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop namenode -format</span><br></pre></td></tr></table></figure>
+<p>当出现如下日志信息时，表示格式化hdfs成功：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">Storage directory /home/hadoop/dfs/name has been successfully formated.</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试hadoop集群"><a href="#测试hadoop集群" class="headerlink" title="测试hadoop集群"></a>测试hadoop集群</h2><p>在hdfs上新建一个文件夹&#x2F;input,并上传测试文件word.txt:  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hdfs dfs -mkdir  /input</span><br><span class="line"></span><br><span class="line">hdfs dfs -put /home/word.txt /input</span><br></pre></td></tr></table></figure>
+
+<p>使用hadoop自带的wordcount类来统计word.txt中的字数：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hadoop jar /opt/hadoop-2.7.1/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.XX.jar worcount /input/* /out  </span><br><span class="line"></span><br><span class="line">使用如下指令查看统计结果：</span><br><span class="line">hdfs dfs -cat /out/*</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>hadoop</category>
+      </categories>
+      <tags>
+        <tag>bigdata</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>linux中很有用的命令</title>
     <url>/2022/07/08/linux%E4%B8%AD%E5%BE%88%E6%9C%89%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
     <content><![CDATA[<p>记录一些常用的Linux指令。</p>
@@ -425,16 +708,19 @@
 
 <h2 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h2><p>sed可以对文件进行编辑，功能非常多，能够满足几乎所有的对文件的操作  </p>
 <ul>
-<li><p>1 替换文本内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>2 删除匹配行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>3 插入</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure></li>
+<li>1 替换文本内容</li>
 </ul>
-]]></content>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本test.txt中的所有old字符串替换成new字符串</span><br><span class="line">sed -i &#x27;s:old:new:g&#x27; test.txt</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>2 删除匹配行</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#将文本中的包含“delete_conent”字符串的行删除掉</span><br><span class="line">sed -i &#x27;/delete_conent/d&#x27; test.txt</span><br><span class="line"></span><br><span class="line">##删除匹配行的下一行</span><br><span class="line">sed -ni &#x27;p;/target_content/n&#x27; test.txt</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>3 插入</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#在匹配行的下一行添加新内容，，，a代表的是after</span><br><span class="line">sed -i &#x27;/target_conent/a\new_add_content&#x27; test.txt</span><br><span class="line"></span><br><span class="line">#在匹配行的上一行添加新内容，，，i代表的是in front</span><br><span class="line">sed -i &#x27;/target_content/i\new_add_content&#x27; test.txt</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>linux</category>
       </categories>
@@ -499,60 +785,6 @@
       </tags>
   </entry>
   <entry>
-    <title>github自定义codespace</title>
-    <url>/2025/01/07/github%E8%87%AA%E5%AE%9A%E4%B9%89codespace/</url>
-    <content><![CDATA[<h3 id="github-codespace的作用"><a href="#github-codespace的作用" class="headerlink" title="github codespace的作用"></a>github codespace的作用</h3><p>github提供的codespace功能，实际上就是一台docker虚拟机（默认2核8GB内存32GB磁盘空间），且默认情况下，该虚拟机已经为我们默认安装了一些基础的开发环境，如java、python环境等等。<br>好处是该虚拟机位于外网，在编译各种软件时，可以通过极快的网速下载各种依赖，几乎不会出现像国内网络经常遇到的下载某个依赖失败的情况（Timeout）。</p>
-<p>免费版的限制：</p>
-<ul>
-<li>codespace不能作为常驻服务器使用，因为一段时间不使用，就会自动关闭</li>
-<li>codespace可使用的资源（cpu，内存和磁盘）有限制，但是提供的资源几乎可以满足个人的绝大部分需求了</li>
-</ul>
-<span id="more"></span>
-
-<p>默认情况下，Github的codespace的虚拟机是一个Ubuntu系统，可能不一定能够满足我们的需求（比如说我们可能需要一个centos环境）。<br>同时，codespace也支持自定义，因此我们可以自定义一套满足自身需求的codespace。</p>
-<h3 id="自定义codespace"><a href="#自定义codespace" class="headerlink" title="自定义codespace"></a>自定义codespace</h3><p>自定义配置如下。</p>
-<h4 id="创建-devcontainer"><a href="#创建-devcontainer" class="headerlink" title="创建.devcontainer"></a>创建<code>.devcontainer</code></h4><p>在指定仓库中的根目录下，创建一个文件夹：<code>.devcontainer</code>.<br>在该文件夹中创建两个文件。</p>
-<ul>
-<li><code>devcontainer.json</code>，该文件用于声明容器的环境</li>
-<li><code>Dockerfile</code>，用于定义docker镜像</li>
-</ul>
-<h5 id="devcontainer-json文件"><a href="#devcontainer-json文件" class="headerlink" title="devcontainer.json文件"></a><code>devcontainer.json</code>文件</h5><p>下面就是<code>devcontainer.json</code>的一个案例。</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;CentOS Dev Container001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;dockerfile&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Dockerfile&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;settings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.defaultProfile.linux&quot;</span><span class="punctuation">:</span> <span class="string">&quot;bash&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;extensions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;ms-python.python&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;redhat.vscode-yaml&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;remoteUser&quot;</span><span class="punctuation">:</span> <span class="string">&quot;root&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>其中</p>
-<ul>
-<li><code>name</code>用于声明docker容器的名字。</li>
-<li><code>build</code>，用于指定如何构建镜像，这里选择使用Dockerfile</li>
-<li><code>settings</code>,用于配置VSCode在docker容器中的默认配置</li>
-<li><code>extensions</code>，用于配置VSCode的扩展插件</li>
-<li><code>remoteUser</code>,用于指明登录该docker容器的用户</li>
-</ul>
-<h5 id="Dockerfile文件"><a href="#Dockerfile文件" class="headerlink" title="Dockerfile文件"></a>Dockerfile文件</h5><p><code>Dockerfile</code>案例如下所示，和普通的<code>Dockerfile</code>文件完全一样。</p>
-<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 使用 CentOS 作为基础镜像</span></span><br><span class="line"><span class="keyword">FROM</span> bigtop/slaves:<span class="number">3.3</span>.<span class="number">0</span>-centos-<span class="number">7</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认用户和工作目录</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /opt</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="将-devcontainer推送到github仓库"><a href="#将-devcontainer推送到github仓库" class="headerlink" title="将.devcontainer推送到github仓库"></a>将<code>.devcontainer</code>推送到github仓库</h4><p>将<code>.devcontainer</code>文件夹及内部的文件作为一次修改，推送到github上的远程仓库中。</p>
-<h4 id="在github上创建容器"><a href="#在github上创建容器" class="headerlink" title="在github上创建容器"></a>在github上创建容器</h4><p>登录github，选择你上一步推送的仓库。<br>按照如下方式，开始创建自定义codespace。<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/Pasted%20image%2020250106232418.png" alt="Pasted image 20250106232418"></p>
-<p>在新弹出的页面中，进行如下选择。<br>其中：</p>
-<ul>
-<li><code>branch</code>: 选择<code>.devcontainer</code>所推送的那个分支</li>
-<li><code>Dev container configuration</code>，会自动解析<code>devcontainer.json</code>中的name，并在此展示</li>
-<li><code>region</code>保持默认和<code>Machine type</code>保持默认即可<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106235831116.png" alt="IMG-20250106235831116"></li>
-</ul>
-<p>点击<code>Create codespace</code>即可在github上创建一个自定义的Docker容器。</p>
-<h3 id="打开codespace的方式"><a href="#打开codespace的方式" class="headerlink" title="打开codespace的方式"></a>打开codespace的方式</h3><p>当codespace创建OK之后，github支持多种打开方式，常用的如下。</p>
-<ul>
-<li>使用浏览器直接打开</li>
-<li>使用VSCode打开（需要本机安装VSCode，注意衍生版本不支持，如Cursor、VSCodium等）<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/IMG-20250106234150677.png" alt="IMG-20250106234150677"></li>
-</ul>
-]]></content>
-      <categories>
-        <category>差生文具多</category>
-      </categories>
-      <tags>
-        <tag>工具</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>mysql索引</title>
     <url>/2023/08/18/mysql%E7%B4%A2%E5%BC%95/</url>
     <content><![CDATA[<h3 id="索引介绍"><a href="#索引介绍" class="headerlink" title="索引介绍"></a>索引介绍</h3><p>索引是一种特殊的数据结构，其主要目的就是为了加快数据的查询速度。<br>mysql索引基于表的指定字段，按照某种数据结构进行排序，并将数据集存储于实际的文件中。<br>mysql索引中也记录了索引字段和表真实记录之间的映射关系，当我们基于索引查询到数据时，再基于该映射关系，据可以快速定位到真实记录行所在的位置，并实现快速的读取。</p>
@@ -612,7 +844,7 @@
 <span id="more"></span>
 
 <h3 id="安装neovim"><a href="#安装neovim" class="headerlink" title="安装neovim"></a>安装neovim</h3><p>以windos为例，直接从github上下载对应版本即可。<br>下载地址是这里：<a href="https://github.com/neovim/neovim/releases">Neovim下载地址</a>, 我这里选择的版本是:<code>v0.9.1</code>。</p>
-<p>将下载好的neovim zip包解压至指定目录，并将<code>&#123;NEOVIM_HOME&#125;\bin</code>目录配置到系统环境变量中，即可完成对neovim的安装。</p>
+<p>将下载好的neovim zip包解压至指定目录，并将<code>{NEOVIM_HOME}\bin</code>目录配置到系统环境变量中，即可完成对neovim的安装。</p>
 <p>针对windows版本，neovim提供了两个命令：<code>nvim.exe</code>和<code>nvim-qt.exe</code>,前者是命令行式的，后者提供一个图形化界面。这里常用的式<code>nvim.exe</code>，也可以简写为<code>nvim</code></p>
 <p>我们可以通过如下命令验证neovim及其环境变量是否安装成功。</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">打开powershell，输入如下命令</span></span><br><span class="line">nvim --verion </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">会打印如下结果</span></span><br><span class="line">NVIM v0.9.1</span><br><span class="line">Build type: RelWithDebInfo</span><br><span class="line">LuaJIT 2.1.0-beta3</span><br><span class="line">Compilation: C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe /MD /Zi /O2 /Ob1  -W3 -wd4311 -wd4146 -DUNIT_TESTING -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_WIN32_WINNT=0x0602 -DMSWIN -DINCLUDE_GENERATED_DECLARATIONS -ID:/a/neovim/neovim/.deps/usr/include/luajit-2.1 -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/build/src/nvim/auto -ID:/a/neovim/neovim/build/include -ID:/a/neovim/neovim/build/cmake.config -ID:/a/neovim/neovim/src -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include</span><br><span class="line"></span><br><span class="line">   system vimrc file: &quot;$VIM\sysinit.vim&quot;</span><br><span class="line">  fall-back for $VIM: &quot;C:/Program Files (x86)/nvim/share/nvim&quot;</span><br><span class="line"></span><br><span class="line">Run :checkhealth for more info</span><br></pre></td></tr></table></figure>
@@ -620,14 +852,14 @@
 <p><strong>neovim自检</strong></p>
 <p>在powershell中输入nvim打开neovim，在normal模式下，输入命令<code>:checkhealth</code>，可以实现对neovim的自检工作。  </p>
 <p>同时，如果没有配置neovim所需要的配置文件的话，自检结果还会显示需要我们在指定路径下新建neovim所需要的配置文件。 </p>
-<p>对于windows而言，需要在<code>$&#123;user&#125;\AppData\Local\nvim</code>目录下新建<code>init.lua</code>文件，如果文件夹不存在，需要手动创建。</p>
+<p>对于windows而言，需要在<code>${user}\AppData\Local\nvim</code>目录下新建<code>init.lua</code>文件，如果文件夹不存在，需要手动创建。</p>
 <h3 id="neovim-配置"><a href="#neovim-配置" class="headerlink" title="neovim 配置"></a>neovim 配置</h3><h4 id="packer-vim"><a href="#packer-vim" class="headerlink" title="packer.vim"></a>packer.vim</h4><p>packer.nvim是neovim的插件管理工具，基于该工具可以安装我们所需的插件。</p>
-<p>要想使用packer.vim，需要首先从github上下载该安装包，并放到指定路径下，对于windows用户而言,默认需要将其放到这个目录中：<code>$&#123;user&#125;\AppData\Local\nvim-data\site\pack\packer\start</code>,如果该目录不存在，请手动创建。</p>
+<p>要想使用packer.vim，需要首先从github上下载该安装包，并放到指定路径下，对于windows用户而言,默认需要将其放到这个目录中：<code>${user}\AppData\Local\nvim-data\site\pack\packer\start</code>,如果该目录不存在，请手动创建。</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd $&#123;user&#125;\AppData\Local\nvim-data\site\pack\packer\start</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">下载packer.nvim</span></span><br><span class="line">git clone https://github.com/wbthomason/packer.nvim</span><br></pre></td></tr></table></figure>
 
-<p>然后进入到neovim的配置目录（<code>$&#123;user&#125;\AppData\Local\nvim</code>），新建一个文件夹，文件夹名字随意，这里我选择名字为<code>lua</code>,然后进入到lua文件夹中，新建一个lua文件，名字随意，这里我选择新建一个<code>plugin_manager.lua</code>.然后在文件中写入如下内容。</p>
+<p>然后进入到neovim的配置目录（<code>${user}\AppData\Local\nvim</code>），新建一个文件夹，文件夹名字随意，这里我选择名字为<code>lua</code>,然后进入到lua文件夹中，新建一个lua文件，名字随意，这里我选择新建一个<code>plugin_manager.lua</code>.然后在文件中写入如下内容。</p>
 <figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="keyword">local</span> ensure_packer = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">  <span class="keyword">local</span> fn = vim.fn</span><br><span class="line">  <span class="keyword">local</span> install_path = fn.stdpath(<span class="string">&#x27;data&#x27;</span>)..<span class="string">&#x27;/site/pack/packer/start/packer.nvim&#x27;</span></span><br><span class="line">  <span class="keyword">if</span> fn.empty(fn.glob(install_path)) &gt; <span class="number">0</span> <span class="keyword">then</span></span><br><span class="line">    fn.system(&#123;<span class="string">&#x27;git&#x27;</span>, <span class="string">&#x27;clone&#x27;</span>, <span class="string">&#x27;--depth&#x27;</span>, <span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;https://github.com/wbthomason/packer.nvim&#x27;</span>, install_path&#125;)</span><br><span class="line">    vim.cmd <span class="string">[[packadd packer.nvim]]</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> packer_bootstrap = ensure_packer()</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="built_in">require</span>(<span class="string">&#x27;packer&#x27;</span>).startup(<span class="function"><span class="keyword">function</span><span class="params">(use)</span></span></span><br><span class="line">  use <span class="string">&#x27;wbthomason/packer.nvim&#x27;</span></span><br><span class="line">  <span class="comment">-- My plugins here</span></span><br><span class="line">  <span class="comment">-- use &#x27;foo1/bar1.nvim&#x27;</span></span><br><span class="line">  <span class="comment">-- use &#x27;foo2/bar2.nvim&#x27;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">-- Automatically set up your configuration after cloning packer.nvim</span></span><br><span class="line">  <span class="comment">-- Put this at the end after all plugins</span></span><br><span class="line">  <span class="keyword">if</span> packer_bootstrap <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">require</span>(<span class="string">&#x27;packer&#x27;</span>).sync()</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span>)</span><br></pre></td></tr></table></figure>
-<p>最后，再在<code>$&#123;user&#125;\AppData\Local\nvim\init.lua</code>中添加如下内容，表示使用该插件。</p>
+<p>最后，再在<code>${user}\AppData\Local\nvim\init.lua</code>中添加如下内容，表示使用该插件。</p>
 <figure class="highlight lua"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 其中lua文件夹这个路径可以缺省，neovim会自动在该目录下的lua文件夹中寻找</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;plugins_manager&#x27;</span>)</span><br></pre></td></tr></table></figure>
 <p>至此，packer.nvim插件管理工具安装过完成。</p>
 <p>可以通过打开neovim，并在normal模式下执行<code>:PackerSync</code>来检查我们的安装效果。</p>
@@ -709,15 +941,44 @@
       </tags>
   </entry>
   <entry>
-    <title>思念到极致的感觉--知乎上有趣的回答</title>
-    <url>/2024/06/13/%E6%80%9D%E5%BF%B5%E5%88%B0%E6%9E%81%E8%87%B4%E7%9A%84%E6%84%9F%E8%A7%89-%E7%9F%A5%E4%B9%8E%E4%B8%8A%E6%9C%89%E8%B6%A3%E7%9A%84%E5%9B%9E%E7%AD%94/</url>
-    <content><![CDATA[<p>原文：思念到极致是什么感觉？ - 大头大头下雨不愁的回答 - 知乎<br><a href="https://www.zhihu.com/question/31914864/answer/3421297405">https://www.zhihu.com/question/31914864/answer/3421297405</a></p>
-<img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/huduisongdesinian20240613.jpg" alt="image description" width="350"/>
+    <title>内存映射(mmap)</title>
+    <url>/2025/12/30/%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84/</url>
+    <content><![CDATA[<h3 id="什么是内存映射-mmap-？"><a href="#什么是内存映射-mmap-？" class="headerlink" title="什么是内存映射 (mmap)？"></a>什么是内存映射 (mmap)？</h3><p>内存映射（Memory Mapped File）是一种操作系统提供的机制，它将磁盘上的文件直接映射到进程的虚拟内存地址空间中。</p>
+<span id="more"></span>
 
+<p>在 Java 中，通过 <code>FileChannel.map()</code> 方法可以创建一个 <code>MappedByteBuffer</code>。对这个 Buffer 的读写操作，会直接反映到磁盘文件上，就像操作内存数组一样简单，而不需要调用传统的 <code>read()</code> 或 <code>write()</code> 方法。</p>
+<p>这样的话，数据实际上并没有被复制到 Java 堆内存中，而是直接在操作系统的 Page Cache 中进行读写，从而实现了“零拷贝”。</p>
+<blockquote>
+<p>“零拷贝”简单来说就是CPU参与的数据拷贝次数为零次，从而大幅提升数据传输效率 – 因为每次数据从系统内存拷贝至程序内存都需要 CPU 参与，而 CPU 是非常宝贵的资源。</p>
+</blockquote>
+<h3 id="为什么它比传统-IO-快？-底层原理"><a href="#为什么它比传统-IO-快？-底层原理" class="headerlink" title="为什么它比传统 IO 快？ (底层原理)"></a>为什么它比传统 IO 快？ (底层原理)</h3><p>要理解 mmap 的优势，我们需要先了解传统 IO 是如何工作的。</p>
+<h4 id="传统-IO-的性能瓶颈"><a href="#传统-IO-的性能瓶颈" class="headerlink" title="传统 IO 的性能瓶颈"></a>传统 IO 的性能瓶颈</h4><p>当我们使用 <code>FileInputStream</code> 读取文件时，数据需要经过两次拷贝：</p>
+<ol>
+<li><strong>磁盘 -&gt; 内核缓冲区 (Page Cache)</strong>：操作系统通过 DMA 将数据从磁盘读取到内核空间的 Page Cache 中。</li>
+<li><strong>内核缓冲区 -&gt; 用户缓冲区 (Java Heap)</strong>：CPU 将数据从内核空间拷贝到用户空间的堆内存中。</li>
+</ol>
+<p>这个过程不仅涉及两次数据拷贝，还涉及两次上下文切换（用户态 &lt;-&gt; 内核态），这在处理大文件时会消耗大量 CPU 资源。</p>
+<h4 id="mmap-的工作原理-零拷贝"><a href="#mmap-的工作原理-零拷贝" class="headerlink" title="mmap 的工作原理 (零拷贝)"></a>mmap 的工作原理 (零拷贝)</h4><p>mmap 建立映射后，操作系统并不会立即读取文件数据，而是建立了一个“虚拟地址”到“文件内容”的映射关系。</p>
+<ol>
+<li><strong>建立映射</strong>：调用 <code>map()</code> 时，操作系统修改进程的页表，将一段虚拟内存地址映射到文件的 Page Cache 上。此时物理内存中可能还没有数据。</li>
+<li><strong>缺页中断</strong>：当你第一次访问这段内存（例如调用 <code>buffer.get()</code>）时，CPU 发现对应的物理页不存在，触发“缺页中断”。</li>
+<li><strong>懒加载</strong>：操作系统捕获中断，直接将文件数据从磁盘读取到 Page Cache 中。</li>
+<li><strong>直接访问</strong>：进程直接访问 Page Cache 中的数据。</li>
+</ol>
+<p><strong>优势总结</strong>：</p>
+<ul>
+<li><strong>零拷贝</strong>：数据只存在于 Page Cache 中，不需要拷贝到 Java 堆内存。</li>
+<li><strong>减少切换</strong>：读写操作直接在用户态进行，减少了系统调用带来的上下文切换。</li>
+</ul>
+<h3 id="Java-代码实现"><a href="#Java-代码实现" class="headerlink" title="Java 代码实现"></a>Java 代码实现</h3><h4 id="基础用法"><a href="#基础用法" class="headerlink" title="基础用法"></a>基础用法</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">RandomAccessFile</span> <span class="variable">raf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RandomAccessFile</span>(<span class="string">&quot;data.dat&quot;</span>, <span class="string">&quot;rw&quot;</span>);</span><br><span class="line"><span class="type">FileChannel</span> <span class="variable">channel</span> <span class="operator">=</span> raf.getChannel();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里是关键，实际上就是建立了内存映射</span></span><br><span class="line"><span class="type">MappedByteBuffer</span> <span class="variable">buffer</span> <span class="operator">=</span> channel.map(FileChannel.MapMode.READ_WRITE, <span class="number">0</span>, <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 往文件中写入数据，实际上就是直接写入到堆外内存中，操作系统会负责同步到磁盘</span></span><br><span class="line">buffer.putInt(<span class="number">100</span>);</span><br><span class="line">buffer.putLong(<span class="number">12345L</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="进程间通信-IPC-示例"><a href="#进程间通信-IPC-示例" class="headerlink" title="进程间通信 (IPC) 示例"></a>进程间通信 (IPC) 示例</h4><p>mmap 非常适合用于进程间通信。以下是一个简单的 Writer&#x2F;Reader 模型。</p>
+<p><strong>Writer (写入者)</strong><br>注意：为了防止 Reader 读到不完整的数据，我们应该<strong>先写数据，最后写长度</strong>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ZeroCopyWriter</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;shared.dat&quot;</span>);</span><br><span class="line">        <span class="keyword">try</span> (<span class="type">RandomAccessFile</span> <span class="variable">raf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RandomAccessFile</span>(file, <span class="string">&quot;rw&quot;</span>);</span><br><span class="line">            <span class="type">FileChannel</span> <span class="variable">channel</span> <span class="operator">=</span> raf.getChannel()) &#123;</span><br><span class="line">            raf.setLength(<span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">            <span class="type">MappedByteBuffer</span> <span class="variable">buffer</span> <span class="operator">=</span> channel.map(FileChannel.MapMode.READ_WRITE, <span class="number">0</span>, <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">            <span class="type">String</span> <span class="variable">content</span> <span class="operator">=</span> <span class="string">&quot;Hello, mmap!&quot;</span>;</span><br><span class="line">            <span class="type">byte</span>[] bytes = content.getBytes(StandardCharsets.UTF_8);</span><br><span class="line"></span><br><span class="line">            buffer.position(<span class="number">4</span>);</span><br><span class="line">            buffer.put(bytes);</span><br><span class="line"></span><br><span class="line">            buffer.putInt(<span class="number">0</span>, bytes.length);</span><br><span class="line"></span><br><span class="line">            System.out.println(<span class="string">&quot;Writer: 数据写入完成&quot;</span>);</span><br><span class="line">            Thread.sleep(<span class="number">60000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Reader (读取者)</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ZeroCopyReader</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;shared.dat&quot;</span>);</span><br><span class="line">        <span class="keyword">while</span> (!file.exists()) Thread.sleep(<span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> (<span class="type">RandomAccessFile</span> <span class="variable">raf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RandomAccessFile</span>(file, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">             <span class="type">FileChannel</span> <span class="variable">channel</span> <span class="operator">=</span> raf.getChannel()) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="type">MappedByteBuffer</span> <span class="variable">buffer</span> <span class="operator">=</span> channel.map(FileChannel.MapMode.READ_ONLY, <span class="number">0</span>, <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">                buffer.clear();</span><br><span class="line">                <span class="type">int</span> <span class="variable">length</span> <span class="operator">=</span> buffer.getInt();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="type">byte</span>[] dst = <span class="keyword">new</span> <span class="title class_">byte</span>[length];</span><br><span class="line">                    buffer.get(dst);</span><br><span class="line">                    System.out.println(<span class="string">&quot;Reader 收到: &quot;</span> + <span class="keyword">new</span> <span class="title class_">String</span>(dst, StandardCharsets.UTF_8));</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                Thread.sleep(<span class="number">500</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
-      <categories>
-        <category>有趣</category>
-      </categories>
   </entry>
   <entry>
     <title>使用Hexo+Next+github搭建个人博客</title>
@@ -822,7 +1083,7 @@
 <p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103321987.png" alt="image-20220714103321987"></p>
 <p>在浏览器中的显示效果如图所示。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714103449990.png" alt="image-20220714103449990"></p>
-<h2 id="将hexo项目部署到github-page"><a href="#将hexo项目部署到github-page" class="headerlink" title="将hexo项目部署到github page"></a>将hexo项目部署到github page</h2><p>首先得在github上创建一个仓库，仓库名字是<code>&#123;github昵称&#125;.github.io</code>。然后查看该仓库的settings，并选择pages页面，可以查看到网址，我们通过该网址可以直接访问该仓库中的静态html资源。</p>
+<h2 id="将hexo项目部署到github-page"><a href="#将hexo项目部署到github-page" class="headerlink" title="将hexo项目部署到github page"></a>将hexo项目部署到github page</h2><p>首先得在github上创建一个仓库，仓库名字是<code>{github昵称}.github.io</code>。然后查看该仓库的settings，并选择pages页面，可以查看到网址，我们通过该网址可以直接访问该仓库中的静态html资源。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/image-20220714104338520.png" alt="image-20220714104338520"></p>
 <p>目前还访问不了，原因是这个仓库中没有任何文件，我们需要将前面hexo生成的静态资源上传至该仓库。</p>
 <p>为了能够将数据上传至该仓库，我们需要再hexo的站点配置文件中增加有关github的配置。</p>
@@ -871,15 +1132,6 @@
       </tags>
   </entry>
   <entry>
-    <title>行式/列式/列族式数据库</title>
-    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
-    <content><![CDATA[<p>TODO</p>
-]]></content>
-      <categories>
-        <category>基础</category>
-      </categories>
-  </entry>
-  <entry>
     <title>小狼毫输入法配置方案</title>
     <url>/2025/11/18/%E5%B0%8F%E7%8B%BC%E6%AF%AB%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88/</url>
     <content><![CDATA[<p>小狼毫输入法是Rime输入法的Windows实现版本，英文名字叫Weasel。<br>Rime输入法（中文名字中州韵），是一个开源可定制的输入法框架，具有如下几个比较优秀的特点：  </p>
@@ -917,7 +1169,7 @@
 <li>有繁体</li>
 </ul>
 <p>此时对于中文简体用户和习惯候选词横向的用户而言，并不友好，甚至可以说是不可用。</p>
-<h4 id="安装雾凇输入法"><a href="#安装雾凇输入法" class="headerlink" title="安装雾凇输入法"></a>安装雾凇输入法</h4><p>切换到<code>C:\Users\lupen\AppData\Roaming</code>目录下，删除Rime文件夹，然后clone一个雾凇输入法的github仓库到这个目录中：</p>
+<h4 id="安装雾凇输入法"><a href="#安装雾凇输入法" class="headerlink" title="安装雾凇输入法"></a>安装雾凇输入法</h4><p>切换到<code>%USERPROFILE%\AppData\Roaming</code>目录下，删除Rime文件夹，然后clone一个雾凇输入法的github仓库到这个目录中：</p>
 <blockquote>
 <p>在删除Rime文件夹的时候可能正在使用，无法删除<br>针对这个问题，点击小狼毫的退出算法服务，并且不使用小狼毫输入法，再次删除Rime就可以</p>
 </blockquote>
@@ -926,7 +1178,7 @@
 <p>然后右键点击右下角”中”或者”A”，小狼毫重新部署，实现雾凇输入法的应用。<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20103426.png" alt="重新部署"></p>
 <p>重新部署后的初始效果展示：  </p>
 <p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20103616.png" alt="雾凇输入法的初始效果展示"></p>
-<p>小狼毫支持自定义配置，我们可以通过修改 <code>C:\Users\lupen\AppData\Roaming\Rime</code> 目录下的配置文件，使其更加符合个人需求。我主要修改了如下配置。</p>
+<p>小狼毫支持自定义配置，我们可以通过修改 <code>%USERPROFILE%\AppData\Roaming\Rime</code> 目录下的配置文件，使其更加符合个人需求。我主要修改了如下配置。</p>
 <h4 id="常用个性化配置"><a href="#常用个性化配置" class="headerlink" title="常用个性化配置"></a>常用个性化配置</h4><p>本节介绍常用的个性化设置，包括字体、候选词个数、默认输入模式及快捷键调整等。</p>
 <h5 id="字体"><a href="#字体" class="headerlink" title="字体"></a>字体</h5><p>字体我选择了霞鹜等宽字体，该字体为免费开源字体，下载安装地址：<a href="https://github.com/lxgw/LxgwWenKai%E3%80%82">https://github.com/lxgw/LxgwWenKai。</a><br>修改 <code>weasel.yaml</code>，如下：</p>
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">style:</span></span><br><span class="line">  <span class="attr">color_scheme:</span> <span class="string">purity_of_form_custom</span>      <span class="comment"># 默认配色方案</span></span><br><span class="line">  <span class="comment"># color_scheme_dark: nord                # 深色模式下，Weasel 的配色方案，Windows 10 1809+ 可用</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 全局字体</span></span><br><span class="line">  <span class="comment"># 格式：字体1:起始码位:结束码位:字重:字形,字体2……，字体会依次 fallback</span></span><br><span class="line">  <span class="comment"># 详细设定请参考 &lt;https://github.com/rime/weasel/wiki/字體設定&gt;</span></span><br><span class="line">  <span class="comment"># font_face: &quot;Segoe UI Emoji, Microsoft YaHei, SF Pro, Noto Color Emoji&quot;</span></span><br><span class="line">  <span class="attr">font_face:</span> <span class="string">&quot;霞鹜文楷等宽&quot;</span></span><br></pre></td></tr></table></figure>
@@ -937,7 +1189,7 @@
 <h5 id="默认为英文格式"><a href="#默认为英文格式" class="headerlink" title="默认为英文格式"></a>默认为英文格式</h5><p>雾凇输入法的默认格式是中文，按 Shift 之后，可以切换成英文格式。我根据自己实际习惯，将默认格式设置为英文。<br>修改配置 <code>rime_ice.schema.yaml</code>，如下所示：</p>
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 开关</span></span><br><span class="line"><span class="comment"># reset: 默认状态。注释掉后，切换窗口时不会重置到默认状态。</span></span><br><span class="line"><span class="comment"># states: 方案选单显示的名称。可以注释掉，仍可以通过快捷键切换。</span></span><br><span class="line"><span class="comment"># abbrev: 默认的缩写取 states 的第一个字符，abbrev 可自定义一个字符</span></span><br><span class="line"><span class="attr">switches:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">ascii_mode</span></span><br><span class="line">    <span class="attr">states:</span> [ <span class="string">中</span>, <span class="string">Ａ</span> ]</span><br><span class="line">    <span class="attr">reset:</span> <span class="number">1</span>  <span class="comment"># 将这个设置为1</span></span><br></pre></td></tr></table></figure>
 
-<h5 id="禁用快捷键-ctrl-96"><a href="#禁用快捷键-ctrl-96" class="headerlink" title="禁用快捷键 ctrl + &#96;"></a>禁用快捷键 ctrl + &#96;</h5><p>该快捷键与VSCode的快捷键冲突了，所以我将其禁用掉。修改配置<code>weasel.yaml</code>，如下所示。</p>
+<h5 id="禁用快捷键-ctrl"><a href="#禁用快捷键-ctrl" class="headerlink" title="禁用快捷键 ctrl + &#96;"></a>禁用快捷键 ctrl + &#96;</h5><p>该快捷键与VSCode的快捷键冲突了，所以我将其禁用掉。修改配置<code>weasel.yaml</code>，如下所示。</p>
 <figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">switcher:</span></span><br><span class="line">  <span class="attr">caption:</span> <span class="string">「方案选单」</span></span><br><span class="line">  <span class="attr">hotkeys:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">F4</span></span><br><span class="line">    <span class="comment"># - Control+grave   # 注释掉这个了</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Control+Shift+grave</span></span><br><span class="line">    <span class="comment"># - Alt+grave</span></span><br></pre></td></tr></table></figure>
 
 <h5 id="候选框色彩配置"><a href="#候选框色彩配置" class="headerlink" title="候选框色彩配置"></a>候选框色彩配置</h5><p>直接在GitHub上的<code>rime/weasel</code>仓库的issue中，找到了一款比较符合自己需求的配色，我选择的是win11暗色这一款。<br>链接地址： <a href="https://github.com/rime/weasel/issues/1205#issuecomment-2077123155">https://github.com/rime/weasel/issues/1205#issuecomment-2077123155</a></p>
@@ -958,7 +1210,7 @@
 <p>官网展示的效果信息地址：<a href="https://github.com/amzxyz/rime_wanxiang">https://github.com/amzxyz/rime_wanxiang</a></p>
 <p>安装方式：</p>
 <p>去官网地址，下载万象语言模型，我这里下载的是 <code>LTS</code> 版本 <code>wanxiang-lts-zh-hans.gram</code>。<br>下载地址：<a href="https://github.com/amzxyz/RIME-LMDG/releases">https://github.com/amzxyz/RIME-LMDG/releases</a></p>
-<p>将下载好的模型文件放到 <code>C:\Users\lupen\AppData\Roaming\Rime</code> 目录下，同时修改 <code>rime_ice.schema.yaml</code> 文件。修改这个文件是因为我的输入法方案是雾凇输入法，其他输入法方案的话，选择对应的配置文件即可。<br>在文件末尾加上如下配置信息： </p>
+<p>将下载好的模型文件放到 <code>%USERPROFILE%\AppData\Roaming\Rime</code> 目录下，同时修改 <code>rime_ice.schema.yaml</code> 文件。修改这个文件是因为我的输入法方案是雾凇输入法，其他输入法方案的话，选择对应的配置文件即可。<br>在文件末尾加上如下配置信息： </p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">__include: octagram   #启用语法模型</span><br><span class="line">#语法模型</span><br><span class="line">octagram:</span><br><span class="line">  __patch:</span><br><span class="line">    grammar:</span><br><span class="line">      language: wanxiang-lts-zh-hans  # 这里的模型文件选择上面下载的即可，不带后缀名gram </span><br><span class="line">      collocation_max_length: 5</span><br><span class="line">      collocation_min_length: 2</span><br><span class="line">    translator/contextual_suggestions: true</span><br><span class="line">    translator/max_homophones: 7</span><br><span class="line">    translator/max_homographs: 7</span><br></pre></td></tr></table></figure>
 
 <p>配置完成之后，再次重新部署，展示效果如下：</p>
@@ -971,5 +1223,25 @@
       <tags>
         <tag>工具</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>思念到极致的感觉--知乎上有趣的回答</title>
+    <url>/2024/06/13/%E6%80%9D%E5%BF%B5%E5%88%B0%E6%9E%81%E8%87%B4%E7%9A%84%E6%84%9F%E8%A7%89-%E7%9F%A5%E4%B9%8E%E4%B8%8A%E6%9C%89%E8%B6%A3%E7%9A%84%E5%9B%9E%E7%AD%94/</url>
+    <content><![CDATA[<p>原文：思念到极致是什么感觉？ - 大头大头下雨不愁的回答 - 知乎<br><a href="https://www.zhihu.com/question/31914864/answer/3421297405">https://www.zhihu.com/question/31914864/answer/3421297405</a></p>
+<img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/huduisongdesinian20240613.jpg" alt="image description" width="350"/>
+
+]]></content>
+      <categories>
+        <category>有趣</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>行式/列式/列族式数据库</title>
+    <url>/2023/05/30/%E8%A1%8C%E5%BC%8F-%E5%88%97%E5%BC%8F-%E5%88%97%E6%97%8F%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
+    <content><![CDATA[<p>TODO</p>
+]]></content>
+      <categories>
+        <category>基础</category>
+      </categories>
   </entry>
 </search>

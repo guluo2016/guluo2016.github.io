@@ -152,7 +152,7 @@
     font-size: 95%;
   }
   </style>
-<meta name="generator" content="Hexo 6.2.0"></head>
+<meta name="generator" content="Hexo 8.1.1"></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -396,7 +396,7 @@
 <span id="more"></span>
 
 <h3 id="安装neovim"><a href="#安装neovim" class="headerlink" title="安装neovim"></a>安装neovim</h3><p>以windos为例，直接从github上下载对应版本即可。<br>下载地址是这里：<a target="_blank" rel="noopener" href="https://github.com/neovim/neovim/releases">Neovim下载地址</a>, 我这里选择的版本是:<code>v0.9.1</code>。</p>
-<p>将下载好的neovim zip包解压至指定目录，并将<code>&#123;NEOVIM_HOME&#125;\bin</code>目录配置到系统环境变量中，即可完成对neovim的安装。</p>
+<p>将下载好的neovim zip包解压至指定目录，并将<code>{NEOVIM_HOME}\bin</code>目录配置到系统环境变量中，即可完成对neovim的安装。</p>
 <p>针对windows版本，neovim提供了两个命令：<code>nvim.exe</code>和<code>nvim-qt.exe</code>,前者是命令行式的，后者提供一个图形化界面。这里常用的式<code>nvim.exe</code>，也可以简写为<code>nvim</code></p>
 <p>我们可以通过如下命令验证neovim及其环境变量是否安装成功。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">打开powershell，输入如下命令</span></span><br><span class="line">nvim --verion </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">会打印如下结果</span></span><br><span class="line">NVIM v0.9.1</span><br><span class="line">Build type: RelWithDebInfo</span><br><span class="line">LuaJIT 2.1.0-beta3</span><br><span class="line">Compilation: C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe /MD /Zi /O2 /Ob1  -W3 -wd4311 -wd4146 -DUNIT_TESTING -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_WIN32_WINNT=0x0602 -DMSWIN -DINCLUDE_GENERATED_DECLARATIONS -ID:/a/neovim/neovim/.deps/usr/include/luajit-2.1 -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/build/src/nvim/auto -ID:/a/neovim/neovim/build/include -ID:/a/neovim/neovim/build/cmake.config -ID:/a/neovim/neovim/src -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include -ID:/a/neovim/neovim/.deps/usr/include</span><br><span class="line"></span><br><span class="line">   system vimrc file: &quot;$VIM\sysinit.vim&quot;</span><br><span class="line">  fall-back for $VIM: &quot;C:/Program Files (x86)/nvim/share/nvim&quot;</span><br><span class="line"></span><br><span class="line">Run :checkhealth for more info</span><br></pre></td></tr></table></figure>
@@ -404,14 +404,14 @@
 <p><strong>neovim自检</strong></p>
 <p>在powershell中输入nvim打开neovim，在normal模式下，输入命令<code>:checkhealth</code>，可以实现对neovim的自检工作。  </p>
 <p>同时，如果没有配置neovim所需要的配置文件的话，自检结果还会显示需要我们在指定路径下新建neovim所需要的配置文件。 </p>
-<p>对于windows而言，需要在<code>$&#123;user&#125;\AppData\Local\nvim</code>目录下新建<code>init.lua</code>文件，如果文件夹不存在，需要手动创建。</p>
+<p>对于windows而言，需要在<code>${user}\AppData\Local\nvim</code>目录下新建<code>init.lua</code>文件，如果文件夹不存在，需要手动创建。</p>
 <h3 id="neovim-配置"><a href="#neovim-配置" class="headerlink" title="neovim 配置"></a>neovim 配置</h3><h4 id="packer-vim"><a href="#packer-vim" class="headerlink" title="packer.vim"></a>packer.vim</h4><p>packer.nvim是neovim的插件管理工具，基于该工具可以安装我们所需的插件。</p>
-<p>要想使用packer.vim，需要首先从github上下载该安装包，并放到指定路径下，对于windows用户而言,默认需要将其放到这个目录中：<code>$&#123;user&#125;\AppData\Local\nvim-data\site\pack\packer\start</code>,如果该目录不存在，请手动创建。</p>
+<p>要想使用packer.vim，需要首先从github上下载该安装包，并放到指定路径下，对于windows用户而言,默认需要将其放到这个目录中：<code>${user}\AppData\Local\nvim-data\site\pack\packer\start</code>,如果该目录不存在，请手动创建。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd $&#123;user&#125;\AppData\Local\nvim-data\site\pack\packer\start</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">下载packer.nvim</span></span><br><span class="line">git clone https://github.com/wbthomason/packer.nvim</span><br></pre></td></tr></table></figure>
 
-<p>然后进入到neovim的配置目录（<code>$&#123;user&#125;\AppData\Local\nvim</code>），新建一个文件夹，文件夹名字随意，这里我选择名字为<code>lua</code>,然后进入到lua文件夹中，新建一个lua文件，名字随意，这里我选择新建一个<code>plugin_manager.lua</code>.然后在文件中写入如下内容。</p>
+<p>然后进入到neovim的配置目录（<code>${user}\AppData\Local\nvim</code>），新建一个文件夹，文件夹名字随意，这里我选择名字为<code>lua</code>,然后进入到lua文件夹中，新建一个lua文件，名字随意，这里我选择新建一个<code>plugin_manager.lua</code>.然后在文件中写入如下内容。</p>
 <figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> ensure_packer = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line">  <span class="keyword">local</span> fn = vim.fn</span><br><span class="line">  <span class="keyword">local</span> install_path = fn.stdpath(<span class="string">&#x27;data&#x27;</span>)..<span class="string">&#x27;/site/pack/packer/start/packer.nvim&#x27;</span></span><br><span class="line">  <span class="keyword">if</span> fn.empty(fn.glob(install_path)) &gt; <span class="number">0</span> <span class="keyword">then</span></span><br><span class="line">    fn.system(&#123;<span class="string">&#x27;git&#x27;</span>, <span class="string">&#x27;clone&#x27;</span>, <span class="string">&#x27;--depth&#x27;</span>, <span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;https://github.com/wbthomason/packer.nvim&#x27;</span>, install_path&#125;)</span><br><span class="line">    vim.cmd <span class="string">[[packadd packer.nvim]]</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> packer_bootstrap = ensure_packer()</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="built_in">require</span>(<span class="string">&#x27;packer&#x27;</span>).startup(<span class="function"><span class="keyword">function</span><span class="params">(use)</span></span></span><br><span class="line">  use <span class="string">&#x27;wbthomason/packer.nvim&#x27;</span></span><br><span class="line">  <span class="comment">-- My plugins here</span></span><br><span class="line">  <span class="comment">-- use &#x27;foo1/bar1.nvim&#x27;</span></span><br><span class="line">  <span class="comment">-- use &#x27;foo2/bar2.nvim&#x27;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">-- Automatically set up your configuration after cloning packer.nvim</span></span><br><span class="line">  <span class="comment">-- Put this at the end after all plugins</span></span><br><span class="line">  <span class="keyword">if</span> packer_bootstrap <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">require</span>(<span class="string">&#x27;packer&#x27;</span>).sync()</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span>)</span><br></pre></td></tr></table></figure>
-<p>最后，再在<code>$&#123;user&#125;\AppData\Local\nvim\init.lua</code>中添加如下内容，表示使用该插件。</p>
+<p>最后，再在<code>${user}\AppData\Local\nvim\init.lua</code>中添加如下内容，表示使用该插件。</p>
 <figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 其中lua文件夹这个路径可以缺省，neovim会自动在该目录下的lua文件夹中寻找</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;plugins_manager&#x27;</span>)</span><br></pre></td></tr></table></figure>
 <p>至此，packer.nvim插件管理工具安装过完成。</p>
 <p>可以通过打开neovim，并在normal模式下执行<code>:PackerSync</code>来检查我们的安装效果。</p>
@@ -610,7 +610,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -621,7 +621,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -632,7 +632,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -701,7 +701,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2026</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

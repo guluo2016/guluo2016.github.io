@@ -143,7 +143,7 @@
     font-size: 95%;
   }
   </style>
-<meta name="generator" content="Hexo 6.2.0"></head>
+<meta name="generator" content="Hexo 8.1.1"></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -403,14 +403,14 @@
 <li><code>appender.console.type = Console</code>：定义了一个名为<code>console</code>的日志输出器，其类型为<code>Console</code>，表示将日志输出到控制台。</li>
 <li><code>appender.console.name = STDOUT</code>：定义了一个名字叫<code>STDOUT</code>的输出器，这个是该appender的唯一标识符，logger可以通过该name引用这个appender。</li>
 <li><code>appender.console.layout.type = PatternLayout</code>：定义了appender的布局类型为<code>PatternLayout</code>，表示日志内容的格式化方式，<code>PatternLayout</code>允许你通过一个模式字符串来完全自定义日志消息的输出格式。其他布局类型还包括<code>JSONLayout</code>、<code>XMLLayout</code>等。</li>
-<li><code>appender.console.layout.pattern = %d&#123;HH:mm:ss.SSS&#125; [%t] %-5level %logger&#123;36&#125; - %msg%n</code>：定义了日志输出的格式模式。</li>
+<li><code>appender.console.layout.pattern = %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</code>：定义了日志输出的格式模式。</li>
 </ul>
 <p>其中<code>appender.console.layout.pattern</code>的格式说明如下：</p>
 <ul>
-<li><code>%d&#123;HH:mm:ss.SSS&#125;</code>：表示日志事件的时间戳，格式为小时:分钟:秒.毫秒。</li>
+<li><code>%d{HH:mm:ss.SSS}</code>：表示日志事件的时间戳，格式为小时:分钟:秒.毫秒。</li>
 <li><code>[%t]</code>：表示当前线程的名称。</li>
 <li><code>%-5level</code>：表示日志级别，左对齐，占5个字符宽度。</li>
-<li><code>%logger&#123;36&#125;</code>：表示日志记录器的名称，最多显示36个字符。</li>
+<li><code>%logger{36}</code>：表示日志记录器的名称，最多显示36个字符。</li>
 <li><code>-</code>：表示日志消息前的分隔符，只是为了格式美观</li>
 <li><code>%msg</code>：表示日志消息内容</li>
 <li><code>%n</code>：表示换行符, 确保每条日志消息后都有一个换行。</li>
@@ -590,7 +590,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -601,7 +601,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -612,7 +612,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -681,7 +681,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2026</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

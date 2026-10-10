@@ -96,7 +96,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20110339.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20111544.png">
 <meta property="article:published_time" content="2025-11-18T14:40:00.000Z">
-<meta property="article:modified_time" content="2025-11-18T15:00:39.341Z">
+<meta property="article:modified_time" content="2026-08-11T13:44:44.503Z">
 <meta property="article:author" content="孤落">
 <meta property="article:tag" content="工具">
 <meta name="twitter:card" content="summary">
@@ -153,7 +153,7 @@
     font-size: 95%;
   }
   </style>
-<meta name="generator" content="Hexo 6.2.0"></head>
+<meta name="generator" content="Hexo 8.1.1"></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
@@ -428,7 +428,7 @@
 <li>有繁体</li>
 </ul>
 <p>此时对于中文简体用户和习惯候选词横向的用户而言，并不友好，甚至可以说是不可用。</p>
-<h4 id="安装雾凇输入法"><a href="#安装雾凇输入法" class="headerlink" title="安装雾凇输入法"></a>安装雾凇输入法</h4><p>切换到<code>C:\Users\lupen\AppData\Roaming</code>目录下，删除Rime文件夹，然后clone一个雾凇输入法的github仓库到这个目录中：</p>
+<h4 id="安装雾凇输入法"><a href="#安装雾凇输入法" class="headerlink" title="安装雾凇输入法"></a>安装雾凇输入法</h4><p>切换到<code>%USERPROFILE%\AppData\Roaming</code>目录下，删除Rime文件夹，然后clone一个雾凇输入法的github仓库到这个目录中：</p>
 <blockquote>
 <p>在删除Rime文件夹的时候可能正在使用，无法删除<br>针对这个问题，点击小狼毫的退出算法服务，并且不使用小狼毫输入法，再次删除Rime就可以</p>
 </blockquote>
@@ -437,7 +437,7 @@
 <p>然后右键点击右下角”中”或者”A”，小狼毫重新部署，实现雾凇输入法的应用。<br><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20103426.png" alt="重新部署"></p>
 <p>重新部署后的初始效果展示：  </p>
 <p><img src="https://cdn.jsdelivr.net/gh/guluo2016/picture@dev/img/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-08-09%20103616.png" alt="雾凇输入法的初始效果展示"></p>
-<p>小狼毫支持自定义配置，我们可以通过修改 <code>C:\Users\lupen\AppData\Roaming\Rime</code> 目录下的配置文件，使其更加符合个人需求。我主要修改了如下配置。</p>
+<p>小狼毫支持自定义配置，我们可以通过修改 <code>%USERPROFILE%\AppData\Roaming\Rime</code> 目录下的配置文件，使其更加符合个人需求。我主要修改了如下配置。</p>
 <h4 id="常用个性化配置"><a href="#常用个性化配置" class="headerlink" title="常用个性化配置"></a>常用个性化配置</h4><p>本节介绍常用的个性化设置，包括字体、候选词个数、默认输入模式及快捷键调整等。</p>
 <h5 id="字体"><a href="#字体" class="headerlink" title="字体"></a>字体</h5><p>字体我选择了霞鹜等宽字体，该字体为免费开源字体，下载安装地址：<a target="_blank" rel="noopener" href="https://github.com/lxgw/LxgwWenKai%E3%80%82">https://github.com/lxgw/LxgwWenKai。</a><br>修改 <code>weasel.yaml</code>，如下：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">style:</span></span><br><span class="line">  <span class="attr">color_scheme:</span> <span class="string">purity_of_form_custom</span>      <span class="comment"># 默认配色方案</span></span><br><span class="line">  <span class="comment"># color_scheme_dark: nord                # 深色模式下，Weasel 的配色方案，Windows 10 1809+ 可用</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 全局字体</span></span><br><span class="line">  <span class="comment"># 格式：字体1:起始码位:结束码位:字重:字形,字体2……，字体会依次 fallback</span></span><br><span class="line">  <span class="comment"># 详细设定请参考 &lt;https://github.com/rime/weasel/wiki/字體設定&gt;</span></span><br><span class="line">  <span class="comment"># font_face: &quot;Segoe UI Emoji, Microsoft YaHei, SF Pro, Noto Color Emoji&quot;</span></span><br><span class="line">  <span class="attr">font_face:</span> <span class="string">&quot;霞鹜文楷等宽&quot;</span></span><br></pre></td></tr></table></figure>
@@ -448,7 +448,7 @@
 <h5 id="默认为英文格式"><a href="#默认为英文格式" class="headerlink" title="默认为英文格式"></a>默认为英文格式</h5><p>雾凇输入法的默认格式是中文，按 Shift 之后，可以切换成英文格式。我根据自己实际习惯，将默认格式设置为英文。<br>修改配置 <code>rime_ice.schema.yaml</code>，如下所示：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 开关</span></span><br><span class="line"><span class="comment"># reset: 默认状态。注释掉后，切换窗口时不会重置到默认状态。</span></span><br><span class="line"><span class="comment"># states: 方案选单显示的名称。可以注释掉，仍可以通过快捷键切换。</span></span><br><span class="line"><span class="comment"># abbrev: 默认的缩写取 states 的第一个字符，abbrev 可自定义一个字符</span></span><br><span class="line"><span class="attr">switches:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">ascii_mode</span></span><br><span class="line">    <span class="attr">states:</span> [ <span class="string">中</span>, <span class="string">Ａ</span> ]</span><br><span class="line">    <span class="attr">reset:</span> <span class="number">1</span>  <span class="comment"># 将这个设置为1</span></span><br></pre></td></tr></table></figure>
 
-<h5 id="禁用快捷键-ctrl-96"><a href="#禁用快捷键-ctrl-96" class="headerlink" title="禁用快捷键 ctrl + &#96;"></a>禁用快捷键 ctrl + &#96;</h5><p>该快捷键与VSCode的快捷键冲突了，所以我将其禁用掉。修改配置<code>weasel.yaml</code>，如下所示。</p>
+<h5 id="禁用快捷键-ctrl"><a href="#禁用快捷键-ctrl" class="headerlink" title="禁用快捷键 ctrl + &#96;"></a>禁用快捷键 ctrl + &#96;</h5><p>该快捷键与VSCode的快捷键冲突了，所以我将其禁用掉。修改配置<code>weasel.yaml</code>，如下所示。</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">switcher:</span></span><br><span class="line">  <span class="attr">caption:</span> <span class="string">「方案选单」</span></span><br><span class="line">  <span class="attr">hotkeys:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">F4</span></span><br><span class="line">    <span class="comment"># - Control+grave   # 注释掉这个了</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Control+Shift+grave</span></span><br><span class="line">    <span class="comment"># - Alt+grave</span></span><br></pre></td></tr></table></figure>
 
 <h5 id="候选框色彩配置"><a href="#候选框色彩配置" class="headerlink" title="候选框色彩配置"></a>候选框色彩配置</h5><p>直接在GitHub上的<code>rime/weasel</code>仓库的issue中，找到了一款比较符合自己需求的配色，我选择的是win11暗色这一款。<br>链接地址： <a target="_blank" rel="noopener" href="https://github.com/rime/weasel/issues/1205#issuecomment-2077123155">https://github.com/rime/weasel/issues/1205#issuecomment-2077123155</a></p>
@@ -469,7 +469,7 @@
 <p>官网展示的效果信息地址：<a target="_blank" rel="noopener" href="https://github.com/amzxyz/rime_wanxiang">https://github.com/amzxyz/rime_wanxiang</a></p>
 <p>安装方式：</p>
 <p>去官网地址，下载万象语言模型，我这里下载的是 <code>LTS</code> 版本 <code>wanxiang-lts-zh-hans.gram</code>。<br>下载地址：<a target="_blank" rel="noopener" href="https://github.com/amzxyz/RIME-LMDG/releases">https://github.com/amzxyz/RIME-LMDG/releases</a></p>
-<p>将下载好的模型文件放到 <code>C:\Users\lupen\AppData\Roaming\Rime</code> 目录下，同时修改 <code>rime_ice.schema.yaml</code> 文件。修改这个文件是因为我的输入法方案是雾凇输入法，其他输入法方案的话，选择对应的配置文件即可。<br>在文件末尾加上如下配置信息： </p>
+<p>将下载好的模型文件放到 <code>%USERPROFILE%\AppData\Roaming\Rime</code> 目录下，同时修改 <code>rime_ice.schema.yaml</code> 文件。修改这个文件是因为我的输入法方案是雾凇输入法，其他输入法方案的话，选择对应的配置文件即可。<br>在文件末尾加上如下配置信息： </p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">__include: octagram   #启用语法模型</span><br><span class="line">#语法模型</span><br><span class="line">octagram:</span><br><span class="line">  __patch:</span><br><span class="line">    grammar:</span><br><span class="line">      language: wanxiang-lts-zh-hans  # 这里的模型文件选择上面下载的即可，不带后缀名gram </span><br><span class="line">      collocation_max_length: 5</span><br><span class="line">      collocation_min_length: 2</span><br><span class="line">    translator/contextual_suggestions: true</span><br><span class="line">    translator/max_homophones: 7</span><br><span class="line">    translator/max_homographs: 7</span><br></pre></td></tr></table></figure>
 
 <p>配置完成之后，再次重新部署，展示效果如下：</p>
@@ -514,6 +514,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2025/12/30/%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84/" rel="prev" title="内存映射(mmap)">
+                内存映射(mmap) <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -597,7 +601,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">21</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -608,7 +612,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -619,7 +623,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -668,7 +672,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%8B%BC%E6%AF%AB%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">小狼毫配置方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%B0%8F%E7%8B%BC%E6%AF%AB"><span class="nav-number">2.1.</span> <span class="nav-text">安装小狼毫</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E9%9B%BE%E5%87%87%E8%BE%93%E5%85%A5%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">安装雾凇输入法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E4%B8%AA%E6%80%A7%E5%8C%96%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.</span> <span class="nav-text">常用个性化配置</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AD%97%E4%BD%93"><span class="nav-number">2.3.1.</span> <span class="nav-text">字体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%80%99%E9%80%89%E8%AF%8D%E4%B8%AA%E6%95%B0"><span class="nav-number">2.3.2.</span> <span class="nav-text">候选词个数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E4%B8%BA%E8%8B%B1%E6%96%87%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.3.3.</span> <span class="nav-text">默认为英文格式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A6%81%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE-ctrl-96"><span class="nav-number">2.3.4.</span> <span class="nav-text">禁用快捷键 ctrl + &#96;</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%80%99%E9%80%89%E6%A1%86%E8%89%B2%E5%BD%A9%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.5.</span> <span class="nav-text">候选框色彩配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%90%8E%E7%9A%84%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="nav-number">2.3.6.</span> <span class="nav-text">配置后的效果展示</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%87%E8%B1%A1%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.4.</span> <span class="nav-text">万象模型</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%8B%BC%E6%AF%AB%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">小狼毫配置方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%B0%8F%E7%8B%BC%E6%AF%AB"><span class="nav-number">2.1.</span> <span class="nav-text">安装小狼毫</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E9%9B%BE%E5%87%87%E8%BE%93%E5%85%A5%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">安装雾凇输入法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E4%B8%AA%E6%80%A7%E5%8C%96%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.</span> <span class="nav-text">常用个性化配置</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AD%97%E4%BD%93"><span class="nav-number">2.3.1.</span> <span class="nav-text">字体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%80%99%E9%80%89%E8%AF%8D%E4%B8%AA%E6%95%B0"><span class="nav-number">2.3.2.</span> <span class="nav-text">候选词个数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E4%B8%BA%E8%8B%B1%E6%96%87%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.3.3.</span> <span class="nav-text">默认为英文格式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A6%81%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE-ctrl"><span class="nav-number">2.3.4.</span> <span class="nav-text">禁用快捷键 ctrl + &#96;</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%80%99%E9%80%89%E6%A1%86%E8%89%B2%E5%BD%A9%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.5.</span> <span class="nav-text">候选框色彩配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%90%8E%E7%9A%84%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA"><span class="nav-number">2.3.6.</span> <span class="nav-text">配置后的效果展示</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%87%E8%B1%A1%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.4.</span> <span class="nav-text">万象模型</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -688,7 +692,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2026</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
